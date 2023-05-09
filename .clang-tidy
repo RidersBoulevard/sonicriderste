@@ -1,0 +1,43 @@
+# Generated from CLion Inspection settings
+---
+Checks: '-*
+performance-*
+readability-*
+bugprone-*
+-bugprone-easily-swappable-parameters
+cert-err52-cpp
+cert-err60-cpp
+cert-err34-c
+cert-str34-c
+cert-dcl21-cpp
+cert-msc50-cpp
+cert-dcl50-cpp
+cert-msc51-cpp
+cert-dcl58-cpp
+cert-flp30-c
+cppcoreguidelines-*
+-cppcoreguidelines-non-private-member-variables-in-classes
+-cppcoreguidelines-explicit-virtual-functions
+-cppcoreguidelines-owning-memory
+-cppcoreguidelines-pro-type-union-access
+-cppcoreguidelines-pro-bounds-constant-array-index
+-cppcoreguidelines-c-copy-assignment-signature
+-cppcoreguidelines-avoid-magic-numbers
+-cppcoreguidelines-avoid-c-arrays
+google-readability-casting
+google-default-arguments
+google-global-names-in-headers
+google-runtime-operator
+google-explicit-constructor
+hicpp-multiway-paths-covered
+hicpp-exception-baseclass
+misc-*
+-misc-non-private-member-variables-in-classes
+modernize-*
+-modernize-use-trailing-return-type
+portability-*
+-portability-restrict-system-includes'
+FormatStyle:     google
+CheckOptions:
+  - key:             IgnorePowersOf2IntegerValues
+    value:           1

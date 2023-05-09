@@ -1,0 +1,104 @@
+#include "slipstream.hpp"
+#include "characters/gizoidreplication.hpp"
+#include "containers/vector3.hpp"
+
+void lbl_SlipstreamParticles(Player *player) {
+	u8 index = player->index;
+
+	PlayerWindParticles &particles = playerWindParticles[index];
+	particles.data[0x10] = 0x3F800000;
+	particles.data[0x11] = 0x3F800000;
+	particles.data[0x12] = 0x2;
+
+	Object *selectedObj = nullptr;
+	for(auto &object: getObjectList()) {
+		if(object.object_group == DashPadParticle) {
+			selectedObj = &object;
+			break;
+		}
+	}
+	if(selectedObj == nullptr) { return; }
+
+	for(; index > 0; index--) {
+		selectedObj = selectedObj->next;
+	}
+
+	if(selectedObj->object_group != DashPadParticle || selectedObj->state == 0x5 || selectedObj->state == 0x6) {
+		return;
+	}
+	selectedObj->state = 0x4;
+}
+
+void lbl_Slipstream(Player *player) { // NOLINT(readability-function-cognitive-complexity)
+	const u32 &gamemode = CurrentGameMode;
+	if(gamemode == FreeRace || gamemode == WorldGrandPrix || gamemode == StoryMode) {
+		player->slipstream = FALSE;
+		if(player->placement == 0 || player->state != Cruise) { return; }
+		vf32 speedGainAbove200 = 0.00262963F;
+		vf32 speedGainUnder200 = 0.001314815F;
+
+		for(auto &player2: players) {
+			if(player->index == player2.index) { continue; }
+			if(player->stageProgress > player2.stageProgress) { continue; }
+			if(player->otherPlayerDistance[player2.index] > 60000.0F) { continue; }
+
+			Vector3 rotation = {
+			        player2.verticalRotation,
+			        player2.horizontalRotation,
+			        player2.rotationRoll,
+			};
+
+			const Vector3 player2Forward = Vector3_GetForwardVectorForRidersRotation(rotation);
+
+			const Vector3 delta = {
+			        player->x - player2.x,
+			        player->y - player2.y,
+			        player->z - player2.z,
+			};
+
+			const Vector3 directionToSecond = Vector3_Normalize(delta);
+
+			const f32 angle = Vector3_CalculateAngle(player2Forward, directionToSecond);
+
+			rotation = {
+			        player->verticalRotation,
+			        player->horizontalRotation,
+			        player->rotationRoll,
+			};
+
+			const Vector3 playerForward = Vector3_GetForwardVectorForRidersRotation(rotation);
+
+			const f32 alignment = Vector3_CalculateAngle(playerForward, player2Forward);
+
+			if(angle > 0.3F || alignment > 0.35F) { continue; } // NOLINT(readability-magic-numbers)
+			player->slipstream = TRUE;
+
+			if(player->character == Emerl) {
+				GizoidReplicationInfo *grInfo = &PlayerGizoidReplication[player->index];
+				if(grInfo->slipstreamPlayer) {
+					if(player2.placement < grInfo->slipstreamPlayer->placement) {
+						grInfo->slipstreamPlayer = &player2;
+					}
+				} else {
+					grInfo->slipstreamPlayer = &player2;
+				}
+			}
+
+			lbl_SlipstreamParticles(player);
+
+			if(player->speed == 0.0F) { continue; }// if player's speed is 0
+			if(!(player->movementFlags & drifting) && (player->movementFlags & braking)) { continue; }
+			// if (player->speed > data[4]) // 200 speed
+			if(player->speed > player->gearStats[player->level].topSpeed) {
+				if(speedGainAbove200 <= 0.0F) { continue; } // zero
+				player->speed += speedGainAbove200;
+				//compound assignment with 'volatile'-qualified left operand is deprecated
+				speedGainAbove200 = speedGainAbove200 - 0.0006574075F;
+			} else {
+				if(speedGainUnder200 <= 0.0F) { continue; } // zero
+				player->speed += speedGainUnder200;
+				speedGainUnder200 = speedGainUnder200 - 0.0006574075F;
+			}
+		}
+	}
+}

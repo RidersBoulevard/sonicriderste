@@ -1,0 +1,40 @@
+# Compiler binaries
+tools/mwcc_compiler/
+
+# Build folders
+tools/build/
+build/
+
+# Python virtual enviroment
+venv/
+
+# VS code folder
+.vscode/
+
+.idea/
+
+# lol
+.DS_Store
+
+# Build artifacts
+*.dol
+*.rel
+*.elf
+*.plf
+*.o
+*.dep
+*.map
+
+# Tool binaries
+tools/elf2dol
+tools/elf2rel
+tools/lzss
+*.exe
+
+# Temporary files
+*.sw*
+*.dump
+__pycache__
+*.bat
+errors.txt
+output.asm

@@ -1,8 +1,9 @@
-#include "context.hpp"
+#include "riders/player.hpp"
+#include "riders/stage.hpp"
 
 ASMUsed void Player_ItemBoxCooldownHandler(Player *player) {
     u8 cooldown = 30;
-    BOOL toSetTimer = TRUE;
+    bool toSetTimer = TRUE;
     switch (CurrentStage) {
         case SegaIllusion:
             if (player->stage_subState == 2) {toSetTimer = FALSE;}

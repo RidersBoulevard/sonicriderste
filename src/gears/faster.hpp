@@ -1,5 +1,5 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/player.hpp"
 
-void Player_Faster(struct Player *player);
+void Player_Faster(Player *player);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/player.hpp"
 
 ASMUsed void Player_DreamTrailParticles(Player*);
 

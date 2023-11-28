@@ -1,8 +1,7 @@
-#include "context.hpp"
 #include "cosmetics/player/exloads.hpp"
 #include "filehandler_dat.hpp"
 
-global void* tex_HotswapTextures;
+ASMDefined void* tex_HotswapTextures;
 
 ASMUsed void* TextureHotswapHandler(Player *player, void* gvrTexture, u32 textureID) {
     void* customTexture = tex_HotswapTextures;

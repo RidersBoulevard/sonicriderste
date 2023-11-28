@@ -1,4 +1,4 @@
-.include "macros.inc"
+#include "macros.S"
 
 .section .rodata # 805BCE98 - 805D37C0
 
@@ -4206,7 +4206,7 @@ Characters:
     .4byte 0x0000014A
     .4byte 0x00000000
     .4byte 0x3F800000
-    .4byte 0x3D21391E
+    .4byte 0x00000000
     .4byte 0x03040500
     .4byte 0x03040400
     .4byte 0x02020200
@@ -4214,7 +4214,7 @@ Characters:
     .4byte 0x0202014D
     .4byte 0x00000000
     .4byte 0x3F8CCCCD
-    .4byte 0x3D21391E
+    .4byte 0x00000000
     .4byte 0x03040500
     .4byte 0x03040400
     .4byte 0x02020200
@@ -4230,7 +4230,7 @@ Characters:
     .4byte 0x02020045
     .4byte 0x00000000
     .4byte 0x3F99999A
-    .4byte 0x3CA1391E
+    .4byte 0x00000000
     .4byte 0x03040500
     .4byte 0x03040400
     .4byte 0x04040400
@@ -4238,7 +4238,7 @@ Characters:
     .4byte 0x01010143
     .4byte 0x01000000
     .4byte 0x3F4CCCCD
-    .4byte 0x3CA1391E
+    .4byte 0x00000000
     .4byte 0x02030400
     .4byte 0x03040400
     .4byte 0x03030300
@@ -4254,7 +4254,7 @@ Characters:
     .4byte 0x00000144
     .4byte 0x00000000
     .4byte 0x3F800000
-    .4byte 0x3CA1391E
+    .4byte 0x00000000
     .4byte 0x02030400
     .4byte 0x03040400
     .4byte 0x03030300
@@ -4270,7 +4270,7 @@ Characters:
     .4byte 0x01010030
     .4byte 0x00000000
     .4byte 0x3F800000
-    .4byte 0x3D21391E
+    .4byte 0x00000000
     .4byte 0x03040500
     .4byte 0x03040400
     .4byte 0x02020200
@@ -4294,7 +4294,7 @@ Characters:
     .4byte 0x0300005A
     .4byte 0x00000000
     .4byte 0x3F800000
-    .4byte 0x3DA1391E
+    .4byte 0x00000000
     .4byte 0x03040500
     .4byte 0x01020200
     .4byte 0x03030300
@@ -7034,8 +7034,8 @@ lbl_001C73B0:
 lbl_001C73B4:
     # 0x1C73B4
     .4byte 0xBF800000
-    .4byte 0x42700000
-    .single 60 # tails level 3 stun timer, counts by 0.5 per frame
+    .single 60 // tails, ulala, rouge level 3 stun timer in emerald chase and battle mode (increments by 0.5)
+    .single 60 // tails, ulala, rouge level 3 stun timer, counts by 0.5 per frame
     .4byte 0x40A00000
 .global lbl_001C73C4
 lbl_001C73C4:
@@ -8900,7 +8900,7 @@ lbl_001C8E98:
 .global lbl_001C8EE8
 lbl_001C8EE8:
     # 0x1C8EE8
-    .4byte 0x3B97B426
+    .4byte 0x3C17B426 # :/ 0x3B97B426 Old ball and chain speed reduction value
     .4byte 0x00000000
 .global lbl_001C8EF0
 lbl_001C8EF0:
@@ -12790,7 +12790,7 @@ lbl_001CC8E8:
     .4byte 0x00000000
     .4byte 0x00000000
     .4byte 0x43160000
-    .4byte 0x42F00000
+    .single 120 // Amy's level 3 flatten stun timer, counts up 1 per frame
     .4byte 0x00000000
     .4byte 0x3F000000
     .4byte 0x3CD67750
@@ -13991,7 +13991,7 @@ lbl_001CD898:
     .4byte 0xBF800000
     .4byte 0x3F800000
     .4byte 0x4622F983
-    .4byte 0x42340000
+    .single 45 // Jet Level 3 Twist Timer (increments by 0.5)
     .4byte 0x425C0000
     .4byte 0x43300000
     .4byte 0x80000000
@@ -14044,8 +14044,8 @@ lbl_001CD950:
     .4byte 0x43160000
     .4byte 0x43960000
     .4byte 0x00000000
-    .4byte 0x42700000
-    .4byte 0x42700000
+    .single 45 // Wave Level 3 Stun Timer in battle mode, emerald chase (increments by 0.5)
+    .single 45 // Wave Level 3 Stun Timer (increments by 0.5)
     .4byte 0x3F000000
     .4byte 0x41A00000
     .4byte 0x447A0000
@@ -20985,9 +20985,9 @@ lbl_001D37F8:
     .4byte 0x020A020B
     .4byte 0x020C020D
     .4byte 0x020E020F
-    .4byte 0x0210020A
+    .4byte 0x021002FE # eggman is 2fe, custom text
     .4byte 0x02120211
-    .4byte 0x020A020A
+    .4byte 0x020A020A # SS is also 0x020A, placeholder
     .4byte 0x022A022B
     .4byte 0x022E022C
     .4byte 0x022D0000
@@ -22197,8 +22197,8 @@ lbl_001D4770:
     .4byte 0x3FE66666
     .4byte 0x43300000
     .4byte 0x80000000
-    .4byte 0x43340000
-    .4byte 0x43960000
+    .single 180 // Opa Opa flatten stun timer in Emerald Chase and Battle Mode (counts up by 1)
+    .single 300 // Opa Opa flatten stun timer in all other modes (counts up by 1)
 .global lbl_001D47B0
 lbl_001D47B0:
     # 0x1D47B0
@@ -23081,8 +23081,8 @@ lbl_001D5354:
     # 0x1D5354
     .4byte 0x3F000000
     .4byte 0x43340000
-    .4byte 0x42DC0000
-    .4byte 0x41700000
+    .single 105 // Ulala's Level 3 Max Timer, involves the time for being in stun state (which increments by 0.5) and the time the character is left in dazed state (increments by 1!)
+    .single 15 // Ulala's Level 3 Shock Spinball Phase Timer (increments by 0.5)
     .4byte 0x3E3DA12F
     .4byte 0x447A0000
     .4byte 0x4852F000
@@ -26217,18 +26217,6 @@ data_C247798C:
     .long 0x1E7D41E6
     .long 0x41111111
 
-.global data_C2432E80_C2436B7C
-data_C2432E80_C2436B7C:
-    .long 0x1E1F201E
-    .long 0x1E201F20
-    .long 0x1F1F1E00
-    .long 0x1F200000
-
-    .long 0x25262725
-    .long 0x25272600
-    .long 0x26262500
-    .long 0x26272500
-
 .global data_C24DB384
 data_C24DB384:
     .single 0.3
@@ -26355,27 +26343,6 @@ SuperNeoMetalHUDColors:
     .long 0x1239B8FF
     .long 0x1239B8FF
     .long 0x1239B8FF
-
-.global EXLoadHUDColors
-EXLoadHUDColors:
-    .long 0x0 # dummy data
-    .long 0x471394ff # perfect nazo
-    .long 0xcf4731ff # e10r
-    .long 0x101010FF # dark sonic
-    .long 0xC0C0C0FF # hyper sonic
-    .long 0x0 # Stardust Speeder II
-    .long 0x0 # Hyper Hang-On
-    .long 0x0 # The Professional
-    .long 0x0 # Ollie King Gear
-    .long 0xD2C864FF # Windmaster Jet
-    .long 0x1239B8FF # neo metal sonic
-    .long 0x0 # E99
-    .long 0x0 # The Beast
-    .long 0x0 # e10b, UNUSED - it uses original colors
-    .long 0x00ffe5ff # hatsune miku
-    .long 0x0 # metal sonic scarf
-    .long 0x4a0015ff # reala
-    .long 0x210d00ff # gongon
 
 .global AllCharacterBoostColors
 AllCharacterBoostColors:
@@ -26849,189 +26816,6 @@ SuperFormBoostColors:
     .single 1
     .single 1
 
-.global EXLoadBoostColors
-EXLoadBoostColors:
-    # dummy data
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-
-    # perfect nazo
-    .single 0.2196078431372549
-    .single 0.0549019607843137
-    .single 0.4588235294117647
-    .single 1
-    .single 0
-    .long 0x3D888889
-    .single 1
-    .single 1
-
-    # e10r
-    .single 1
-    .single 0.345098
-    .single 0.133333
-    .single 1
-    .single 0.133333
-    .single 0.7843137254901961
-    .single 1
-    .single 1
-
-    # dark sonic
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-
-    # hyper sonic
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-
-    # Stardust Speeder II
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-
-    # Hyper Hang-On
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-
-    # The Professional
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-
-    # Ollie King Gear
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-
-    # Windmaster Jet
-    .4byte 0x3F800000
-    .4byte 0x3F6EEEEF
-    .4byte 0x00000000
-    .4byte 0x3F800000
-    .4byte 0x00000000
-    .4byte 0x3D888889
-    .4byte 0x3F800000
-    .4byte 0x3F800000
-
-    # neo metal sonic
-    .single 0.1215686274509804
-    .single 0.1490196078431373
-    .single 1
-    .single 1
-    .single 1
-    .single 0.9725490196078431
-    .single 0.1215686274509804
-    .single 1
-
-    # E99
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-
-    # The Beast
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-
-    # e10b, UNUSED - uses original character boost colors
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-
-    # hatsune miku
-    .single 0.2705882352941176
-    .single 1.0
-    .single 0.9254901960784314
-    .single 1
-    .single 1.0
-    .single 0.2705882352941176
-    .single 0.3450980392156863
-    .single 1
-
-
-    # metal sonic scarf
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-    .single -1
-
-    # reala
-    .single 0.8
-    .single 0.0
-    .single 0.0352941176470588
-    .single 1
-    .single 0.0
-    .single 0.8
-    .single 0.7647058823529412
-    .single 1
-
-    # gongon
-   .single 0.5294117647058824
-   .single 0.3490196078431373
-   .single 0.2745098039215686
-   .single 1
-   .single 0.2745098039215686
-   .single 0.4549019607843137
-   .single 0.5294117647058824
-   .single 1
-
 .global data_C24D08B0
 data_C24D08B0:
     .single 1.38889
@@ -27043,7 +26827,7 @@ CSS_CharacterPortraitID:
     .4byte 0xC2C8CBC1
     .4byte 0xC0C5C6C7
     .4byte 0xC3BCCABF
-    .4byte 0xBED5F7D7
+    .4byte 0xBED5D6D7
     .4byte 0xD8D9DAC6
 
 .global CSS_CharacterTextTextureID
@@ -27058,42 +26842,42 @@ CSS_CharacterTextTextureID:
 
 .global CSS_GearPortraitID
 CSS_GearPortraitID:
-    .4byte 0x8F909192
-    .4byte 0x93949596
-    .4byte 0x9798999A
-    .4byte 0x9B9C9D9E
-    .4byte 0x9FA0A1A2
-    .4byte 0xA3A4A5AB
-    .4byte 0xACADAEAF
-    .4byte 0xB0B1B2B3
-    .4byte 0xB4B5B6B7
-    .4byte 0xB8B9BABB
-    .4byte 0x86878889 # from here starts different default gear portraits
-    .4byte 0x8A8B8C8C
-    .4byte 0x8E8DCE8C
-    .4byte 0xA6A7AAA8
-    .4byte 0xA9E7E8E9
-    .4byte 0xEAEBECCE
+    .8byte 0x008F009000910092
+    .8byte 0x0093009400950096
+    .8byte 0x009700980099009A
+    .8byte 0x009B009C009D009E
+    .8byte 0x009F00A000A100A2
+    .8byte 0x00A300A400A500AB
+    .8byte 0x00AC00AD00AE00AF
+    .8byte 0x00B000B100B200B3
+    .8byte 0x00B400B500B600B7
+    .8byte 0x00B800B900BA00BB
+    .8byte 0x0086008700880089 # from here starts different default gear portraits
+    .8byte 0x008A008B008C0108 # eggman is 108
+    .8byte 0x008E008D00CE0086 # SS is 0086 to mimic blue star
+    .8byte 0x00A600A700AA00A8
+    .8byte 0x00A900E700E800E9
+    .8byte 0x00EA00EB00EC00CE
 
 .global CSS_GearTextTextureID
 CSS_GearTextTextureID:
     # 0x1D37BC
-    .4byte 0x090A0B0C
-    .4byte 0x0D0E0F10
-    .4byte 0x11121314
-    .4byte 0x15161718
-    .4byte 0x191A1B1C
-    .4byte 0x1D1E1F25
-    .4byte 0x26272829
-    .4byte 0x2A2B2C2D
-    .4byte 0x2E2F3031
-    .4byte 0x32333435
-    .4byte 0x00010203 # from here starts different default gear texts
-    .4byte 0x04050606
-    .4byte 0x08070606
-    .4byte 0x20212422
-    .4byte 0x23E1E2E3
-    .4byte 0xE4E5E606
+    .8byte 0x0009000A000B000C
+    .8byte 0x000D000E000F0010
+    .8byte 0x0011001200130014
+    .8byte 0x0015001600170018
+    .8byte 0x0019001A001B001C
+    .8byte 0x001D001E001F0025
+    .8byte 0x0026002700280029
+    .8byte 0x002A002B002C002D
+    .8byte 0x002E002F00300031
+    .8byte 0x0032003300340035
+    .8byte 0x0000000100020003 # from here starts different default gear texts
+    .8byte 0x0004000500060109 # eggman is 0109
+    .8byte 0x0008000700FB0000 # SS is 00 to mimic blue star
+    .8byte 0x0020002100240022
+    .8byte 0x002300E100E200E3
+    .8byte 0x00E400E500E60006
 
 .global CSS_CharacterHeightOnBoard
 CSS_CharacterHeightOnBoard:
@@ -27198,7 +26982,15 @@ data_C248E6C0:
 
 .global data_C248D9A0
 data_C248D9A0:
-    .single 10
+    .single 10 // super tails super form extra stun frames
+
+.global asm_ShockAttackStunFrames
+asm_ShockAttackStunFrames:
+    // all increment by 0.5 per frame
+    .single 65 // Tails stun frames
+    .single 45 // Rouge stun frames
+    .single 45 // Ulala stun frames
+
 
 .global data_C24C1DCC
 data_C24C1DCC:
@@ -27256,32 +27048,6 @@ RuleSettings_ArrowPositions:
 .global BoostArchetype_AccelBuff
 BoostArchetype_AccelBuff:
     .single 6
-
-.global CharacterPassingPlayerVoice
-CharacterPassingPlayerVoice:
-    .4byte 0xA9020500
-    .4byte 0xA9030500
-    .4byte 0xA9040500
-    .4byte 0xA9080500
-    .4byte 0xA9050500
-    .4byte 0xA9070500
-    .4byte 0xA9060500
-    .4byte 0xA90A0500
-    .4byte 0xA9090500
-    .4byte 0xA90E0500
-    .4byte 0xA90D0500
-    .4byte 0xA91E0500
-    .4byte 0xFFFFFFFF
-    .4byte 0xA91F0500
-    .4byte 0xA9200500
-    .4byte 0xFFFFFFFF
-    .4byte 0xFFFFFFFF
-    .4byte 0xA9330400 # silver
-    .4byte 0xA9340400 # metal sonic
-    .4byte 0xA9350400 # emerl
-    .4byte 0xA9360400 # blaze
-    .4byte 0xA9370400 # chaos
-    .4byte 0xA9380400 # tikal
 
 .global ExtraCharacterResultsScreenTextureBoundaries
 ExtraCharacterResultsScreenTextureBoundaries:
@@ -27495,7 +27261,7 @@ ExtraDefaultGearTextID:
 
 .global SplashCanyonLastFlyRouteAirGain
 SplashCanyonLastFlyRouteAirGain:
-    .single 0.5
+    .single 0.3 # OG: 0.5
 
 .global str_MSFX
 str_MSFX:
@@ -27510,3 +27276,197 @@ UlalaAssetsStructure:
     .4byte 0x00070004
     .4byte 0x000F0004
     .4byte 0x00030000
+
+.global PerfectNazoAuraParticles
+PerfectNazoAuraParticles:
+    # 0x1EFF98
+    .4byte 0x07030033
+    .4byte 0x0001B3B0
+    .4byte 0x3F19999A
+    .4byte 0x3F800000
+    .4byte 0x00000000
+    .4byte 0x00060005
+    .4byte 0x00000000
+    .4byte 0x3CCCCCCD
+    .4byte 0x3D4CCCCD
+    .4byte 0x398D8EC9
+    .4byte 0x000F0003
+    .4byte 0x430F0000
+    .4byte 0x00000000
+    .4byte 0x437F0000
+    .4byte 0x41A00000
+    .4byte 0x430F0000
+    .4byte 0x00000000
+    .4byte 0x437F0000
+    .4byte 0x00000000
+    .4byte 0x3CA3D70A
+    .4byte 0x3CA3D70A
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x461C4000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x80000000
+    .4byte 0x3E4CCCCD
+    .4byte 0x00000000
+    .4byte 0x3ECCCCCD
+    .4byte 0x3DCCCCCD
+    .4byte 0x3DCCCCCD
+    .4byte 0x00000000
+    .4byte 0x3F800000
+    .4byte 0x00000000
+    .4byte 0x000F0000
+
+.global DarkSonicAuraParticles
+DarkSonicAuraParticles:
+    # 0x1EFF98
+    .4byte 0x07030033
+    .4byte 0x0001B3B0
+    .4byte 0x3F19999A
+    .4byte 0x3F800000
+    .4byte 0x00000000
+    .4byte 0x00060005
+    .4byte 0x00000000
+    .4byte 0x3CCCCCCD
+    .4byte 0x3D4CCCCD
+    .4byte 0x398D8EC9
+    .4byte 0x000F0003
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x42000000
+    .4byte 0x42FE0000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x42000000
+    .4byte 0x42FE0000
+    .4byte 0x3CA3D70A
+    .4byte 0x3CA3D70A
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x461C4000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x80000000
+    .4byte 0x3E4CCCCD
+    .4byte 0x00000000
+    .4byte 0x3ECCCCCD
+    .4byte 0x3DCCCCCD
+    .4byte 0x3DCCCCCD
+    .4byte 0x00000000
+    .4byte 0x3F800000
+    .4byte 0x00000000
+    .4byte 0x000F0000
+
+.global HyperSonicAuraParticles
+HyperSonicAuraParticles:
+    # 0x1EFF98
+    .4byte 0x07030053
+    .4byte 0x0000B3B0
+    .4byte 0x3E800000
+    .4byte 0x3E800000
+    .4byte 0x00000000
+    .4byte 0x00060005
+    .4byte 0x00000000
+    .4byte 0x3CCCCCCD
+    .4byte 0x3D4CCCCD
+    .4byte 0x398D8EC9
+    .4byte 0x000F0003
+    .4byte 0x437F0000
+    .4byte 0x437F0000
+    .4byte 0x437F0000
+    .4byte 0x43480000
+    .4byte 0x43700000
+    .4byte 0x43600000
+    .4byte 0x436B0000
+    .4byte 0x00000000
+    .4byte 0x3CA3D70A
+    .4byte 0x3CA3D70A
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x461C4000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x80000000
+    .4byte 0x3E4CCCCD
+    .4byte 0x00000000
+    .4byte 0x3ECCCCCD
+    .4byte 0x3DCCCCCD
+    .4byte 0x3DCCCCCD
+    .4byte 0x00000000
+    .4byte 0x3F800000
+    .4byte 0x00000000
+    .4byte 0x000F0000
+
+.global SuperKnucklesAuraParticles
+SuperKnucklesAuraParticles:
+    # 0x1EFF98
+    .4byte 0x07030033
+    .4byte 0x0001B3B0
+    .4byte 0x3F19999A
+    .4byte 0x3F800000
+    .4byte 0x00000000
+    .4byte 0x00060005
+    .4byte 0x00000000
+    .4byte 0x3CCCCCCD
+    .4byte 0x3D4CCCCD
+    .4byte 0x398D8EC9
+    .4byte 0x000F0003
+    .4byte 0x437F0000
+    .4byte 0x43600000
+    .4byte 0x437D0000
+    .4byte 0x41A00000
+    .4byte 0x437F0000
+    .4byte 0x43600000
+    .4byte 0x437D0000
+    .4byte 0x00000000
+    .4byte 0x3CA3D70A
+    .4byte 0x3CA3D70A
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x461C4000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x80000000
+    .4byte 0x3E4CCCCD
+    .4byte 0x00000000
+    .4byte 0x3ECCCCCD
+    .4byte 0x3DCCCCCD
+    .4byte 0x3DCCCCCD
+    .4byte 0x00000000
+    .4byte 0x3F800000
+    .4byte 0x00000000
+    .4byte 0x000F0000
+
+.global asm_MikuFlattenTimer
+asm_MikuFlattenTimer:
+    .single 180 // increments by 1
+
+.global asm_SuperShadowAttackRange
+asm_SuperShadowAttackRange:
+    .single 3 // lvl 1
+    .single 3 // lvl 2
+    .single 3 // lvl 3

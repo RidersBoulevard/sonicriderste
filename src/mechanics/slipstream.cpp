@@ -1,17 +1,22 @@
 #include "slipstream.hpp"
 #include "characters/gizoidreplication.hpp"
 #include "containers/vector3.hpp"
+#include "riders/gamemode.hpp"
+#include "riders/object.hpp"
 
-void lbl_SlipstreamParticles(Player *player) {
-	u8 index = player->index;
-
+/**
+ * Enables slipstream particles for a given player.
+ *
+ * @param index The player index to enable particles for.
+ */
+void lbl_SlipstreamParticles(u8 index) {
 	PlayerWindParticles &particles = playerWindParticles[index];
 	particles.data[0x10] = 0x3F800000;
 	particles.data[0x11] = 0x3F800000;
 	particles.data[0x12] = 0x2;
 
-	Object *selectedObj = nullptr;
-	for(auto &object: getObjectList()) {
+	ObjectNode *selectedObj = nullptr;
+	for(auto &object : getObjectList()) {
 		if(object.object_group == DashPadParticle) {
 			selectedObj = &object;
 			break;
@@ -29,36 +34,39 @@ void lbl_SlipstreamParticles(Player *player) {
 	selectedObj->state = 0x4;
 }
 
+/**
+ * Handles all of slipstream's mechanics for a given player.
+ *
+ * @param player The player to apply slipstream mechanics to.
+ */
 void lbl_Slipstream(Player *player) { // NOLINT(readability-function-cognitive-complexity)
-	const u32 &gamemode = CurrentGameMode;
+	const u32 gamemode = CurrentGameMode;
 	if(gamemode == FreeRace || gamemode == WorldGrandPrix || gamemode == StoryMode) {
 		player->slipstream = FALSE;
-		if(player->placement == 0 || player->state != Cruise) { return; }
-		vf32 speedGainAbove200 = 0.00262963F;
-		vf32 speedGainUnder200 = 0.001314815F;
+		if(player->placement == 0 || player->state != Cruise || player->statusEffectFlags.hasAny(BallAndChainStatus)) { return; }
 
 		for(auto &player2: players) {
 			if(player->index == player2.index) { continue; }
 			if(player->stageProgress > player2.stageProgress) { continue; }
 			if(player->otherPlayerDistance[player2.index] > 60000.0F) { continue; }
 
-			Vector3 rotation = {
+			Vector3F rotation = {
 			        player2.verticalRotation,
 			        player2.horizontalRotation,
 			        player2.rotationRoll,
 			};
 
-			const Vector3 player2Forward = Vector3_GetForwardVectorForRidersRotation(rotation);
+			const Vector3F player2Forward = rotation.getForwardVectorForRidersRotation();
 
-			const Vector3 delta = {
+			const Vector3F delta = {
 			        player->x - player2.x,
 			        player->y - player2.y,
 			        player->z - player2.z,
 			};
 
-			const Vector3 directionToSecond = Vector3_Normalize(delta);
+			const Vector3F directionToSecond = delta.normalized();
 
-			const f32 angle = Vector3_CalculateAngle(player2Forward, directionToSecond);
+			const f32 angle = player2Forward.calculateAngle(directionToSecond);
 
 			rotation = {
 			        player->verticalRotation,
@@ -66,16 +74,16 @@ void lbl_Slipstream(Player *player) { // NOLINT(readability-function-cognitive-c
 			        player->rotationRoll,
 			};
 
-			const Vector3 playerForward = Vector3_GetForwardVectorForRidersRotation(rotation);
+			const Vector3F playerForward = rotation.getForwardVectorForRidersRotation();
 
-			const f32 alignment = Vector3_CalculateAngle(playerForward, player2Forward);
+			const f32 alignment = playerForward.calculateAngle(player2Forward);
 
 			if(angle > 0.3F || alignment > 0.35F) { continue; } // NOLINT(readability-magic-numbers)
 			player->slipstream = TRUE;
 
 			if(player->character == Emerl) {
 				GizoidReplicationInfo *grInfo = &PlayerGizoidReplication[player->index];
-				if(grInfo->slipstreamPlayer) {
+				if(grInfo->slipstreamPlayer != nullptr) {
 					if(player2.placement < grInfo->slipstreamPlayer->placement) {
 						grInfo->slipstreamPlayer = &player2;
 					}
@@ -84,19 +92,29 @@ void lbl_Slipstream(Player *player) { // NOLINT(readability-function-cognitive-c
 				}
 			}
 
-			lbl_SlipstreamParticles(player);
+			lbl_SlipstreamParticles(player->index);
 
 			if(player->speed == 0.0F) { continue; }// if player's speed is 0
-			if(!(player->movementFlags & drifting) && (player->movementFlags & braking)) { continue; }
+			if(!player->movementFlags.hasAny(drifting) && player->movementFlags.hasAny(braking)) { continue; }
 			// if (player->speed > data[4]) // 200 speed
+			vf32 speedGainAbove200 = 0.00262963F;   // Todo: Are these two supposed to be set by something?
+			vf32 speedGainUnder200 = 0.001314815F;
 			if(player->speed > player->gearStats[player->level].topSpeed) {
-				if(speedGainAbove200 <= 0.0F) { continue; } // zero
-				player->speed += speedGainAbove200;
+				if(speedGainAbove200 <= 0.0F) { continue; } // zero // Always false
+				//if (player->characterArchetype == Windcatcher) {
+				//	player->speed += speedGainAbove200 * 1.1F;
+				//} else {
+					player->speed += speedGainAbove200;
+				//}
 				//compound assignment with 'volatile'-qualified left operand is deprecated
 				speedGainAbove200 = speedGainAbove200 - 0.0006574075F;
 			} else {
-				if(speedGainUnder200 <= 0.0F) { continue; } // zero
-				player->speed += speedGainUnder200;
+				if(speedGainUnder200 <= 0.0F) { continue; } // zero // Always false
+				//if (player->characterArchetype == Windcatcher) {
+				//	player->speed += speedGainUnder200 * 1.1F;
+				//} else {
+					player->speed += speedGainUnder200;
+				//}
 				speedGainUnder200 = speedGainUnder200 - 0.0006574075F;
 			}
 		}

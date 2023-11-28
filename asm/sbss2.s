@@ -1,4 +1,4 @@
-.include "macros.inc"
+#include "macros.S"
 
 .section .sbss2, "", @nobits # 0x80125E00 - 0x8021CFA4
 

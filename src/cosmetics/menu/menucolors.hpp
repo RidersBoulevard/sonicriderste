@@ -1,10 +1,9 @@
 #pragma once
 
-#include "context.hpp"
 #include "containers/graphicalobject.hpp"
 
 struct MainMenuObject1 {
-    char filler[0xE];
+	fillerData<0xE> filler;
     u8 colorPreset;
 };
 

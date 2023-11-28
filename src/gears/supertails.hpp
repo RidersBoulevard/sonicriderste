@@ -1,9 +1,9 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/player.hpp"
 
-global void lbl_0008CC74(u32);
-global void SNDF_SeqIdStop(u32);
-global void lbl_Player_BoostEndFunction(Player*);
+ASMDefined void lbl_0008CC74(u32);
+ASMDefined void SNDF_SeqIdStop(u32);
+ASMDefined void lbl_Player_BoostEndFunction(Player*);
 
 void Player_SuperTailsTransformation(Player &player);

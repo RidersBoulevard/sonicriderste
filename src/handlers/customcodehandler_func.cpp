@@ -1,9 +1,13 @@
 #include "customcodehandler_func.hpp"
+#include "files/filehandler_dat.hpp"
+#include "lib/stdlib.hpp"
+#include "main.hpp"
 #include "music/custom_music.hpp"
 #include "player/SetPlayerState.hpp"
-#include "files/filehandler_dat.hpp"
+#include "riders/gamemode.hpp"
+#include "riders/stage.hpp"
 
-void* CustomCodehandler_Retrieve(u32 input) {
+const void* CustomCodehandler_Retrieve(u32 input) {
     switch (input) {
         case CCH_PlayerPtr:
             return players.data();
@@ -16,15 +20,15 @@ void* CustomCodehandler_Retrieve(u32 input) {
         case CCH_RandFunction:
             return reinterpret_cast<void *>(&lbl_RNG_Number);
         case CCH_InGamePlayerCount:
-            return &InGamePlayerCount;
+            return (const void *) &InGamePlayerCount; // Todo: Figure out what C++ cast is needed to do this
         case CCH_RuleSettings:
-            return &RuleSettings;
+            return (const void *) &RuleSettings; // Todo: Figure out what C++ cast is needed to do this
         case CCH_CurrentStage:
-            return &CurrentStage;
+            return (const void *) &CurrentStage; // Todo: Figure out what C++ cast is needed to do this
         case CCH_CurrentGameMode:
-            return &CurrentGameMode;
+            return (const void *) &CurrentGameMode; // Todo: Figure out what C++ cast is needed to do this
         case CCH_IsGamePausedFlag:
-            return &gu32Game_PauseFlag;
+            return (const void *) &gu32Game_PauseFlag; // Todo: Figure out what C++ cast is needed to do this
         case CCH_CharacterHUDColorPtr:
             return &AllCharacterHUDColors;
         case CCH_DumpFileFunction:

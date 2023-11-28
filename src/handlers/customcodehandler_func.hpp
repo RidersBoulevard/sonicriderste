@@ -1,12 +1,10 @@
 #pragma once
 
-#include "context.hpp"
 #include "containers/rgba.hpp"
-
 
 extern RGBA AllCharacterHUDColors[];
 
-void* CustomCodehandler_Retrieve(u32 input);
+const void* CustomCodehandler_Retrieve(u32 input);
 
 enum CustomCodehandlerValues {
 	CCH_PlayerPtr,

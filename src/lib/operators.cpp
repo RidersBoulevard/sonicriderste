@@ -1,28 +1,46 @@
-#include <cstddef>
-#include "context.hpp"
+#include "stdlib.hpp"
+#include "types.hpp"
 
-void *operator new(size_t n) {
-	// new operator overload
-	return gNp_MallocHi(4, n);
+// new operator overload
+void *operator new(size_t size) {
+	void* ptr = aligned_malloc(4, size);
+	if(ptr == nullptr) { throw std::bad_alloc(); }
+	return ptr;
 }
 
-void operator delete(void *p) {
-	free_Hi(p);
+// new operator overload
+void *operator new(size_t count, std::align_val_t al = std::align_val_t { 4 }) {
+	void* ptr = aligned_malloc(static_cast<size_t>(al), count);
+	if(ptr == nullptr) { throw std::bad_alloc(); }
+	return ptr;
 }
 
-void operator delete(void *p, unsigned int) {
-	free_Hi(p);
+void operator delete(void *ptr) noexcept{
+	nnFree(ptr);
 }
 
-void *operator new[](size_t n) {
-	// new[] operator overload
-	return aligned_calloc(4, n);
+void operator delete(void *ptr, unsigned int) noexcept{
+	nnFree(ptr);
 }
 
-void operator delete[](void *p) {
-	nnFree(p); // Todo: check if this is the correct free
+// new[] operator overload
+void *operator new[](size_t size) {
+	void* ptr = aligned_malloc(4, size);
+	if(ptr == nullptr) { throw std::bad_alloc(); }
+	return ptr;
 }
 
-void operator delete[](void *p, unsigned int) {
-	nnFree(p); // Todo: check if this is the correct free
+// new[] operator overload
+void *operator new[](size_t size, std::align_val_t al = std::align_val_t { 4 }) {
+	void* ptr = aligned_malloc(static_cast<size_t>(al), size);
+	if(ptr == nullptr) { throw std::bad_alloc(); }
+	return ptr;
+}
+
+void operator delete[](void *ptr) noexcept{
+	nnFree(ptr);
+}
+
+void operator delete[](void *ptr, unsigned int) noexcept{
+	nnFree(ptr);
 }

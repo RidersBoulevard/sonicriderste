@@ -3,17 +3,17 @@
 #include "tweaks/player/archetype/character_archetype.hpp"
 #include "lib/sound.hpp"
 
-struct HHOInfo PlayerHHOInfo[8];
+HHOInfo PlayerHHOInfo[8];
 
 const f32 HHOBoostControlSpeedsBoostArchetype[4] = {pSpeed(230.0f), pSpeed(260.0f), pSpeed(275.0f), pSpeed(290.0f)};
 const f32 HHOBoostControlSpeeds[4] = {pSpeed(225.0f), pSpeed(255.0f), pSpeed(270.0f), pSpeed(285.0f)};
 const f32 HHO_BoostSpeeds[4] = {pSpeed(220.0f), pSpeed(250.0f), pSpeed(265.0f), pSpeed(270.0f)};
 
-void Player_HyperHangOn(struct Player *player) {
+void Player_HyperHangOn(Player *player) {
     u8 controllerPort = player->input->port;
-    struct EnabledEXLoads exLoads; 
+    EnabledEXLoads exLoads;
     FetchEnabledEXLoadIDs(player, &exLoads);
-    struct HHOInfo *hhoInfo = &PlayerHHOInfo[player->index];
+    HHOInfo *hhoInfo = &PlayerHHOInfo[player->index];
     if (exLoads.gearExLoadID != HyperHangOnEXLoad) return;
 
     if (player->state == StartLine)

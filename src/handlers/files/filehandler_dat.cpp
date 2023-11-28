@@ -1,18 +1,13 @@
 #include "filehandler_dat.hpp"
 
-void LoadDATFileDynamic(const char filename[]) {
-    DATFile dat{};
-	DATSpecs* datfile = DumpFile(filename, 1);
+ASMUsed void LoadDATFileDynamic(const char filename[]) {
+	DATSpecs *datfile = DumpFile(filename, 1);
+	DATFile dat{filename, datfile->spec1, datfile->spec2};
+	delete datfile;
 
-    strcpy(dat.file, filename);
-    dat.spec1 = datfile->spec1;
-    dat.spec2 = datfile->spec2;
-    dat.soundFileID = nullptr;
-    nnFree(datfile);
-
-    LoadCustomDATFile(&dat);
+	LoadCustomDATFile(dat);
 }
 
 ASMUsed void DATFileHandler() {
-    LoadDATFileDynamic("SFX.DAT");
+	LoadDATFileDynamic("SFX.DAT");
 }

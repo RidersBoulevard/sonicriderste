@@ -1,33 +1,23 @@
 #include "flyhoopdash.hpp"
-#include "lib/sound.hpp"
 #include "cosmetics/player/exloads.hpp"
+#include "lib/sound.hpp"
+#include "lib/stdlib.hpp"
 
-PlayerFlyHoopDashProperties playerFlyHoopDashProperties[8];
+std::array<PlayerFlyHoopDashProperties, MaxPlayerCount> playerFlyHoopDashProperties;
 
-constexpr s32 FlyHoopDashInitialCosts[3] = {
-		// 40000, 45000, 50000
-		30000, 35000, 40000
-};
-
-constexpr f32 FlyHoopDashAirLoss[3] = {
-		-333.3f, -416.6f, -500.0f
-};
-
-constexpr s32 FlyHoopDashAirLossRingGear = 30;
-
-ASMUsed void Player_SetFlyHoopProperties(Player *player){
+ASMUsed void Player_SetFlyHoopProperties(Player *player) {
 	PlayerFlyHoopDashProperties *properties = &playerFlyHoopDashProperties[player->index];
 
 	properties->canUse = TRUE;
 	properties->duration = 0;
 }
 
-void Player_FlyHoopDashHandler(Player *player){
-	EnabledEXLoads exLoads;
-	FetchEnabledEXLoadIDs(player, exLoads);
+void Player_FlyHoopDashHandler(Player *player) {
+	const EnabledEXLoads exLoads = FetchEnabledEXLoadIDs(*player);
 	PlayerFlyHoopDashProperties *properties = &playerFlyHoopDashProperties[player->index];
 
-	if (player->state == StartLine || player->state != Fly) {
+	// player->state == StartLine is redundant here, should this be `&&`?
+	if(player->state == StartLine || player->state != Fly) {
 		properties->duration = 0;
 		properties->gainDelay = 0.0f;
 		properties->hasUsed = FALSE;
@@ -99,15 +89,10 @@ void Player_FlyHoopDashHandler(Player *player){
 	// }
 }
 
-ASMUsed void Player_FlyHoopDashAttack(Player *attackingPlayer, Player *attackedPlayer){
-	if(!(attackedPlayer->specialFlags & ringGear) &&
-	   ((attackedPlayer->state == Fly) & (attackingPlayer->state == Fly) & (attackingPlayer->flyHoopDash))){
+ASMUsed void Player_FlyHoopDashAttack(Player *attackingPlayer, Player *attackedPlayer) {
+	if(!attackedPlayer->specialFlags.hasAny(ringGear) && attackedPlayer->state == Fly && attackingPlayer->state == Fly && attackingPlayer->flyHoopDash != 0) {
 		Player_RingLossVisualsSFX(attackedPlayer);
 		RingLoss_OnAttack(attackedPlayer);
 		attackedPlayer->changeInAir_gain -= 30000;
 	}
-}
-
-ASMUsed void ClearData_HoopDash(){
-	TRK_memset(&playerFlyHoopDashProperties, 0, sizeof(PlayerFlyHoopDashProperties));
 }

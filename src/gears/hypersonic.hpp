@@ -1,6 +1,6 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/player.hpp"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 struct HyperSonicInfo {
@@ -14,9 +14,9 @@ struct HyperSonicInfo {
 };
 #pragma GCC diagnostic pop
 
-extern HyperSonicInfo PlayerHyperSonicInfo[8];
+extern std::array<HyperSonicInfo, MaxPlayerCount> PlayerHyperSonicInfo;
 
-global {
+ASMDefined {
 void func_Particle_Task();
 extern void *gpsTexList_Particle;
 extern void *lbl_001D8F58;
@@ -29,4 +29,8 @@ void Player_HyperSonicTotalLinkCalc(Player *player);
 void Player_HyperSonicRingStream(Player *player);
 
 void Player_HyperdriveHandler(Player *player);
+
+void Player_ZGSuperSonic(Player *player);
+
+void Player_Excalibur(Player *player);
 }

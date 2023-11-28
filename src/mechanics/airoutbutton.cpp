@@ -1,44 +1,46 @@
 #include "airoutbutton.hpp"
 #include "handlers/menu/debugmenu/debugmenu.hpp"
+#include "cosmetics/player/exloads.hpp"
+#include "gears/hypersonic.hpp"
+#include "gears/blastGaugeGears.hpp"
 
-#define CHEATCODE_LBUTTONSTART 1
-#define CHEATCODE_RBUTTONSTART 2
-#define CHEATCODE_NONEBUTTONSTART 0
+constexpr auto CHEATCODE_LBUTTONSTART = 1;
+constexpr auto CHEATCODE_RBUTTONSTART = 2;
+constexpr auto CHEATCODE_NONEBUTTONSTART = 0;
 
-struct CheatCodeInput PlayerAirOutCheatCode[8];
+std::array<CheatCodeInput, MaxPlayerCount> PlayerAirOutCheatCode;
 
-inline void CheatCodeAdvanceState(struct CheatCodeInput *cheatCodeInfo) {
-    cheatCodeInfo->buttonCount += 1;
-    cheatCodeInfo->delayFrames = 30;
+inline void CheatCodeAdvanceState(CheatCodeInput *cheatCodeInfo) {
+	cheatCodeInfo->buttonCount += 1;
+	cheatCodeInfo->delayFrames = 30;
 }
 
-inline void CheatCodeDetermineStartingButton(struct Player *player, struct CheatCodeInput *cheatCodeInfo) {
-    if (cheatCodeInfo->startingButton != CHEATCODE_NONEBUTTONSTART) return;
+void CheatCodeDetermineStartingButton(Player *player, CheatCodeInput *cheatCodeInfo) {
+	if(cheatCodeInfo->startingButton != CHEATCODE_NONEBUTTONSTART) return;
 
-    u8 startingButton = CHEATCODE_NONEBUTTONSTART;
+	u8 startingButton = CHEATCODE_NONEBUTTONSTART;
 
-    if (player->input->toggleFaceButtons & LButton) {
-        startingButton = CHEATCODE_LBUTTONSTART;
-    }
-    else if (player->input->toggleFaceButtons & RButton) {
-        startingButton = CHEATCODE_RBUTTONSTART;
-    }
+	if(player->input->toggleFaceButtons & LButton) {
+		startingButton = CHEATCODE_LBUTTONSTART;
+	} else if(player->input->toggleFaceButtons & RButton) {
+		startingButton = CHEATCODE_RBUTTONSTART;
+	}
 
-    if (startingButton != CHEATCODE_NONEBUTTONSTART) {
-        cheatCodeInfo->startingButton = startingButton;
-        CheatCodeAdvanceState(cheatCodeInfo);
-    }
+	if(startingButton != CHEATCODE_NONEBUTTONSTART) {
+		cheatCodeInfo->startingButton = startingButton;
+		CheatCodeAdvanceState(cheatCodeInfo);
+	}
 }
 
 /*
-void Player_AirOutButton(struct Player *player) {
+void Player_AirOutButton(Player *player) {
     // L + R + any of the 3 face buttons in quick succession
 
     if (!DebugMenu_CheckOption(ExtremeDetach)) return;
     if (player->flags & InAPit || player->state == QTE || player->state == RailGrind || player->state == Fly) return;
     if (player->extremeGear == AdvantageS || player->extremeGear == Beginner) return;
 
-    struct CheatCodeInput *cheatCodeInfo = &PlayerAirOutCheatCode[player->index];
+    CheatCodeInput *cheatCodeInfo = &PlayerAirOutCheatCode[player->index];
 
     if (cheatCodeInfo->delayFrames > 0) {
         cheatCodeInfo->delayFrames -= 1;
@@ -81,16 +83,26 @@ void Player_AirOutButton(struct Player *player) {
 }
 */
 
-void Player_AirOutButton(struct Player *player) {
-    // L or R + Z + C stick up
+void Player_AirOutButton(Player *player) {
+	// L or R + Z + C stick up
+    BlastGaugeInfo *bgInfo = &PlayerBlastGaugeInfo[player->index];
+    HyperSonicInfo *hsInfo = &PlayerHyperSonicInfo[player->index];
+	if(!DebugMenu_CheckOption(DebugMenuOptions::ExtremeDetach)) { return; }
+	if(player->flags.hasAny(InAPit) ||
+	   player->state == QTE ||
+	   player->state == RailGrind ||
+	   player->state == Fly) {
+		return;
+	}
+	if(player->extremeGear == ExtremeGear::AdvantageS ||
+	   player->extremeGear == ExtremeGear::Beginner ||
+       (player->character == SuperSonic && FetchEnabledEXLoadIDs(*player).gearExLoadID == HyperSonicEXLoad 
+       && hsInfo->hyperdriveEnabled)) {
+		return;
+	}
 
-    if (!DebugMenu_CheckOption(ExtremeDetach)) return;
-    if (player->flags & InAPit || player->state == QTE || player->state == RailGrind || player->state == Fly) return;
-    if (player->extremeGear == AdvantageS || player->extremeGear == Beginner) return;
-
-    u32 holdButtons = player->input->holdFaceButtons;
-
-    if ((holdButtons & (LButton | RButton)) && (holdButtons & ZButton) && (player->input->rightStickVertical > 80)) {
-        player->currentAir = 0;
-    }
+	const auto &holdButtons = player->input->holdFaceButtons;
+	if(holdButtons.hasAny(LButton, RButton) && holdButtons.hasAny(ZButton) && player->input->rightStickVertical > 80) {
+		player->currentAir = 0;
+	}
 }

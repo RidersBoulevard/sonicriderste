@@ -1,13 +1,13 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/player.hpp"
 
-global void *lbl_1000DFE4; // pointer to character model data
+ASMDefined void *lbl_1000DFE4; // pointer to character model data
 
 void HyperSonic_RainbowLighting(Player *player);
 
 struct Lighting {
-	char filler[0x14];
+fillerData<0x14> filler;
 	f32 red1;
 	f32 green1;
 	f32 blue1;

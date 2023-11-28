@@ -1,14 +1,18 @@
-#include "context.hpp"
 #include "lib/lib.hpp"
+#include "riders/object.hpp"
+#include "riders/stage.hpp"
 
 struct StageIconObject1 {
-    char filler[0x8];
+	fillerData<0x8> filler;
     u32 state;
 };
 
-global void* lbl_10087ECC[2];
+ASMDefined std::array<void*, 2> lbl_10087ECC;
 
-ASMUsed void StageIconInCSS(struct Object *object, struct StageIconObject1 *object1) {
+/**
+ * Draws a stage icon texture in the bottom right corner when in character selection screen.
+ */
+ASMUsed void StageIconInCSS(ObjectNode *object, StageIconObject1 *object1) {
     u32 textureID = 0x1, stage = CurrentStage, row, column;
     HUDStruct hud{};
 

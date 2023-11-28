@@ -1,238 +1,237 @@
 #include "debugmenu.hpp"
-#include "lib/sound.hpp"
+#include "handlers/ingame/customtext.hpp"
 #include "handlers/music/custom_music.hpp"
 #include "lib/lib.hpp"
-#include "handlers/ingame/customtext.hpp"
+#include "lib/sound.hpp"
 
-#define SFX_MENUSCROLL 0xA9000000
-#define SFX_MENUCONFIRM 0xA9000100
-#define SFX_MENUBACK 0xA9000200
+constexpr auto HISTORY_MEGACOLLECTION_ID = 15;
 
-#define HISTORY_MEGACOLLECTION_ID 15
-
-#define DISABLEMUSIC_OPTIONCOUNT 2
-#define MAGNETICIMPULSE_OPTIONCOUNT 2
-#define AUTOPILOT_OPTIONCOUNT 2
-#define EXTREMEDETACH_OPTIONCOUNT 2
-#define TORNADOIGNORE_OPTIONCOUNT 2
-#define TIMERACTIVITY_OPTIONCOUNT 5
+constexpr auto DISABLEMUSIC_OPTIONCOUNT = 2;
+constexpr auto MAGNETICIMPULSE_OPTIONCOUNT = 2;
+constexpr auto AUTOPILOT_OPTIONCOUNT = 2;
+constexpr auto EXTREMEDETACH_OPTIONCOUNT = 2;
+constexpr auto TORNADOIGNORE_OPTIONCOUNT = 2;
+constexpr auto TIMERACTIVITY_OPTIONCOUNT = 5;
+constexpr auto DISABLEHUD_OPTIONCOUNT = 3;
+constexpr auto INFINITEAIR_OPTIONCOUNT = 2;
+constexpr auto INFINITERINGS_OPTIONCOUNT = 2;
+constexpr auto MAXMI_OPTIONCOUNT = 2;
 
 extern u32 lbl_001F1D80[];
 
-u8 DebugMenu_DisableMusicOptions[DISABLEMUSIC_OPTIONCOUNT] = {DisableMusic, 0xFF};
-u8 DebugMenu_MagneticImpulseOptions[MAGNETICIMPULSE_OPTIONCOUNT] = {MagneticImpulse, 0xFF};
-u8 DebugMenu_AutoPilotOptions[AUTOPILOT_OPTIONCOUNT] = {Autopilot, 0xFF};
-u8 DebugMenu_ExtremeDetachOptions[EXTREMEDETACH_OPTIONCOUNT] = {ExtremeDetach, 0xFF};
-u8 DebugMenu_TornadoIgnoreOptions[TORNADOIGNORE_OPTIONCOUNT] = {TornadoIgnore, 0xFF};
-u8 DebugMenu_TimerActivityOptions[TIMERACTIVITY_OPTIONCOUNT] = {
-TimerActivity_ActiveInSingleplayer,
-TimerActivity_ActiveIn1v1,
-TimerActivity_ActiveIn1v1Middle,
-TimerActivity_ActiveIn3OrMorePlayers,
-0xFF
-};
+std::array<u8, DISABLEMUSIC_OPTIONCOUNT> DebugMenu_DisableMusicOptions = {DebugMenuOptions::DisableMusic, 0xFF};
+std::array<u8, MAGNETICIMPULSE_OPTIONCOUNT> DebugMenu_MagneticImpulseOptions = {DebugMenuOptions::MagneticImpulse, 0xFF};
+std::array<u8, AUTOPILOT_OPTIONCOUNT> DebugMenu_AutoPilotOptions = {DebugMenuOptions::Autopilot, 0xFF};
+std::array<u8, EXTREMEDETACH_OPTIONCOUNT> DebugMenu_ExtremeDetachOptions = {DebugMenuOptions::ExtremeDetach, 0xFF};
+std::array<u8, TORNADOIGNORE_OPTIONCOUNT> DebugMenu_TornadoIgnoreOptions = {DebugMenuOptions::TornadoIgnore, 0xFF};
+std::array<u8, TIMERACTIVITY_OPTIONCOUNT> DebugMenu_TimerActivityOptions = {
+		DebugMenuOptions::TimerActivity_ActiveInSingleplayer,
+		DebugMenuOptions::TimerActivity_ActiveIn1v1,
+		DebugMenuOptions::TimerActivity_ActiveIn1v1Middle,
+		DebugMenuOptions::TimerActivity_ActiveIn3OrMorePlayers,
+		0xFF};
+std::array<u8, DISABLEHUD_OPTIONCOUNT> DebugMenu_DisableHUDOptions = {DebugMenuOptions::DisableHUDPartial, DebugMenuOptions::DisableHUDFull, 0xFF};
+std::array<u8, INFINITEAIR_OPTIONCOUNT> DebugMenu_InfiniteAirOptions = {DebugMenuOptions::InfiniteAir, 0xFF};
+std::array<u8, INFINITERINGS_OPTIONCOUNT> DebugMenu_InfiniteRingsOptions = {DebugMenuOptions::InfiniteRings, 0xFF};
+std::array<u8, MAXMI_OPTIONCOUNT> DebugMenu_MaxMIOptions = {DebugMenuOptions::AlwaysMaxMI, 0xFF};
 
 Text2dFileData DebugMenu_TextData;
 DebugMenuData DebugMenu_Data = {
-    0,
-    0,
-    0,
-    0,
-
-    {
-            {DISABLEMUSIC_OPTIONCOUNT, DebugMenu_DisableMusicOptions},
-            {MAGNETICIMPULSE_OPTIONCOUNT, DebugMenu_MagneticImpulseOptions},
-            {AUTOPILOT_OPTIONCOUNT, DebugMenu_AutoPilotOptions},
-            {EXTREMEDETACH_OPTIONCOUNT, DebugMenu_ExtremeDetachOptions},
-            {TORNADOIGNORE_OPTIONCOUNT, DebugMenu_TornadoIgnoreOptions},
-            {TIMERACTIVITY_OPTIONCOUNT, DebugMenu_TimerActivityOptions}
-        },
-    0
-};
+		{
+				DebugMenu_DisableMusicOptions,
+				DebugMenu_MagneticImpulseOptions,
+				DebugMenu_AutoPilotOptions,
+				DebugMenu_ExtremeDetachOptions,
+				DebugMenu_TornadoIgnoreOptions,
+				DebugMenu_TimerActivityOptions,
+				DebugMenu_DisableHUDOptions,
+				DebugMenu_InfiniteAirOptions,
+				DebugMenu_InfiniteRingsOptions,
+				DebugMenu_MaxMIOptions
+		}};
 
 bool DebugMenu_CheckOption(u32 option) {
-    return (DebugMenu_Data.toggledPageOptions & 1 << option) ? TRUE : FALSE;
+	return (DebugMenu_Data.toggledPageOptions & 1 << option) != 0;
 }
 
-void DebugMenu_ToggleOption(DebugOptions *options) {
-    DebugMenu_Data.toggledPageOptions ^= 1 << options->options[0];
+void DebugMenu_ToggleOption(std::span<u8> options) {
+	if(options.empty()) { return; }
+	DebugMenu_Data.toggledPageOptions ^= 1 << options[0];
 }
 
-void DebugMenu_ToggleOptionSet(DebugOptions *options, u32 direction) {
-    s32 toggledOptionIndex = -1;
-    u32 i;
+void DebugMenu_ToggleOptionSet(std::span<u8> options, u32 direction) {
+	s32 toggledOptionIndex = -1;
 
-    for (i = 0; i < options->optionCount - 1; i++) {
-        if (DebugMenu_CheckOption(options->options[i])) {
-            toggledOptionIndex = i;
-        }
+	for(auto i = 0U; i < options.size() - 1; i++) {
+		if(DebugMenu_CheckOption(options[i])) {
+			toggledOptionIndex = static_cast<s32>(i);
+		}
 
-        DebugMenu_Data.toggledPageOptions &= ~(1 << options->options[i]);
-    }
+		DebugMenu_Data.toggledPageOptions &= ~(1 << options[i]);
+	}
 
-    if (toggledOptionIndex != -1) {
-        if (direction == 1) {
-            // user pressed right
-            toggledOptionIndex += 1;
-            if (toggledOptionIndex >= options->optionCount)
-                toggledOptionIndex = 0;
-        } else {
-            // user pressed left
-            toggledOptionIndex -= 1;
-            if (toggledOptionIndex < 0)
-                toggledOptionIndex = -1;
-        }
-    } else {
-        if (direction == 1) {
-            // user pressed right whilst being on OFF
-            toggledOptionIndex = 0;
-        } else {
-            // user pressed left whilst being on OFF
-            toggledOptionIndex = options->optionCount - 2;
-        }
-    }
+	if(toggledOptionIndex != -1) {
+		if(direction == 1) {
+			// user pressed right
+			toggledOptionIndex += 1;
+			if(static_cast<u32>(toggledOptionIndex) >= options.size()) {
+				toggledOptionIndex = 0;
+			}
+		} else {
+			// user pressed left
+			toggledOptionIndex -= 1;
+			if(toggledOptionIndex < 0) {
+				toggledOptionIndex = -1;
+			}
+		}
+	} else {
+		if(direction == 1) {
+			// user pressed right whilst being on OFF
+			toggledOptionIndex = 0;
+		} else {
+			// user pressed left whilst being on OFF
+			toggledOptionIndex = static_cast<s32>(options.size() - 2);
+		}
+	}
 
-    if (toggledOptionIndex != -1) {
-        DebugMenu_Data.toggledPageOptions |= 1 << options->options[toggledOptionIndex];
-    }
+	if(toggledOptionIndex != -1) {
+		DebugMenu_Data.toggledPageOptions |= 1 << options[static_cast<u32>(toggledOptionIndex)];
+	}
 }
 
-void DebugMenu_HandleAllToggles(DebugOptions *options, u32 direction) {
-    if (options->optionCount == 2) {
-        // simple on/off toggle
-        DebugMenu_ToggleOption(options);
-    } else {
-        // more toggles than on/off
-        DebugMenu_ToggleOptionSet(options, direction);
-    }
+void DebugMenu_HandleAllToggles(std::span<u8> options, u32 direction) {
+	if(options.size() == 2) {
+		// simple on/off toggle
+		DebugMenu_ToggleOption(options);
+	} else {
+		// more toggles than on/off
+		DebugMenu_ToggleOptionSet(options, direction);
+	}
 }
 
-u32 DebugMenu_FetchTextIDAllToggles(DebugOptions *options) {
-    u32 textID;
-    s32 currentOption;
+u32 DebugMenu_FetchTextIDAllToggles(std::span<u8> options) {
+	u32 textID;
 
-    if (options->optionCount == 2) {
-        // simple on/off toggle
-        textID = DebugMenu_CheckOption(options->options[0]);
-    } else {
-        // more toggles than on/off
-        currentOption = DebugMenu_FetchOptionFromOptionSet(options);
-        if (currentOption == -1) textID = 0;
-        else {
-            textID = DebugMenu_FetchTextID(currentOption);
-        }
-    }
+	if(options.size() == 2) {
+		// simple on/off toggle
+		textID = DebugMenu_CheckOption(options[0]) ? 1 : 0;
+	} else {
+		// more toggles than on/off
+		const auto currentOption = DebugMenu_FetchOptionFromOptionSet(options);
+		if(currentOption.has_value()) {
+			textID = DebugMenu_FetchTextID(*currentOption);
+		} else {
+			textID = 0;
+		}
+	}
 
-    return textID;
+	return textID;
 }
 
-s32 DebugMenu_FetchOptionFromOptionSet(DebugOptions *options) {
-    u32 i;
-    s32 option = -1;
+std::optional<u8> DebugMenu_FetchOptionFromOptionSet(std::span<u8> options) {
+	for(const auto &option: options) {
+		if(DebugMenu_CheckOption(option)) {
+			return option;
+		}
+	}
 
-    for (i = 0; i < options->optionCount - 1; i++) {
-        if (DebugMenu_CheckOption(options->options[i])) {
-            option = options->options[i];
-            break;
-        }
-    }
-
-    return option;
+	return std::nullopt;
 }
 
 u32 DebugMenu_FetchTextID(u32 option) {
-    switch (option) {
-        case TimerActivity_ActiveInSingleplayer:
-            return 2;
-        case TimerActivity_ActiveIn1v1:
-            return 3;
-        case TimerActivity_ActiveIn1v1Middle:
-            return 4;
-        case TimerActivity_ActiveIn3OrMorePlayers:
-            return 5;
-        default:
-            return 0;
-    }
+	switch(option) {
+		case DebugMenuOptions::TimerActivity_ActiveInSingleplayer:
+			return 2;
+		case DebugMenuOptions::TimerActivity_ActiveIn1v1:
+			return 3;
+		case DebugMenuOptions::TimerActivity_ActiveIn1v1Middle:
+			return 4;
+		case DebugMenuOptions::TimerActivity_ActiveIn3OrMorePlayers:
+			return 5;
+        case DebugMenuOptions::DisableHUDPartial:
+            return 6;
+        case DebugMenuOptions::DisableHUDFull:
+            return 7;
+		default:
+			return 0;
+	}
 }
 
-void DebugMenu_RenderDescription() {
-    void *textTexture = gpasTexList_SubFont;
-    u32 x, xDiff, textCoords;
-
-    // render description in menu
-    textCoords = CenterText(540, 0, lbl_001F1D80[6], &gasSubFont->textDataHeader);
-    xDiff = textCoords >> 17;
-    x = 320 - xDiff;
-    RenderText(x, 374, ~0U, 540, 0, lbl_001F1D80[6], &gasSubFont->textDataHeader, textTexture, -100.0f);
+ASMUsed void DebugMenu_RenderDescription() {
+	// render description in menu
+	const auto textCoords = CenterText(540, 0, lbl_001F1D80[6], &gasSubFont[0].textDataHeader);
+	const auto xDiff = textCoords >> 17;
+	const auto x = 320 - xDiff;
+	RenderText(static_cast<s32>(x), 374, ~0U, 540, 0, lbl_001F1D80[6], &gasSubFont[0].textDataHeader, gpasTexList_SubFont.unk0, -100.0f);
 }
 
-inline void DebugMenu_HandleInputs(struct AllPlayerInputs *inputs, DebugMenuData *debugMenu) {
-    u32 selectedItemRow;
+void DebugMenu_HandleInputs(AllPlayerInputs *inputs, DebugMenuData *debugMenu) {
+	if(inputs->toggleButtons.hasAny(LStickDown | DPadDown)) {
+		PlayAudioFromDAT(Sound::VSFX::MenuScroll);
 
-    if (inputs->toggleButtons & (LStickDown | DPadDown)) {
-        PlayAudioFromDAT(SFX_MENUSCROLL);
+		u32 selectedItemRow = debugMenu->selectedItemRow + 1;
+		if(selectedItemRow >= debugMenu->maximumItems)
+			selectedItemRow = 0;
 
-        selectedItemRow = debugMenu->selectedItemRow + 1;
-        if (selectedItemRow >= debugMenu->maximumItems)
-            selectedItemRow = 0;
+		debugMenu->selectedItemRow = selectedItemRow;
+	}
 
-        debugMenu->selectedItemRow = selectedItemRow;
-    }
+	if(inputs->toggleButtons.hasAny(LStickUp, DPadUp)) {
+		PlayAudioFromDAT(Sound::VSFX::MenuScroll);
 
-    if (inputs->toggleButtons & (LStickUp | DPadUp)) {
-        PlayAudioFromDAT(SFX_MENUSCROLL);
+		if(debugMenu->selectedItemRow > 0) {
+			debugMenu->selectedItemRow -= 1;
+		} else {
+			debugMenu->selectedItemRow = debugMenu->maximumItems - 1;
+		}
+	}
 
-        if (debugMenu->selectedItemRow > 0) debugMenu->selectedItemRow -= 1;
-        else debugMenu->selectedItemRow = debugMenu->maximumItems - 1;
-    }
+	if(inputs->toggleButtons.hasAny(AButton, LStickRight, DPadRight)) {
+		const std::span<u8> options = debugMenu->page1Options[debugMenu->selectedItemRow];
+		PlayAudioFromDAT(Sound::VSFX::MenuConfirm);
 
-    if (inputs->toggleButtons & (AButton | LStickRight | DPadRight)) {
-        DebugOptions options = debugMenu->page1Options[debugMenu->selectedItemRow];
-        PlayAudioFromDAT(SFX_MENUCONFIRM);
+		DebugMenu_HandleAllToggles(options, 1);
+	} else if(inputs->toggleButtons.hasAny(LStickLeft, DPadLeft)) {
+		auto options = debugMenu->page1Options[debugMenu->selectedItemRow];
+		PlayAudioFromDAT(Sound::VSFX::MenuConfirm);
 
-        DebugMenu_HandleAllToggles(&options, 1);
-    } else if (inputs->toggleButtons & (LStickLeft | DPadLeft)) {
-        DebugOptions options = debugMenu->page1Options[debugMenu->selectedItemRow];
-        PlayAudioFromDAT(SFX_MENUCONFIRM);
-
-        DebugMenu_HandleAllToggles(&options, 0);
-    }
+		DebugMenu_HandleAllToggles(options, 0);
+	}
 }
 
-void DebugMenu_Handler(struct Object *object, struct AllPlayerInputs *inputs) {
-    auto *header = static_cast<struct Text2dFileHeader*>(DebugMenu_TextData.textData[0]);
-    DebugMenuData *debugMenu = &DebugMenu_Data;
+ASMUsed void DebugMenu_Handler(ObjectNode *object, AllPlayerInputs *inputs) {
+	auto *header = static_cast<Text2dFileHeader *>(DebugMenu_TextData.textData[0]);
 
-    switch (debugMenu->state) {
-        case 0:
-            debugMenu->selectedItemRow = 0;
-            debugMenu->selectedItemColumn = 0;
-            debugMenu->maximumItems = header->textCount;
-            debugMenu->state += 1;
+	switch(DebugMenu_Data.state) {
+		case 0:
+			DebugMenu_Data.selectedItemRow = 0;
+			DebugMenu_Data.selectedItemColumn = 0;
+			DebugMenu_Data.maximumItems = header->textCount;
+			DebugMenu_Data.state += 1;
 
-            if (bss_CustomMusicID != HISTORY_MEGACOLLECTION_ID) {
-                PlayADX(gpasAdxtHandle_Bgm, menuMusic[HISTORY_MEGACOLLECTION_ID]);
-            }
+			if(bss_CustomMusicID != HISTORY_MEGACOLLECTION_ID) {
+				PlayADX(gpasAdxtHandle_Bgm, menuMusic[HISTORY_MEGACOLLECTION_ID]);
+			}
 
-            break;
-        case 1:
-            if (inputs->toggleButtons & BButton) {
-                auto *object1 = static_cast<struct TitleSequenceObject1*>(object->object);
-                PlayAudioFromDAT(SFX_MENUBACK);
-                object->state = 0x20;
-                object1->currentButtonIndex = 0x6;
-                debugMenu->state = 0;
+			break;
+		case 1:
+			if(inputs->toggleButtons.hasAny(BButton)) {
+				auto *object1 = static_cast<TitleSequenceObject1 *>(object->object);
+				PlayAudioFromDAT(Sound::VSFX::MenuBack);
+				object->state = 0x20;
+				object1->currentButtonIndex = 0x6;
+				DebugMenu_Data.state = 0;
 
-                if (bss_CustomMusicID < MENU_MUSIC_COUNT) {
-                    PlayADX(gpasAdxtHandle_Bgm, menuMusic[bss_CustomMusicID]);
-                } else {
-                    PlayADX(gpasAdxtHandle_Bgm, lbl_001E99BC[19]);
-                }
-                return;
-            }
+				if(bss_CustomMusicID < MENU_MUSIC_COUNT) {
+					PlayADX(gpasAdxtHandle_Bgm, menuMusic[bss_CustomMusicID]);
+				} else {
+					PlayADX(gpasAdxtHandle_Bgm, lbl_001E99BC[19]);
+				}
+				return;
+			}
 
-            DebugMenu_HandleInputs(inputs, debugMenu);
+			DebugMenu_HandleInputs(inputs, &DebugMenu_Data);
 
-            break;
-    }
+			break;
+	}
 }

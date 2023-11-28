@@ -1,6 +1,6 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/player.hpp"
 
 struct CheatCodeInput {
     u8 buttonCount; // keeps incrementing to a certain point until it reaches the desired button count, where it then triggers
@@ -8,4 +8,4 @@ struct CheatCodeInput {
     u16 delayFrames; // how many frames you have in between button presses to successfully perform cheat code
 };
 
-void Player_AirOutButton(struct Player *player);
+void Player_AirOutButton(Player *player);

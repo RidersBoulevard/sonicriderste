@@ -5,32 +5,18 @@
 #include "customcodehandler.hpp"
 #include "menu/debugmenu/debugmenu.hpp"
 #include "menu/debugmenu/debugmenu_handlers.hpp"
-#include "macros.hpp"
+
+#define DEBUG_TESTING false && DEBUG
+
+#if DEBUG_TESTING
+#include <debug.h>
+ASMDefined void __exception_init();
+#endif
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "readability-magic-numbers"
 #pragma ide diagnostic ignored "readability-implicit-bool-conversion"
-global [[noreturn]] void _prolog() {
-	//struct lbl_001D78C8 *struct1;
-	//struct1 = &lbl_001D78C8;
-
-    /*
-	u32 *customCodehandlerHookAddress = reinterpret_cast<u32 *>(0x80001f88);
-	u32 offset = reinterpret_cast<u32>(&CustomCodehandlerHook) - reinterpret_cast<u32>(customCodehandlerHookAddress);
-	*customCodehandlerHookAddress = (offset & 0x03FFFFFC) | 0x48000001;
-
-	asm(" clrlwi r4, %[HookAddr], 0x10\n"
-		" rlwinm r3, %[HookAddr], 0, 0, 0xF\n"
-		" dcbf r3, r4\n"
-		" sync\n"
-		" icbi r3, r4\n"
-		" isync"
-			:
-			: [HookAddr] "r"(customCodehandlerHookAddress)
-			: "r3", "r4");
-     */
-
-	DebugMenu_Data.toggledPageOptions = DEBUGMENU_DEFAULTPAGE1OPTIONS;
+ASMUsed [[noreturn]] void _prolog() {
 
 	const u32 tick = OSGetTick();
 	srand(tick);
@@ -48,61 +34,23 @@ global [[noreturn]] void _prolog() {
 	nnInitLight();
 	InitLight(0);
 
+	gaNnViewRotInvertMtx.fill(0);
+
 	gaNnViewRotInvertMtx[10] = 0x3F800000;
 	gaNnViewRotInvertMtx[5] = 0x3F800000;
 	gaNnViewRotInvertMtx[0] = 0x3F800000;
-
-	gaNnViewRotInvertMtx[11] = 0;
-	gaNnViewRotInvertMtx[9] = 0;
-	gaNnViewRotInvertMtx[8] = 0;
-	gaNnViewRotInvertMtx[7] = 0;
-	gaNnViewRotInvertMtx[6] = 0;
-	gaNnViewRotInvertMtx[4] = 0;
-	gaNnViewRotInvertMtx[3] = 0;
-	gaNnViewRotInvertMtx[2] = 0;
-	gaNnViewRotInvertMtx[1] = 0;
 
 	gaNnViewRotInvertMtx[22] = 0x3F800000;
 	gaNnViewRotInvertMtx[17] = 0x3F800000;
 	gaNnViewRotInvertMtx[12] = 0x3F800000;
 
-	gaNnViewRotInvertMtx[23] = 0;
-	gaNnViewRotInvertMtx[21] = 0;
-	gaNnViewRotInvertMtx[20] = 0;
-	gaNnViewRotInvertMtx[19] = 0;
-	gaNnViewRotInvertMtx[18] = 0;
-	gaNnViewRotInvertMtx[16] = 0;
-	gaNnViewRotInvertMtx[15] = 0;
-	gaNnViewRotInvertMtx[14] = 0;
-	gaNnViewRotInvertMtx[13] = 0;
-
 	gaNnViewRotInvertMtx[34] = 0x3F800000;
 	gaNnViewRotInvertMtx[29] = 0x3F800000;
 	gaNnViewRotInvertMtx[24] = 0x3F800000;
 
-	gaNnViewRotInvertMtx[35] = 0;
-	gaNnViewRotInvertMtx[33] = 0;
-	gaNnViewRotInvertMtx[32] = 0;
-	gaNnViewRotInvertMtx[31] = 0;
-	gaNnViewRotInvertMtx[30] = 0;
-	gaNnViewRotInvertMtx[28] = 0;
-	gaNnViewRotInvertMtx[27] = 0;
-	gaNnViewRotInvertMtx[26] = 0;
-	gaNnViewRotInvertMtx[25] = 0;
-
 	gaNnViewRotInvertMtx[46] = 0x3F800000;
 	gaNnViewRotInvertMtx[41] = 0x3F800000;
 	gaNnViewRotInvertMtx[36] = 0x3F800000;
-
-	gaNnViewRotInvertMtx[47] = 0;
-	gaNnViewRotInvertMtx[45] = 0;
-	gaNnViewRotInvertMtx[44] = 0;
-	gaNnViewRotInvertMtx[43] = 0;
-	gaNnViewRotInvertMtx[42] = 0;
-	gaNnViewRotInvertMtx[40] = 0;
-	gaNnViewRotInvertMtx[39] = 0;
-	gaNnViewRotInvertMtx[38] = 0;
-	gaNnViewRotInvertMtx[37] = 0;
 
 	std::array<u32,4> struct3{
 		(&lbl_001D78C8)->int1,
@@ -118,13 +66,19 @@ global [[noreturn]] void _prolog() {
 	lbl_800645A8(&lbl_100066C0, (&lbl_001D78C8)->f1, (&lbl_001D78C8)->f2, (&lbl_001D78C8)->f3, (&lbl_001D78C8)->f1,
 				 (&lbl_001D78C8)->f5, (&lbl_001D78C8)->f6);
 	lbl_80006778();
-	SetTask(&TitleSequence_Task, 2, 2);
+	SetTask(&TitleSequence_Task, ObjectGroups::TitleSequence, 2);
+
+#if DEBUG_TESTING
+	__exception_init();
+	DEBUG_Init(GDBSTUB_DEVICE_USB, 1); //0x802ca720
+	_break();
+#endif
 
 	const u32 boob = 0xB00B;
 	for(;;) {
 		lbl_80006778();
 		lbl_0004F404();
-		gNp_TaskDone(CurrentStage, players.data(), playerCameraStruct.data());
+		gNp_TaskDone();
 		if (!lbl_8021BB84) {
 			lbl_0014C080();
 		}
@@ -134,7 +88,8 @@ global [[noreturn]] void _prolog() {
 		lbl_000375B4();
 		ReadAsyncReadFileData(1);
 		CustomCodehandler::InvokeInjectedCodes();
-		DebugMenuHandler_DisableMusic();lbl_8021BB68 += 1;
+		DebugMenuHandler_DisableMusic();
+		lbl_8021BB68 += 1;
 	}
 }
 #pragma clang diagnostic pop

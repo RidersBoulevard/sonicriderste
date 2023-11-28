@@ -48,7 +48,7 @@
  *
  */
 
-#include "macros.hpp"
+#include "macros.h"
 
 #define ASMHELPER_ALLOCSTACKFRAME \
 "stwu r1, -0x90 (r1)\n"\

@@ -1,12 +1,14 @@
 #include "timerhandler.hpp"
 #include "cosmetics/player/exloads.hpp"
 #include "gears/hyperhangon.hpp"
-#include "mechanics/magneticimpulse.hpp"
 #include "lib/sound.hpp"
+#include "mechanics/magneticimpulse.hpp"
 
 void Player_TimerHandler(Player &player) {
+    EnabledEXLoads exLoads;
+	FetchEnabledEXLoadIDs(&player, exLoads);
     // decrement item box cooldown timer
-    if (player.flags & ItemBoxCooldownFlag) {
+    if (player.flags.hasAny(ItemBoxCooldownFlag)) {
         if (player.itemBox_cooldown != 0) {
             player.itemBox_cooldown -= 1;
         } else {
@@ -23,7 +25,7 @@ void Player_TimerHandler(Player &player) {
     if (player.tornadoInvulnerabilityTimer != 0) {
         if (player.tornadoInvulnerabilityTimer == 1) {
             player.statusEffectFlags &= ~InvincibilityStatus;
-        } else if (!(player.statusEffectFlags & InvincibilityStatus)) {
+        } else if (!player.statusEffectFlags.hasAny(InvincibilityStatus)) {
             player.statusEffectFlags |= InvincibilityStatus;
         }
         
@@ -42,13 +44,20 @@ void Player_TimerHandler(Player &player) {
     }
 
     // decrement hang on max rings timer and set max rings
-    if (player.extremeGear == HangOn) {
+    if (player.extremeGear == ExtremeGear::HangOn) {
         if (player.hangOn_infiniteRingTimer > 0) { //  && player->state != AttackingPlayer
             if (player.state != AttackingPlayer) {
                 player.hangOn_infiniteRingTimer -= 1;
-                if(player.hangOn_infiniteRingTimer >= 179) PlayAudioFromDAT(Sound::SFX::GoldExp);
+                if(player.hangOn_infiniteRingTimer >= 179) {
+					PlayAudioFromDAT(Sound::SFX::GoldExp);
+				}
             }
-            player.currentAir = player.gearStats[player.level].maxAir;
+            if (exLoads.gearExLoadID == HangOnATEXLoad) {
+                player.rings = 100;
+                player.currentAir += 750;
+            } else {
+				player.currentAir = player.gearStats[player.level].maxAir;
+			}
         }
     }
 
@@ -59,18 +68,20 @@ void Player_TimerHandler(Player &player) {
         }
     }
 
-	EnabledEXLoads exLoads;
-	FetchEnabledEXLoadIDs(&player, exLoads);
+	// EnabledEXLoads exLoads;
+	// FetchEnabledEXLoadIDs(&player, exLoads);
     if (exLoads.gearExLoadID == HyperSonicEXLoad) {
-        if (player.hyperSonic_totalLinkTimer > 0 && ((player.state == Cruise) || (player.state == Run)) && !(player.movementFlags & boosting)) { // && !(player->movementFlags & boosting)
+        if (player.hyperSonic_totalLinkTimer > 0 && ((player.state == Cruise) || (player.state == Run)) && !player.movementFlags.hasAny(boosting)) { // && !(player->movementFlags & boosting)
             player.hyperSonic_totalLinkTimer -= 1;
         }
-        if (player.hyperSonic_totalLinkTimer == 1 && (!((player.state == Cruise) || (player.state == Run)) || (player.movementFlags & boosting))) {
+        if (player.hyperSonic_totalLinkTimer == 1 && ((player.state != Cruise && player.state != Run) || player.movementFlags.hasAny(boosting))) {
             player.hyperSonic_totalLinkTimer = 0;
         }
     }
 
-    if (magneticImpulseData[player.index].afterburnerTimer > 0) magneticImpulseData[player.index].afterburnerTimer -= 1;
+    if (MI::impulseData[player.index].afterburnerTimer > 0) {
+		MI::impulseData[player.index].afterburnerTimer -= 1;
+	}
 
 	//HHOInfo *hhoInfo = &PlayerHHOInfo[player.index];
     // if (exLoads.gearExLoadID == HyperHangOnEXLoad) {
@@ -83,4 +94,9 @@ void Player_TimerHandler(Player &player) {
     //         }
     //     }
     // }
+
+    if (player.specialReciproExtend && player.reciproExtendTimer >= 60) {
+        // reset special recipro extend if you lose original recipro extend
+        player.specialReciproExtend = false;
+    }
 }

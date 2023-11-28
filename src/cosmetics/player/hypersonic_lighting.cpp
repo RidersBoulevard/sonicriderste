@@ -1,7 +1,7 @@
 #include "hypersonic_lighting.hpp"
 #include "exloads.hpp"
 
-HyperSonic_ColorState HyperSonic_ColorState[8];
+std::array<HyperSonic_ColorState, MaxPlayerCount> HyperSonic_ColorState;
 
 
 inline RGBModule TransitionColorValues(RGBModule *fromValues, RGBModule *toValues) {
@@ -22,20 +22,19 @@ void HyperSonic_RainbowLighting(Player *player) {
 	void **temp = static_cast<void **>(generallightingptr);
 	auto *lighting =  static_cast<Lighting *>(*temp);
 	RGBModule originalValues{}, toValues{}, finalValues;
-	u8 index = player->index;
-	EnabledEXLoads exLoads{};
-	FetchEnabledEXLoadIDs(player, exLoads);
+	const u8 &index = player->index;
+	const EnabledEXLoads exLoads = FetchEnabledEXLoadIDs(*player);
 
-	if (exLoads.gearExLoadID != HyperSonicEXLoad) return;
+	if (exLoads.gearExLoadID != HyperSonicEXLoad) { return; }
 
-	if (!player->hyperSonic_status) {
+	if (!player->hyperSonicInit) {
 		lighting->red1 = 0.5647058823529412f;
 		//lighting->red2 = 1;
 		lighting->green1 = 0;
 		//lighting->green2 = 0;
 		lighting->blue1 = 1;
 		//lighting->blue2 = 0;
-		player->hyperSonic_status = 1;
+		player->hyperSonicInit = 1;
 		HyperSonic_ColorState[index].state = 0;
 		HyperSonic_ColorState[index].transitionFrames = 0;
 	}

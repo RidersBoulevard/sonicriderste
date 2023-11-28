@@ -2,488 +2,330 @@
 
 #include "initgeardata.hpp"
 #include "cosmetics/player/exloads.hpp"
+#include "gears/berserker.hpp"
 #include "gears/supers.hpp"
+#include "handlers/files/separatemodelloading.hpp"
+#include "lib/stdlib.hpp"
+#include "mechanics/characters/gizoidreplication.hpp"
+#include "mechanics/dash/flyhoopdash.hpp"
+#include "mechanics/magneticimpulse.hpp"
+#include "riders/gamemode.hpp"
 
-inline f32 CustomBoostSpeeds(Player *player, f32 boostSpeed, s32 level) {
-	if (player->extremeGear == LightBoard) {
-		switch (player->characterArchetype) {
+inline f32 CustomBoostSpeeds(const Player &player, const f32 &boostSpeed, const u32 &level) {
+	f32 newBoostSpeed = boostSpeed;
+	if(player.extremeGear == ExtremeGear::LightBoard) {
+		switch(player.characterArchetype) {
 			case CombatArchetype:
-				boostSpeed += pSpeed(2);
+				newBoostSpeed += pSpeed(2);
 				break;
 			case LateBooster:
 			case NoTypeArchetype:
-				boostSpeed += pSpeed(5);
+				newBoostSpeed += pSpeed(5);
 				break;
+			default: break;
 		}
 	} else {
-		if (player->extremeGear == ChaosEmerald) {
-			switch (player->character) {
+		if(player.extremeGear == ExtremeGear::ChaosEmerald) {
+			switch(player.character) {
 				case Tails:
-					boostSpeed = pSpeed(200);
+					newBoostSpeed = pSpeed(200);
 					break;
 				case Knuckles:
-					boostSpeed = pSpeed(250);
+					newBoostSpeed = pSpeed(250);
 					break;
 				case Shadow:
-					boostSpeed = pSpeed(300);
+					newBoostSpeed = pSpeed(300);
 					break;
 				case MetalSonic:
-					boostSpeed = pSpeed(235);
+					newBoostSpeed = pSpeed(235);
 					break;
+				default: break;
 			}
 		}
 	}
 
-	if (player->characterArchetype == BoostArchetype) {
-		boostSpeed += BoostArchetypeBoostSpeeds[level];
+	if(player.characterArchetype == BoostArchetype) {
+		newBoostSpeed += BoostArchetypeBoostSpeeds[level];
 	}
-	return boostSpeed;
+	return newBoostSpeed;
 }
 
-inline f32 CustomTopSpeeds(Player *player, f32 topSpeed, s32 level) {
+inline f32 CustomTopSpeeds(const Player &player, const f32 &topSpeed, const u32 &level) {
 	// this top speed is additive, usually adds on top of 162 speed
-	if (player->character == Emerl) {
-		topSpeed += EmerlTopSpeedBonus[level];
-	} else {
-		if (player->extremeGear == ChaosEmerald) {
-			switch (player->character) {
-				case Tails:
-					topSpeed = pSpeed(45);
-					break;
-				case Knuckles:
-					topSpeed = pSpeed(37);
-					break;
-				case Shadow:
-					topSpeed = pSpeed(55);
-					break;
-				case MetalSonic:
-					topSpeed = pSpeed(38);
-					break;
-			}
-		}
+	if(player.character == Emerl) {
+		return topSpeed + EmerlTopSpeedBonus[level];
 	}
-
-	return topSpeed;
+	if(player.extremeGear == ExtremeGear::ChaosEmerald) {
+		switch(player.character) {
+			case Tails: return pSpeed(45);
+			case Knuckles: return pSpeed(37);
+			case Shadow: return pSpeed(58.5);
+			case MetalSonic: return pSpeed(38);
+			default: break;
+		}
+		return topSpeed;// Retains previous behavior. todo: Should this return actually be here?
+	}
+	return player.gearptr->topSpeed + Archetype_TopSpeedBonus[player.characterArchetype];
 }
 
-inline s32 CustomTornadoCosts(Player *player, s32 tornadoCost) {
-	if (player->extremeGear == ChaosEmerald) {
-		switch (player->character) {
+inline s32 CustomTornadoCosts(const Player &player, const s32 &tornadoCost) {
+	if(player.extremeGear == ExtremeGear::ChaosEmerald) {
+		switch(player.character) {
 			case Tails:
 			case Knuckles:
 			case Shadow:
-				tornadoCost = 5500;
-				break;
+				return 5500;
 			case MetalSonic:
-				tornadoCost = 25000;
-				break;
+				return 25000;
+			default: break;
 		}
 	}
 	return tornadoCost;
 }
 
-inline s32 CustomBoostCosts(Player *player, s32 boostCost) {
-	if (player->extremeGear == ChaosEmerald) {
-		switch (player->character) {
+inline s32 CustomBoostCosts(const Player &player, const s32 &boostCost) {
+	if(player.extremeGear == ExtremeGear::ChaosEmerald) {
+		switch(player.character) {
 			case Tails:
-				boostCost = 27500;
-				break;
+				return 27500;
 			case Knuckles:
-				boostCost = 11000;
-				break;
+				return 11000;
 			case Shadow:
-				boostCost = 33000;
-				break;
+				return 33000;
 			case MetalSonic:
-				boostCost = 25000;
-				break;
+				return 25000;
+			default: break;
 		}
 	}
 	return boostCost;
 }
 
-inline s32 CustomPassiveAirDrain(Player *player, s32 airDrain) {
-	if (player->extremeGear == ChaosEmerald) {
-		switch (player->character) {
+inline s32 CustomPassiveAirDrain(const Player &player, const s32 &airDrain) {
+	if(player.extremeGear == ExtremeGear::ChaosEmerald) {
+		switch(player.character) {
 			case Tails:
 			case MetalSonic:
-				airDrain = 16;
-				break;
+				return 16;
 			case Knuckles:
-				airDrain = 9;
-				break;
+				return 9;
 			case Shadow:
-				airDrain = 0x15;
-				break;
+				return 0x15;
+			default: break;
 		}
 	}
 	return airDrain;
 }
 
-inline s32 CustomDriftCosts(Player *player, s32 driftCost) {
-	if (player->extremeGear == ChaosEmerald) {
-		switch (player->character) {
+inline s32 CustomDriftCosts(const Player &player, const s32 &driftCost) {
+	if(player.extremeGear == ExtremeGear::ChaosEmerald) {
+		switch(player.character) {
 			case Tails:
-				driftCost = 0xA6;
-				break;
+				return 0xA6;
 			case Knuckles:
-				driftCost = 0xC;
-				break;
+				return 0xC;
 			case MetalSonic:
-				driftCost = 200;
-				break;
+				return 200;
+			default: break;
 		}
 	}
 	return driftCost;
 }
 
-inline s32 CustomDriftDashFrames(Player *player, s32 driftFrames) {
-	if (player->extremeGear == ChaosEmerald) {
-		switch (player->character) {
+inline s32 CustomDriftDashFrames(const Player &player, const s32 &driftFrames) {
+	if(player.extremeGear == ExtremeGear::ChaosEmerald) {
+		switch(player.character) {
 			case Knuckles:
-				driftFrames = 0;
-				break;
+				return 0;
+			default: break;
 		}
 	}
 	return driftFrames;
 }
 
-inline u32 CustomSpecialFlags(Player *player, u32 specialFlags) {
-	if (player->extremeGear == ChaosEmerald) {
-		switch (player->character) {
+inline Flag<SpecialFlags> CustomSpecialFlags(const Player &player, const Flag<SpecialFlags> &specialFlags) {
+	Flag<SpecialFlags> newSpecialFlags = specialFlags;
+	if(player.extremeGear == ExtremeGear::ChaosEmerald) {
+		switch(player.character) {
 			case Tails:
-				specialFlags |= (iceImmunity | noSpeedLossChargingJump);
-				specialFlags &= ~(ringGear | noPits | thirtyPercentAir);
+				newSpecialFlags |= (iceImmunity | noSpeedLossChargingJump);
+				newSpecialFlags &= ~(ringGear | noPits | thirtyPercentAir);
 				break;
 			case Shadow:
-				specialFlags |= stickyFingers;
-				specialFlags &= ~thirtyPercentAir;
-				specialFlags |= fiftyPercentAir;
+				newSpecialFlags |= stickyFingers;
+				newSpecialFlags &= ~thirtyPercentAir;
+				newSpecialFlags |= fiftyPercentAir;
 				break;
 			case MetalSonic:
-				specialFlags &= ~(ringGear | thirtyPercentAir | noPits);
+				newSpecialFlags &= ~(ringGear | thirtyPercentAir | noPits);
 				break;
-
+			default: break;
 		}
 	}
-	return specialFlags;
+	return newSpecialFlags;
 }
 
-inline f32 CustomAcceleration(Player *player, f32 acceleration) {
-	if (player->extremeGear == ChaosEmerald) {
-		switch (player->character) {
+inline f32 CustomAcceleration(const Player &player, const f32 &acceleration) {
+	f32 newAcceleration = acceleration;
+	if(player.extremeGear == ExtremeGear::ChaosEmerald) {
+		switch(player.character) {
 			case Knuckles:
-				acceleration = 0.00617286f;
+				newAcceleration = 0.00617286f;
 				break;
+			default: break;
 		}
 	}
-	if (player->characterArchetype == TopSpeedArchetype && player->extremeGear != CoverP) acceleration += 0.0010;
-	return acceleration;
+	// if (player->characterArchetype == TopSpeedArchetype && player->extremeGear != CoverP
+	// 	&& player->extremeGear != HangOn) acceleration += 0.0010;
+	// if (player->characterArchetype == Windcatcher && player->extremeGear != CoverP
+	// 	&& player->extremeGear != HangOn) acceleration += 0.0010;
+	return newAcceleration;
 }
 
-inline void GetCustomEXLoadWeight(u16 exLoadID, f32 &weight) {
-    if (exLoadID == 0) {
-        return;
-    }
+inline void GetCustomEXLoadWeight(const u16 &exLoadID, f32 &weight) {
+	if(exLoadID == 0) { return; }
 
-    f32 const newWeight = EXLoadWeights[exLoadID];
-    if (newWeight != -1.0F) {
-        weight = newWeight;
-    }
+	const f32 &newWeight = EXLoadWeights[exLoadID];
+	if(newWeight == -1.0F) { return; }
+	weight = newWeight;
 }
 
-ASMUsed void InitGearData(Player *arg0) {
-	GearLevelStats *phi_r31;
-	const LevelTypeStats *phi_r30;
-	f32 topSpeed, acceleration;
-	u32 specialFlags;
-	f32 temp_f0;
-	f32 temp_f0_2;
-	f32 temp_f0_3;
-	f32 temp_f0_4;
-	f32 temp_f0_5;
-	f32 temp_f0_6;
-	f32 temp_f0_7;
-	f32 temp_f0_8;
-	f32 temp_f0_9;
-	//f32 temp_f1;
-	f32 temp_f1_2;
-	f32 temp_f1_3;
-	f32 temp_f1_4;
-	f32 temp_f1_5;
-	f32 temp_f1_6;
-	f32 temp_f2;
-	f32 temp_f2_2;
-	f32 temp_f2_3;
-	f32 temp_f2_4;
-	f32 temp_f2_5;
-	f32 temp_f2_6;
-	f32 temp_f2_7;
-	f32 temp_f2_8;
-	//f32 temp_f2_9;
-	f32 temp_f3;
-	f32 temp_f3_2;
-	f32 temp_f4;
-	f32 temp_f5;
-	f32 temp_f6;
-	f32 temp_f7;
-	f32 temp_f7_2;
-	f32 temp_f7_3;
-	f32 temp_f7_4;
-	f32 temp_f7_5;
-	f32 temp_f7_6;
-	f32 temp_f7_7;
-	//s32 temp_r29;
-	Gear *temp_r5;
-	const TypeStats *temp_r6;
-	Character *temp_r7;
-	PlayerGearStats *temp_r8;
-	PlayerGearStats *phi_r9;
-	EnabledEXLoads exLoads{};
-	EnabledEXLoads *exLoadsptr = &exLoads;
+inline bool isLevel2Gear(const Player &player, std::optional<const EnabledEXLoads> exLoads = std::nullopt) {
+	const auto &enabledExLoad = exLoads.value_or(FetchEnabledEXLoadIDs(player));
+	return player.extremeGear == ExtremeGear::CoverF || player.extremeGear == ExtremeGear::CoverP || player.extremeGear == ExtremeGear::CoverS || (player.extremeGear == ExtremeGear::HighBooster && enabledExLoad.gearExLoadID == StardustSpeederEXLoad);
+}
 
-	FakePlayerStruct *fakeplayer;
-	s32 phi_r29;
-	u32 i;
-    f32 weight;
+ASMUsed void InitPlayerData(Player &player) {
+	// Preserve fields we want to keep
+	const auto voiceID = player.characterVoiceID;
 
-	if (arg0->input) {
-		FetchEnabledEXLoadIDs(arg0, exLoads);
-	} else {
-		exLoadsptr = nullptr;
+	// Copy the index since it gets cleared in the memset
+	const auto index = player.index;
+
+	// Clears the player struct for everything not below unkC4
+	TRK_memset(&player.unkC4, 0, sizeof(Player) - offsetof(Player, unkC4));
+	// Re-Init our extra player data using the default constructors
+	MI::impulseData[index] = {};
+	PlayerGizoidReplication[index] = {};
+	playerFlyHoopDashProperties[index] = {};
+	Player_BerserkerStatIncreaseMultipliers[index] = {};
+	if(RaceExitMethod != 2) {// on retry, don't clear data
+		IsSeparateBoardModelActive[index] = false;
 	}
 
-	temp_r8 = &arg0->gearStats[0];
-	//temp_f1 = 1.0f;
-	temp_f6 = 2.07f;
-	temp_r7 = arg0->characterptr;
-	temp_r5 = arg0->gearptr;
+	// Copy our preserved fields back
+	player.characterVoiceID = voiceID;
+}
 
-	temp_f3 = temp_r7->speedMultiplier;
-	temp_f2 = temp_r5->speedHandlingMultiplier;
-	temp_f5 = 0.0115741f;
+ASMUsed void InitGearData(Player &player) {
+	const Character &character = *player.characterptr;
+	const Gear &gear = *player.gearptr;
 
-	temp_f0 = 1.0f + temp_f3 + temp_f2;
-	if (exLoadsptr && exLoadsptr->characterExLoadID == E10REXLoad) {
-		temp_r6 = &StatPresets[2];
-	} else {
-		temp_r6 = &StatPresets[temp_r7->statPreset];
-	}
-	temp_f1_2 = 1.0f - temp_f3;
+	const EnabledEXLoads exLoads = FetchEnabledEXLoadIDs(player);
+	const TypeStats &typeStats = StatPresets[(exLoads.characterExLoadID == E10REXLoad ? 2 : character.statPreset)];
+	const f32 &speedMultiplier = character.speedMultiplier;
+	const f32 &speedHandlingMultiplier = gear.speedHandlingMultiplier;
+	const f32 handlingSpeed = 1.0f + speedMultiplier + speedHandlingMultiplier;
+	const f32 handlingPenaltyFromSpeed = 1.0f - speedMultiplier;
+	const bool level2Gear = isLevel2Gear(player, exLoads);
 
-	temp_f4 = 0.00771605f;
-	temp_f3_2 = 200.0f;
-	phi_r9 = temp_r8;
-	phi_r30 = &temp_r6->stats[0];
-	phi_r31 = &temp_r5->levelStats[0];
-	phi_r29 = 0;
-	do {
-		/*
-		if ((u8) arg0->aiControl == 1) {
-			phi_r9->baseTopSpeed = (f32) 0.462963f;
-			phi_r9->baseAccel = (f32) 0.717593f;
-			phi_r9->topSpeed = (f32) 0.75f;
-			phi_r9->tier1Accel = (f32) 0.00385802f;
-			phi_r9->tier2Accel = (f32) 0.000848765f;
-			phi_r9->tier3Accel = (f32) 0.000308642f;
-			phi_r9->offroadSpeedCap = (f32) 50.0f;
-			phi_r9->driftDashSpeed = (f32) 0.37037f;
-			phi_r9->boostSpeed = (f32) 1.06481f;
-		} else {
-		*/
-		topSpeed = CustomTopSpeeds(arg0, temp_r5->topSpeed, phi_r29);
-		phi_r9->baseTopSpeed = (f32) ((temp_f0 * phi_r30->unk0) + topSpeed);
-		phi_r9->baseAccel = (f32) ((temp_f0 * phi_r30->unk4) + topSpeed);
-		phi_r9->topSpeed = (f32) ((temp_f0 * phi_r30->unk8) + topSpeed);
-		acceleration = CustomAcceleration(arg0, temp_r5->acceleration);
-		phi_r9->tier1Accel = (f32) ((temp_f1_2 * phi_r30->unkC) + acceleration);
-		phi_r9->tier2Accel = (f32) ((temp_f1_2 * phi_r30->unk10) + acceleration);
-		phi_r9->tier3Accel = (f32) ((temp_f1_2 * phi_r30->unk14) + acceleration);
-		phi_r9->offroadSpeedCap = (f32) ((temp_f0 * phi_r30->unk18) + temp_r5->offRoadSpeed);
-		phi_r9->driftDashSpeed = (f32) phi_r31->driftDashSpeed;
-		phi_r9->boostSpeed = CustomBoostSpeeds(arg0, phi_r31->boostSpeed, phi_r29);
-		//}
-		phi_r9->maxAir = (s32) phi_r31->maxAir;
-		//phi_r9->airDrain = (s32) ((f32) CustomPassiveAirDrain(arg0, phi_r31->passiveAirDrain) * gf32_SystemHzAdd1);
-		//phi_r9->driftCost = (s32) ((f32) CustomDriftCosts(arg0, phi_r31->driftingAirCost) * gf32_SystemHzAdd1);
+	for(auto level = 0u; level < 3; level++) {
+		const auto gearLevel = level2Gear ? 1 : level;// Level 2 gears init (almost) all stats as level 2
+		const auto &currentLevelTypeStats = typeStats.stats[gearLevel];
+		const auto &currentGearLevelStats = gear.levelStats[gearLevel];
+		auto &currentPlayerGearStats = player.gearStats[level];
+
+		const f32 topSpeed = CustomTopSpeeds(player, gear.topSpeed, gearLevel);
+		currentPlayerGearStats.baseTopSpeed = (handlingSpeed * currentLevelTypeStats.unk0) + topSpeed;
+		currentPlayerGearStats.baseAccel = (handlingSpeed * currentLevelTypeStats.unk4) + topSpeed;
+		currentPlayerGearStats.topSpeed = (handlingSpeed * currentLevelTypeStats.unk8) + topSpeed;
+		const f32 acceleration = CustomAcceleration(player, gear.acceleration);
+		currentPlayerGearStats.tier1Accel = (handlingPenaltyFromSpeed * currentLevelTypeStats.unkC) + acceleration;
+		currentPlayerGearStats.tier2Accel = (handlingPenaltyFromSpeed * currentLevelTypeStats.unk10) + acceleration;
+		currentPlayerGearStats.tier3Accel = (handlingPenaltyFromSpeed * currentLevelTypeStats.unk14) + acceleration;
+		currentPlayerGearStats.offroadSpeedCap = (handlingSpeed * currentLevelTypeStats.unk18) + gear.offRoadSpeed;
+		currentPlayerGearStats.driftDashSpeed = currentGearLevelStats.driftDashSpeed;
+		currentPlayerGearStats.boostSpeed = CustomBoostSpeeds(player, currentGearLevelStats.boostSpeed, gearLevel);
+		currentPlayerGearStats.maxAir = gear.levelStats[level].maxAir;// UI Air bar length is relative based on lvl 1 max air
 
 		// sometimes gf32_SystemHzAdd1 will not be 1.0 in float for some reason? so it will bug passive air drain and drift costs to insane values
-		phi_r9->airDrain = (s32) ((f32) CustomPassiveAirDrain(arg0, phi_r31->passiveAirDrain));
-		phi_r9->driftCost = (s32) ((f32) CustomDriftCosts(arg0, phi_r31->driftingAirCost));
-		phi_r9->boostCost = CustomBoostCosts(arg0, phi_r31->boostCost);
-		phi_r9->tornadoCost = CustomTornadoCosts(arg0, phi_r31->tornadoCost);
-		if ((u8) temp_r7->type == 2) {
-			phi_r9->airDrain = (s32) (1.3f * (f32) phi_r9->airDrain);
-		}
-		temp_f7 = phi_r9->baseTopSpeed;
-		if (temp_f7 > temp_f6) {
-			phi_r9->baseTopSpeed = temp_f6;
-		} else {
-			temp_f2_2 = 0.555556f;
-			if (temp_f7 < temp_f2_2) {
-				phi_r9->baseTopSpeed = temp_f2_2;
-			}
-		}
-		temp_f7_2 = phi_r9->baseAccel;
-		if (temp_f7_2 > temp_f6) {
-			phi_r9->baseAccel = temp_f6;
-		} else {
-			temp_f2_3 = 0.555556f;
-			if (temp_f7_2 < temp_f2_3) {
-				phi_r9->baseAccel = temp_f2_3;
-			}
-		}
-		temp_f7_3 = phi_r9->topSpeed;
-		if (temp_f7_3 > temp_f6) {
-			phi_r9->topSpeed = temp_f6;
-		} else {
-			temp_f2_4 = 0.555556f;
-			if (temp_f7_3 < temp_f2_4) {
-				phi_r9->topSpeed = temp_f2_4;
-			}
-		}
-		temp_f7_4 = phi_r9->tier1Accel;
-		if (temp_f7_4 > temp_f5) {
-			phi_r9->tier1Accel = temp_f5;
-		} else {
-			temp_f2_5 = 0.00154321f;
-			if (temp_f7_4 < temp_f2_5) {
-				phi_r9->tier1Accel = temp_f2_5;
-			}
-		}
-		temp_f7_5 = phi_r9->tier2Accel;
-		if (temp_f7_5 > temp_f4) {
-			phi_r9->tier2Accel = temp_f4;
-		} else {
-			temp_f2_6 = 0.000231481f;
-			if (temp_f7_5 < temp_f2_6) {
-				phi_r9->tier2Accel = temp_f2_6;
-			}
-		}
-		temp_f7_6 = phi_r9->tier3Accel;
-		if (temp_f7_6 > temp_f4) {
-			phi_r9->tier3Accel = temp_f4;
-		} else {
-			temp_f2_7 = 0.000108025f;
-			if (temp_f7_6 < temp_f2_7) {
-				phi_r9->tier3Accel = temp_f2_7;
-			}
-		}
-		temp_f7_7 = phi_r9->offroadSpeedCap;
-		if (temp_f7_7 > temp_f3_2) {
-			phi_r9->offroadSpeedCap = temp_f3_2;
-		} else {
-			temp_f2_8 = 10.0f;
-			if (temp_f7_7 < temp_f2_8) {
-				phi_r9->offroadSpeedCap = temp_f2_8;
-			}
-		}
-		phi_r29++;
-		phi_r9++;
-		phi_r31++;
-		phi_r30++;
-	} while (phi_r29 < 3);
-	fakeplayer = (FakePlayerStruct *) temp_r8;
-	/*
-	if ((u8) arg0->aiControl == 1) {
-		fakeplayer->unkBC = (f32) 0.8f;
-		fakeplayer->unkC0 = (f32) 0.0253073f;
-		fakeplayer->unkC4 = (f32) 0.00959931f;
-		fakeplayer->unkC8 = (f32) 0.00261799f;
-		fakeplayer->unkCC = (f32) 0.0261799f;
-		fakeplayer->unkD0 = (f32) 1.0472f;
-		fakeplayer->unkD4 = (f32) 0.174533f;
-		fakeplayer->unkD8 = (f32) 0.0244346f;
-		fakeplayer->unkDC = (f32) 0.601852f;
-		fakeplayer->unkE0 = (f32) -0.000462963f;
-		fakeplayer->unkE4 = (f32) 2.07f;
-		fakeplayer->unkE8 = 0x3C;
+		currentPlayerGearStats.airDrain = CustomPassiveAirDrain(player, currentGearLevelStats.passiveAirDrain);
+		currentPlayerGearStats.driftCost = CustomDriftCosts(player, currentGearLevelStats.driftingAirCost);
+		currentPlayerGearStats.boostCost = CustomBoostCosts(player, currentGearLevelStats.boostCost);
+		currentPlayerGearStats.tornadoCost = CustomTornadoCosts(player, currentGearLevelStats.tornadoCost);
+		// if(character.type == Character::FlyType) {
+		// 	currentPlayerGearStats.airDrain = static_cast<s32>(1.3f * static_cast<f32>(currentPlayerGearStats.airDrain));
+		// }
+		constexpr f32 maxSpeed = pSpeed(447.12f);
+		constexpr f32 minSpeed = pSpeed(120.0f);
+		currentPlayerGearStats.baseTopSpeed = clamp(currentPlayerGearStats.baseTopSpeed, minSpeed, maxSpeed);
+		currentPlayerGearStats.baseAccel = clamp(currentPlayerGearStats.baseAccel, minSpeed, maxSpeed);
+		currentPlayerGearStats.topSpeed = clamp(currentPlayerGearStats.topSpeed, minSpeed, maxSpeed);
+
+		currentPlayerGearStats.tier1Accel = clamp(currentPlayerGearStats.tier1Accel, pSpeed(1.0f / 3.0f), pSpeed(2.5f));
+
+		constexpr f32 temp_f4 = pSpeed(1.666667);
+		currentPlayerGearStats.tier2Accel = clamp(currentPlayerGearStats.tier2Accel, pSpeed(0.05), temp_f4);
+		currentPlayerGearStats.tier3Accel = clamp(currentPlayerGearStats.tier3Accel, pSpeed(0.0233334), temp_f4);
+		currentPlayerGearStats.offroadSpeedCap = clamp(currentPlayerGearStats.offroadSpeedCap, 10.0f, 200.0f);
+	}
+	player.unk998 = gear.turningSpeedLoss + (handlingPenaltyFromSpeed * typeStats.unk54);
+	player.unk99C = gear.handling + (handlingPenaltyFromSpeed * typeStats.unk58);
+	player.unk9A0 = gear.backAxelHandling + (handlingPenaltyFromSpeed * typeStats.unk5C);
+	player.unk9A4 = gear.frontAxelHandling + (handlingPenaltyFromSpeed * typeStats.unk60);
+	player.unk9A8 = gear.driftRadius + pSpeed(5.654859);
+	player.unk9AC = gear.driftRotation + pSpeed(226.1952);
+	player.unk9B0 = gear.backAxelDriftRotation + pSpeed(37.69913);
+	player.unk9B4 = gear.frontAxelDriftRotation + pSpeed(5.277874);
+	player.unk9B8 = gear.unk44 + pSpeed(130.0);
+	player.unk9BC = gear.unk48 + pSpeed(-0.1);
+	player.unk9C0 = gear.unk4C + pSpeed(447.12);
+	player.requiredDriftDashFrames = CustomDriftDashFrames(player, gear.driftDashFrames) + 0x3C;
+
+	if(exLoads.characterExLoadID == E10REXLoad) {
+		player.typeAttributes = gear.extraTypeAttributes | Type::Power;
+	} else if(isSuperCharacter(player, MetalSonic)) {
+		player.typeAttributes = Type::Speed | Type::Power;
 	} else {
-	*/
-	fakeplayer->unkBC = (f32) ((temp_f1_2 * temp_r6->unk54) + temp_r5->turningSpeedLoss);
-	fakeplayer->unkC0 = (f32) ((temp_f1_2 * temp_r6->unk58) + temp_r5->handling);
-	fakeplayer->unkC4 = (f32) ((temp_f1_2 * temp_r6->unk5C) + temp_r5->backAxelHandling);
-	fakeplayer->unkC8 = (f32) ((temp_f1_2 * temp_r6->unk60) + temp_r5->frontAxelHandling);
-	fakeplayer->unkCC = (f32) (0.0261799f + temp_r5->driftRadius);
-	fakeplayer->unkD0 = (f32) (1.0472f + temp_r5->driftRotation);
-	fakeplayer->unkD4 = (f32) (0.174533f + temp_r5->backAxelDriftRotation);
-	fakeplayer->unkD8 = (f32) (0.0244346f + temp_r5->frontAxelDriftRotation);
-	fakeplayer->unkDC = (f32) (0.601852f + temp_r5->unk44);
-	fakeplayer->unkE0 = (f32) (-0.000462963f + temp_r5->unk48);
-	fakeplayer->unkE4 = (f32) (2.07f + temp_r5->unk4C);
-	fakeplayer->unkE8 = CustomDriftDashFrames(arg0, temp_r5->driftDashFrames) + 0x3C;
-	//}
-	//temp_f2_9 = 1.0f;
-	if (exLoadsptr && exLoadsptr->characterExLoadID == E10REXLoad) {
-		arg0->typeAttributes = PowerType | temp_r5->extraTypeAttributes;
-	} else if (isSuperCharacter(*arg0, MetalSonic)) {
-		arg0->typeAttributes = (SpeedType | PowerType);
-	} else {
-		arg0->typeAttributes = ((1 << temp_r7->type) | temp_r5->extraTypeAttributes);
+		const Flag<Type> newType = static_cast<Type>(1 << character.type);
+		player.typeAttributes = gear.extraTypeAttributes | newType;
 	}
-	//fakeplayer->unkB8 = (f32) (temp_r5->weight + (1.0f + temp_r7->speedMultiplier + temp_r5->speedHandlingMultiplier));
-	weight = CharacterWeights[arg0->character];
-    if (exLoadsptr != nullptr) {
-        GetCustomEXLoadWeight(exLoadsptr->characterExLoadID, weight);
-    }
-    fakeplayer->unkB8 = (f32) (temp_r5->weight + weight);
-	fakeplayer->unkA8 = (s32) temp_r8->maxAir;
-	fakeplayer->unkAC = 0;
-	fakeplayer->unkB0 = 0;
-	fakeplayer->unkB4 = 0;
-	fakeplayer->unkEC = (f32) (1.0f + temp_r5->trickAirGainMultiplier);
-	fakeplayer->unkF0 = (f32) (1.0f + temp_r5->shortcutAirGainMultiplier);
-	fakeplayer->unkF4 = (f32) (1.0f + temp_r5->QTEAirGainMultiplier);
-	specialFlags = fakeplayer->unkF8 = CustomSpecialFlags(arg0, temp_r5->specialFlags);
-	arg0->typeAttributes = (arg0->typeAttributes * ((((u32) specialFlags >> 0xDU) & 1) ^ 1));
-	if ((specialFlags & 0x8000) != 0) {
-		fakeplayer->unkA8 = ((temp_r8 + arg0->level)->maxAir * 0x1E) / 100;
+	auto weight = CharacterWeights[player.character];
+	if(exLoads.isExloadEnabled()) {
+		GetCustomEXLoadWeight(exLoads.characterExLoadID, weight);
 	}
-	if ((specialFlags & 0x10000) != 0) {
-		fakeplayer->unkA8 = ((temp_r8 + arg0->level)->maxAir * 0x32) / 100;
+	player.weight = gear.weight + weight;
+	player.currentAir = player.gearStats[0].maxAir;
+	player.changeInAir_gain = 0;
+	player.changeInAir_loss = 0;
+	player.unk990 = 0;
+	player.trickAirGainMultiplier = 1.0f + gear.trickAirGainMultiplier;
+	player.shortcutAirGainMultiplier = 1.0f + gear.shortcutAirGainMultiplier;
+	player.QTEAirGainMultiplier = 1.0f + gear.QTEAirGainMultiplier;
+	const Flag<SpecialFlags> &specialFlags = player.specialFlags = CustomSpecialFlags(player, gear.specialFlags);
+	if(specialFlags.hasAny(noTypeShortcuts)) {
+		player.typeAttributes = Type::None;
 	}
-	temp_f1_3 = fakeplayer->unkBC;
-	temp_f0_2 = 1.0f;
-	if (temp_f1_3 > temp_f0_2) {
-		fakeplayer->unkBC = temp_f0_2;
-	} else {
-		temp_f0_3 = 0.0f;
-		if (temp_f1_3 < temp_f0_3) {
-			fakeplayer->unkBC = temp_f0_3;
-		}
+	if(specialFlags.hasAny(thirtyPercentAir)) {
+		player.currentAir = (player.gearStats[player.level].maxAir * 0x1E) / 100;
 	}
-	temp_f1_4 = fakeplayer->unkC0;
-	temp_f0_4 = 0.174533f;
-	if (temp_f1_4 > temp_f0_4) {
-		fakeplayer->unkC0 = temp_f0_4;
-	} else {
-		temp_f0_5 = 0.0f;
-		if (temp_f1_4 < temp_f0_5) {
-			fakeplayer->unkC0 = temp_f0_5;
-		}
+	if(specialFlags.hasAny(fiftyPercentAir)) {
+		player.currentAir = (player.gearStats[player.level].maxAir * 0x32) / 100;
 	}
-	temp_f1_5 = fakeplayer->unkC4;
-	temp_f0_6 = 0.174533f;
-	if (temp_f1_5 > temp_f0_6) {
-		fakeplayer->unkC4 = temp_f0_6;
-	} else {
-		temp_f0_7 = 0.0f;
-		if (temp_f1_5 < temp_f0_7) {
-			fakeplayer->unkC4 = temp_f0_7;
-		}
+	if(level2Gear) {
+		player.currentAir = player.gearStats[1].maxAir;
 	}
-	temp_f1_6 = fakeplayer->unkC8;
-	temp_f0_8 = 0.174533f;
-	if (temp_f1_6 > temp_f0_8) {
-		fakeplayer->unkC8 = temp_f0_8;
+	constexpr f32 ONE = 1.0f;
+	constexpr f32 ZERO = 0.0f;
+	player.unk998 = clamp(player.unk998, ZERO, ONE);
+	constexpr f32 temp_f0_4 = pSpeed(37.69913);
+	player.unk99C = clamp(player.unk99C, ZERO, temp_f0_4);
+	player.unk9A0 = clamp(player.unk9A0, ZERO, temp_f0_4);
+	player.unk9A4 = clamp(player.unk9A4, ZERO, temp_f0_4);
+	if(player.unk9A4 == temp_f0_4) {
 		return;
 	}
-	temp_f0_9 = 0.0f;
-	if (temp_f1_6 < temp_f0_9) {
-		fakeplayer->unkC8 = temp_f0_9;
-	}
 
-	for (i = 0; i < 8; i++) {
-		SuperNeoMetalHUDColors[i] = 0x1239B8FF;
+	for(auto &color: SuperNeoMetalHUDColors) {// Should this be here? this is defined in rodata, and already contains this value
+		color = 0x1239B8FF;
 	}
 }

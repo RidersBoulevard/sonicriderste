@@ -2,7 +2,6 @@
 ---
 Checks: '-*
 performance-*
-readability-*
 bugprone-*
 -bugprone-easily-swappable-parameters
 cert-err52-cpp
@@ -36,8 +35,10 @@ misc-*
 modernize-*
 -modernize-use-trailing-return-type
 portability-*
--portability-restrict-system-includes'
-FormatStyle:     google
+-portability-restrict-system-includes
+readability-*
+-readability-uppercase-literal-suffix'
+FormatStyle: google
 CheckOptions:
-  - key:             IgnorePowersOf2IntegerValues
-    value:           1
+  - key: IgnorePowersOf2IntegerValues
+    value: 1

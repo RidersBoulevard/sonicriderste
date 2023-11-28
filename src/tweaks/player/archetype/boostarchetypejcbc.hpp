@@ -1,13 +1,15 @@
 #pragma once
 
-#include "context.hpp"
+#include "mechanics/magneticimpulse.hpp"
 
 struct DriftInfo {
 	f32 lastDirectionDrifted;
+	bool hasHeldDrift;
 };
 
-extern DriftInfo PlayerDriftInfo[8];
+extern std::array<DriftInfo, MaxPlayerCount> PlayerDriftInfo;
 
-global void lbl_0006E664();
-global void lbl_Player_BoostEndFunction(Player*);
+ASMDefined void lbl_0006E664();
+ASMDefined void lbl_Player_BoostEndFunction(Player*);
 ASMUsed void Player_BoostArchetypeJCBC(Player *player);
+void Player_windcatcher(Player *player);

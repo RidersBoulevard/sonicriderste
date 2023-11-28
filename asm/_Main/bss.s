@@ -1,4 +1,4 @@
-.include "macros.inc"
+#include "macros.S"
 
 .section .bss
 
@@ -31,8 +31,8 @@ lbl_1000633C:
 .global gaNnViewRotInvertMtx
 gaNnViewRotInvertMtx:
     .skip 0xC0
-.global lbl_100064BC
-lbl_100064BC:
+.global gaNnViewMtx
+gaNnViewMtx:
     .skip 0x104
 .global lbl_100065C0
 lbl_100065C0:
@@ -49,8 +49,8 @@ lbl_10006800:
 .global lbl_10006940
 lbl_10006940:
     .skip 0x48
-.global lbl_10006988
-lbl_10006988:
+.global gsaCamPosFast
+gsaCamPosFast:
     .skip 0x6C
 .global PlayerCameraPositionStruct
 PlayerCameraPositionStruct:
@@ -78,8 +78,8 @@ playerCameraStruct:
 .global lbl_100081F4
 lbl_100081F4:
     .skip 0x4
-.global lbl_100081F8
-lbl_100081F8:
+.global gpsLightDetailDefault
+gpsLightDetailDefault:
     .skip 0x8
 .global lbl_10008200
 lbl_10008200:
@@ -2059,9 +2059,6 @@ bss_C24D91DC:
 .global bss_CustomMusicID
 bss_CustomMusicID:
     .skip 0x4
-.global bss_SuperHangOn
-bss_SuperHangOn:
-    .skip 0xC
 .global bss_BoardOnlyModelData
 bss_BoardOnlyModelData:
     .skip 0x20

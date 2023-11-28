@@ -1,9 +1,11 @@
+#include "globalDefs.hpp"
+#include "riders/character.hpp"
+
 #include <array>
-#include <cctype>
-#include "main.hpp"
+#include <locale>
 
 template<std::size_t size>
-consteval std::array<char, size * 2> makeTe(const char (&str)[size]) {
+consteval std::array<char, size * 2> makeTe(const char (&str)[size]) { // NOLINT(modernize-avoid-c-arrays)
 	std::array<char, size * 2> buf{};
 	int spaces = 0;
 	for (std::size_t i = 0; i < size; i++) {
@@ -11,7 +13,7 @@ consteval std::array<char, size * 2> makeTe(const char (&str)[size]) {
 		char curChar = str[i];
 		switch (curChar) {
 			case 'A'...'Z':
-				curChar = _tolower(curChar);
+				curChar = static_cast<char>(std::tolower(curChar));
 				[[fallthrough]];
 			case 'a'...'z':
 				buf[destIdx] = curChar - 'a';
@@ -37,7 +39,7 @@ consteval std::size_t getTeLength(const std::array<char, size> &array) {
 	std::size_t chars = 0;
 	for (std::size_t i = 0; i < size; i += 2) {
 		chars++;
-		if (array[i] == 0xFF) break;
+		if (array[i] == 0xFF) { break; }
 	}
 	return chars;
 }
@@ -133,7 +135,7 @@ constexpr auto tikal_Harmony = makeTe("harmony");
 constexpr auto tikal_Golden = makeTe("golden");
 
 
-global {
+ASMDefined {
 	volatile constexpr char silver_lengths[] = {
 			// skate trick text strings
             getTeLength(silver_PsychicBurst),
@@ -148,7 +150,7 @@ global {
 			getTeLength(silver_Psychokinetic), getTeLength(silver_Future), getTeLength(silver_Change),
 			getTeLength(silver_NoUse)
 	};
-	global constexpr const char *silver_stringptrs[] = {
+	ASMDefined constexpr const char *silver_stringptrs[] = {
 			// skate trick text strings
             silver_PsychicBurst.data(),
             silver_Savior.data(),
@@ -176,7 +178,7 @@ global {
 			getTeLength(tikal_HeavenlyLight), getTeLength(tikal_Justice), getTeLength(tikal_Tribal),
 			getTeLength(tikal_Queen)
 	};
-	global constexpr const char *tikal_stringptrs[] = {
+	ASMDefined constexpr const char *tikal_stringptrs[] = {
 			// skate trick text strings
 			tikal_Ghostly.data(),
             tikal_PastTense.data(),
@@ -204,7 +206,7 @@ global {
 			getTeLength(chaos_Hydrokinetic), getTeLength(chaos_Dive), getTeLength(chaos_Chaotic),
 			getTeLength(chaos_SwiftSwim)
 	};
-	global constexpr const char *chaos_stringptrs[] = {
+	ASMDefined constexpr const char *chaos_stringptrs[] = {
 			// skate trick text strings
 			chaos_Evolution.data(),
             chaos_Elastic.data(),
@@ -231,7 +233,7 @@ global {
 			// board trick text strings
 			getTeLength(blaze_Sol), getTeLength(blaze_Ablaze), getTeLength(blaze_Emerald), getTeLength(blaze_Pyrokinesis)
 	};
-	global constexpr const char *blaze_stringptrs[] = {
+	ASMDefined constexpr const char *blaze_stringptrs[] = {
 			// skate trick text strings
 			blaze_Royal.data(),
             blaze_Princess.data(),
@@ -258,7 +260,7 @@ global {
 			// board trick text strings
 			getTeLength(emerl_Gizoid), getTeLength(emerl_Indy), getTeLength(emerl_Card), getTeLength(emerl_Immortal)
 	};
-	global constexpr const char *emerl_stringptrs[] = {
+	ASMDefined constexpr const char *emerl_stringptrs[] = {
 			// skate trick text strings
 			emerl_SkillShot.data(),
             emerl_BlankSlate.data(),
@@ -286,7 +288,7 @@ global {
 			getTeLength(metalsonic_Assimilated), getTeLength(metalsonic_Destructive), getTeLength(metalsonic_Speedbreak),
 			getTeLength(metalsonic_Data)
 	};
-	global constexpr const char *metalsonic_stringptrs[] = {
+	ASMDefined constexpr const char *metalsonic_stringptrs[] = {
 			// skate trick text strings
 			metalsonic_Stardust.data(),
             metalsonic_Speedway.data(),
@@ -301,8 +303,9 @@ global {
 			metalsonic_Data.data()
 	};
 
-	volatile constexpr signed char CharacterAFSVoiceLines[][9] = {
+	volatile constexpr m2darray<signed char, TotalCharacterAmount, 9> CharacterAFSVoiceLines = {{
 			// first 6 are never used, so they're -1
+			// 4th: Appears to be related to attacking?
 			// 7th: race start voiceline ID in AFS
 			// 8th: race win voiceline ID in AFS
 			// 9th: race lose voiceline ID in AFS
@@ -330,5 +333,5 @@ global {
 			{-1, -1, -1, -1, -1, -1, 58,   59,   60},
 			{-1, -1, -1, -1, -1, -1, 61,   62,   63},
 			{-1, -1, -1, -1, -1, -1, 64,   65,   66},
-	};
+	}};
 }

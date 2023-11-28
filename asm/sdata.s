@@ -1,4 +1,4 @@
-.include "macros.inc"
+#include "macros.S"
 
 .section .sdata, "wa"  # 0x8021B8C0 - 0x8021BB40
 

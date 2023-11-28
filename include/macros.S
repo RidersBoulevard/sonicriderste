@@ -1,3 +1,4 @@
+#pragma once
 /*
 Code sections:
 	.text0:	0x00000100	0x80003100	0x800055E0
@@ -13,7 +14,19 @@ BSS section:
 	.bss:	0x00000000	0x80125E00	0x8021CFA4
 Entry Point: 0x80003154
 */
-# PowerPC Register Constants
+
+/* https://sourceware.org/binutils/docs/as/Symbol-Names.html under "Local Labels" */
+/* local label definitions */
+#define RETURN  0
+#define LOOP    1
+#define NEXT    2
+
+/* macros to actually call local labels */
+#define PASTER(x,y) x ## y
+#define FORWARD(LABEL)  PASTER(LABEL,f)
+#define BACKWARD(LABEL)  PASTER(LABEL,b)
+
+/* PowerPC Register Constants */
 .set r0, 0
 .set r1, 1
 .set r2, 2
@@ -87,7 +100,7 @@ Entry Point: 0x80003154
 .set qr6, 6
 .set qr7, 7
 
-# AND with a bit and convert to bool macro
+/* AND with a bit and convert to bool macro */
 .macro andbool dgpr, gpr, bit
 .if (\bit == 0x1)
 rlwinm \dgpr, \gpr, 0, 31, 31
@@ -217,4 +230,3 @@ rlwinm \dgpr, \gpr, 2, 31, 31
 rlwinm \dgpr, \gpr, 1, 31, 31
 .endif
 .endm
-

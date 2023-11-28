@@ -1,4 +1,5 @@
-#include "context.hpp"
+#include "riders/player.hpp"
+#include "riders/stage.hpp"
 
 // WEIGHT STAT
 
@@ -36,7 +37,7 @@ ASMUsed f32 Weight_UpDownHillSpeed(Player *player, f32 currentSpeed) {
             // uphill
             finalSpeed -= deltaSpeed;
             deltaSpeed *= (player->weight / 1.3f);
-            if (player->extremeGear == PowerfulGear) {
+            if (player->extremeGear == ExtremeGear::PowerfulGear) {
                 deltaSpeed = -deltaSpeed / 4.0f;
             }
             finalSpeed += deltaSpeed;

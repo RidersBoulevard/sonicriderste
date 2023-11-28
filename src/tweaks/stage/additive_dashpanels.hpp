@@ -1,10 +1,11 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/object.hpp"
+#include "riders/player.hpp"
 
-ASMUsed void lbl_DashPanelSpeed(f32 dashPanelSpeed, Player *player, Object *object);
+ASMUsed void lbl_DashPanelSpeed(f32 dashPanelSpeed, Player *player, ObjectNode *object);
 
-constexpr f32 data_DashPanelSpeed[17] = {
+constexpr std::array<f32, 17> data_DashPanelSpeed = {
 		pSpeed(20.0f), // test stage
 		pSpeed(20.0f), // metal city
 		pSpeed(20.0f), // splash canyon

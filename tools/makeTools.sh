@@ -2,4 +2,4 @@
 
 mkdir build -p && cd build || exit
 cmake ../ || exit
-make -j2
+ninja -j$(nproc --all)

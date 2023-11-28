@@ -1,5 +1,12 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/player.hpp"
 
-void Player_TurboStar(struct Player *player);
+namespace TurboStar{
+	enum GearSpecific{
+		Level4,
+
+	};
+}
+
+void Player_TurboStar(Player *player);

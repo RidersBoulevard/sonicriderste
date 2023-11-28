@@ -1,4 +1,5 @@
-#include "context.hpp"
+#include "riders/player.hpp"
+#include "riders/stage.hpp"
 
 ASMUsed f32 IceFactory_QTEFlyHoopVerticalSpeedCap(Player *player, f32 currentSpeed, f32 multiplier) {
     if (CurrentStage == IceFactory) {

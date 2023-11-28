@@ -1,6 +1,6 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/player.hpp"
 
-global u32 SuperFormHUDColors[];
-global u32 SuperNeoMetalHUDColors[];
+ASMDefined std::array<u32, TotalCharacterAmount> SuperFormHUDColors;
+ASMDefined std::array<u32, MaxPlayerCount> SuperNeoMetalHUDColors;

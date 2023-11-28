@@ -1,15 +1,25 @@
 #pragma once
 
-#include "context.hpp"
+#include "types.hpp"
+#include "globalDefs.hpp"
 
-global u32 OSGetTime(); // actually returns a 64 bit value, in r3 and r4
-global u32 Divide64Bit(u32 dividendLow, u32 dividendHigh, u32 divisorLow, u32 divisorHigh); // actually returns a 64 bit value, in r3 and r4
+ASMDefined u64 gettime(); // ogc function
 
 struct Date {
-	u8 day;
-	u8 month;
-	u16 year;
+	u8 day = 1;
+	u8 month = 1;
+	u16 year = 2000;
 
-	Date();
+	static Date GetCurrentDate();
+
+	[[nodiscard]] inline bool CheckAprilFools() const{
+		return (day == 1 && month == 4);
+	}
+
+	// Tested to be functionally equivalent to the old implementation
+	static inline u32 ConvertGetTimeToSeconds() {
+		// gets time passed in seconds from 1st Jan 2000 until current time
+		static constexpr auto timeBaseFrequency = 40500000;
+		return gettime() / timeBaseFrequency;
+	}
 };
-bool CheckAprilFools();

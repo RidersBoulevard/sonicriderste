@@ -1,48 +1,39 @@
 #include "boostarchetypejcbc.hpp"
 
-//global void lbl_Player_BoostEndFunction(struct Player*);
-
-// DriftInfo PlayerDriftInfo[8];
+std::array<DriftInfo, MaxPlayerCount> PlayerDriftInfo;
 
 ASMUsed void Player_BoostArchetypeJCBC(Player *player) {
-    if(player->characterArchetype != BoostArchetype) return;
-    if (player->input->holdFaceButtons & AButton && player->movementFlags & drifting && player->input->toggleFaceButtons & (BButton | XButton)){
-        lbl_Player_BoostEndFunction(player);
-    }
-	//Controller *readInput = player->input;
-	//DriftInfo *driftInfo = &PlayerDriftInfo[player->index];
-    // if ((player->last_movementFlags & drifting) && player->input->holdFaceButtons & AButton && player->input->toggleFaceButtons & (XButton | BButton)) // && player->input->toggleFaceButtons & (BButton | XButton)
-    // {
-    //     driftInfo->lastDirectionDrifted = player->unkB4C;
-    //     lbl_Player_BoostEndFunction(player);
-    //     switch (player->unkB4C)
-    //     {
-    //         case 1:
-    //             if (driftInfo->lastDirectionDrifted != player->unkB4C) 
-    //             {
-    //                 lbl_Player_BoostEndFunction(player);
-    //                 driftInfo->lastDirectionDrifted = player->unkB4C;
-    //             }
-    //         break;
+	if(player->characterArchetype != BoostArchetype) { return; }
+	DriftInfo *driftInfo = &PlayerDriftInfo[player->index];
+	if(player->movementFlags.hasAny(drifting)) {
+		if(!driftInfo->hasHeldDrift &&
+		   player->input->toggleFaceButtons.hasAny(BButton, XButton) &&
+		   player->input->holdFaceButtons.hasAny(AButton) &&
+		   player->jumpCharge > 0) {
+			lbl_Player_BoostEndFunction(player);
+			driftInfo->hasHeldDrift = TRUE;
+		}
+	} else {
+		driftInfo->hasHeldDrift = FALSE;
+	}
+}
 
-    //         case -1:
-    //             if (driftInfo->lastDirectionDrifted != player->unkB4C) 
-    //             {
-    //                 lbl_Player_BoostEndFunction(player);
-    //                 driftInfo->lastDirectionDrifted = player->unkB4C;
-    //             }
-    //         break;
+void Player_windcatcher(Player *player) {
+	if(player->characterArchetype != Windcatcher) { return; }
+	auto &windcatcherTurbGain = MI::impulseData[player->index].windcatcherTurbGain;
+	if(player->state == TurbulenceRide) {
+		windcatcherTurbGain += 1;
+	} else {
+		windcatcherTurbGain = 0;
+	}
 
-    //         case 0:
-    //         default:
-    //             driftInfo->lastDirectionDrifted = 0;
-    //         break;
-    //     }
-    // }
-    // if ((player->last_movementFlags & drifting))
-    // {
-    //     if (player->input->holdFaceButtons & (XButton | BButton)) return;
-    //     if (readInput->leftstick.leftStickHorizontal == 0 && player->state == Cruise && player->input->holdFaceButtons & AButton) return; // player->input->holdFaceButtons & (AButton) && 
-    //     lbl_Player_BoostEndFunction(player);
-    // }
+	if(windcatcherTurbGain % 30 == 0 && windcatcherTurbGain != 0 && (player->state == TurbulenceRide)) {
+		if(player->extremeGear == ExtremeGear::SuperHangOn) {
+			player->currentAir += 4000;
+		} else if(player->specialFlags.hasAny(ringGear)) {
+			player->currentAir += (player->gearStats[player->level].maxAir * 1) / 100;
+		} else {
+			player->currentAir += 10000;
+		}
+	}
 }

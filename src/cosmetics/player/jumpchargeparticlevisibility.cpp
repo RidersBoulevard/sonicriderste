@@ -1,10 +1,15 @@
-#include "context.hpp"
+#include "riders/object.hpp"
+#include "riders/player.hpp"
+#include "tweaks/stage/stage_changes.hpp"
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
+#pragma GCC diagnostic pop
+
 struct JumpChargeObject {
-	void *update;
-	Object *back;
-	Object *next;
+	Task update;
+	ObjectNode *back;
+	ObjectNode *next;
 	u16 flags;
 	u16 object_group;
 	Object1 *object;
@@ -17,15 +22,15 @@ struct JumpChargeObject {
 	u16 object_id;
 	u16 index;
 };
-#pragma GCC diagnostic pop
 
-global JumpChargeObject *gpsCurrentTask;
-global void Player_JumpChargeParticlesTask();
+ASMDefined JumpChargeObject *gpsCurrentTask;
+
+ASMDefined void Player_JumpChargeParticlesTask();
 
 ASMUsed void Player_JumpChargeParticlesVisibility() {
 	auto &obj = *gpsCurrentTask;
 	const Player &player = players[obj.player_index];
-	if (player.extremeGear != AdvantageS && player.state == Run) {
+	if (player.extremeGear != ExtremeGear::AdvantageS && player.state == Run) {
 		return;
 	}
 	Player_JumpChargeParticlesTask();

@@ -1,4 +1,6 @@
-#include "context.hpp"
+#include "riders/object.hpp"
+#include "riders/player.hpp"
+#include "riders/stage.hpp"
 
 struct EggFacQTEObject1 {
 	std::array<char, 0x48> filler;

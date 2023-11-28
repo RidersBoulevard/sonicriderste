@@ -1,9 +1,9 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/player.hpp"
 
-global void* gpsTexList_Particle;
-global void* lbl_001D8F58;
-global void func_Particle_Task();
+ASMDefined void* gpsTexList_Particle;
+ASMDefined void* lbl_001D8F58;
+ASMDefined void func_Particle_Task();
 
 void Player_CoverS(Player *player);

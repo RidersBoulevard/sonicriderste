@@ -1,4 +1,4 @@
-.include "macros.inc"
+#include "macros.S"
 
 .section .data, "wa"  # 0x800ED300 - 0x80125E00
 
@@ -56,7 +56,8 @@ lbl_800ED380:
 	.4byte 0x00000060
 	.4byte 0x000081e0
 	.4byte 0x00008560
-	.4byte 0x000105c0
+	// this is the offset to the text file that holds various exception texts
+	.4byte ExceptionTextData - lbl_800ED380 //.4byte 0x000105c0
 	.4byte 0x00010be0
 	.4byte 0x00014c40
 	.4byte 0x000152a0
@@ -58402,26 +58403,9 @@ data_stageChanges:
 #  .long 0x37EF6000
 #  .single -238.356
 
-/*
-.global switch_StageChanges
-switch_StageChanges:
-	.4byte func_StageChanges_metal_city  # metal city
-	.4byte func_StageChanges_splash_canyon  # splash canyon
-	.4byte func_StageChanges_end  # egg factory
-	.4byte func_StageChanges_end  # green cave
-	.4byte func_StageChanges_sand_ruins  # sand ruins
-	.4byte func_StageChanges_end  # babylon garden
-	.4byte func_StageChanges_digital_dimension  # digital dimension
-	.4byte func_StageChanges_end  # sega carnival
-	.4byte func_StageChanges_night_chase # night chase
-	.4byte func_StageChanges_end  # red canyon
-	.4byte func_StageChanges_end  # ice factory
-	.4byte func_StageChanges_end  # white cave
-	.4byte func_StageChanges_end  # dark desert
-	.4byte func_StageChanges_sky_road  # sky road
-	.4byte func_StageChanges_end  # babylon guardian
-	.4byte func_StageChanges_sega_illusion  # sega illusion
-*/
+.global ExceptionTextData
+ExceptionTextData:
+	.incbin "ExceptionTextData.bin", 0x0, 0x620
 
 .global __data_rom_end__
 __data_rom_end__:

@@ -24,45 +24,24 @@ constexpr GearLevelStats SuperTails_NonSuperStats = {
 };
 
 ASMUsed void SuperTails_SpawnMagnetAtStart(Player *player){
-	EnabledEXLoads exLoads;
-	FetchEnabledEXLoadIDs(player, exLoads);
-	// struct EggInfo *EggInfo = &PlayerEggsterminator[player->index];
-
 	if(isSuperCharacter(*player, Tails)){
 		lbl_0008CC74(player->index); // spawn magnet
 		player->superFormState = 0;
-		player->typeAttributes &= ~PowerType;
+		player->typeAttributes &= ~Type::Power;
 	}
-	// if (player->extremeGear == CoverP) // temporary, move to different function later
-	// {
-	//     lbl_0008CC74(player->index); // spawn magnet
-	// }
-	// if (exLoads.gearExLoadID == E99EXLoad && EggInfo->extraLevel == 2)
-	// {
-	//     lbl_0008CC74(player->index); // spawn magnet
-	// }
 }
 
 ASMUsed void SuperTails_SpawnMagnetAfterDeath(Player *player){
-	EnabledEXLoads exLoads;
-	FetchEnabledEXLoadIDs(player, exLoads);
-	// struct EggInfo *EggInfo = &PlayerEggsterminator[player->index];
-
 	if(isSuperCharacter(*player, Tails) && player->superFormState == 0){
 		lbl_0008CC74(player->index); // spawn magnet
 	}
-	if(player->extremeGear == CoverP){ // temporary, move to different function later
-		// lbl_0008CC74(player->index); // spawn magnet
+	if(player->extremeGear == ExtremeGear::CoverP){ // temporary, move to different function later
 		player->level = 1;
 		player->currentAir = player->gearStats[player->level].maxAir;
 	}
-	// if (exLoads.gearExLoadID == E99EXLoad && EggInfo->extraLevel == 2)
-	// {
-	//     lbl_0008CC74(player->index); // spawn magnet
-	//     player->currentAir = player->gearStats[player->level].maxAir;
-	// }
-	if(player->extremeGear == CoverF
-	   || player->extremeGear == CoverS
+	const EnabledEXLoads exLoads = FetchEnabledEXLoadIDs(*player);
+	if(player->extremeGear == ExtremeGear::CoverF
+	   || player->extremeGear == ExtremeGear::CoverS
 	   || exLoads.gearExLoadID == StardustSpeederEXLoad){ // temporary, move to different function later
 		player->level = 1;
 		player->currentAir = player->gearStats[player->level].maxAir;
@@ -70,7 +49,7 @@ ASMUsed void SuperTails_SpawnMagnetAfterDeath(Player *player){
 
 	player->reciproExtendTimer = 0; // grant recipro extend
 
-	if(player->extremeGear == CoverF){
+	if(player->extremeGear == ExtremeGear::CoverF){
 		player->level = 1;
 		player->currentAir = player->gearStats[player->level].maxAir;
 	}
@@ -88,21 +67,22 @@ inline void SuperTails_UpdatePlayerStats(Player &player, const GearLevelStats *s
 }
 
 void Player_SuperTailsTransformation(Player &player){
-	if(player.playerType == 1) return;
-	if(!isSuperCharacter(player, Tails)) return;
-	if(player.superTails_transformCooldown > 0) return;
-	if(player.flags & 0x02000000) return; // if in a pit
+	if(player.playerType) { return; }
+	if(!isSuperCharacter(player, Tails)) { return; }
+	if(player.superTails_transformCooldown > 0) { return; }
+	if(player.flags.hasAny(InAPit)) { return; }
+	constexpr auto transformationCost = 5;
 
 	if(player.superFormState == 2 || player.rings >= 50){
-		if(player.input->toggleFaceButtons & XButton){
+		if((player.input->toggleFaceButtons & XButton) != 0u){
 			if(player.superFormState == 0){
 				// transform
-				if(player.rings < 5) return; // transform cost
+				if(player.rings < transformationCost) { return; }
 
 				player.superFormState = 1;
 				player.superTails_transformCooldown = 180;
-				player.rings -= 5; // transform cost
-				player.currentAir = s32(player.rings * 1100);
+				player.rings -= transformationCost; // transform cost
+				player.currentAir = static_cast<s32>(player.rings * 1100);
 				player.specialFlags ^= (iceImmunity
 				                        | noSpeedLossChargingJump
 				                        | ringGear
@@ -118,17 +98,17 @@ void Player_SuperTailsTransformation(Player &player){
 
 				PlayAudioFromDAT(Sound::SFX::SuperTransformation); // super transformation sfx
 
-				player.typeAttributes |= SpeedType;
-				if(player.movementFlags & boosting) lbl_Player_BoostEndFunction(&player);
+				player.typeAttributes |= Type::Speed;
+				if(player.movementFlags.hasAny(boosting)) { lbl_Player_BoostEndFunction(&player); }
 
 			}else{
 				// untransform
-				if(player.state == Run) return;
+				if(player.state == Run) { return; }
 
 				player.superFormState = 0;
 				player.superTails_transformCooldown = 180;
 				if(player.rings <= 20){
-					player.currentAir = s32(player.rings * 5500);
+					player.currentAir = static_cast<s32>(player.rings * 5500);
 				}else{
 					player.currentAir = SuperTails_NonSuperStats.maxAir;
 				}
@@ -141,7 +121,7 @@ void Player_SuperTailsTransformation(Player &player){
 				);
 				SuperTails_UpdatePlayerStats(player, &SuperTails_NonSuperStats, pSpeed(200));
 				lbl_0008CC74(player.index); // spawn magnet
-				player.typeAttributes &= ~SpeedType;
+				player.typeAttributes &= ~Type::Speed;
 			}
 		}
 	}

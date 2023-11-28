@@ -1,6 +1,6 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/player.hpp"
 
 struct HHOInfo {
 	u8 attackCount; // stores successful attacks
@@ -15,6 +15,6 @@ extern const f32 HHO_BoostSpeeds[4];
 extern const f32 HHOBoostControlSpeeds[4];
 extern const f32 HHOBoostControlSpeedsBoostArchetype[4];
 
-global void lbl_Player_BoostEndFunction(Player *);
+ASMDefined void lbl_Player_BoostEndFunction(Player *);
 
-void Player_HyperHangOn(struct Player *player);
+void Player_HyperHangOn(Player *player);

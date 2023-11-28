@@ -1,4 +1,4 @@
-.include "macros.inc"
+#include "macros.S"
 
 .section .ctors, "wa"  # 0x800E2F20 - 0x800E2F40
 

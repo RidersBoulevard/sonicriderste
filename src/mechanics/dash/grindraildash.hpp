@@ -1,18 +1,33 @@
 #pragma once
 
-#include "main.hpp"
+#include "riders/player.hpp"
 
-extern const f32 GrindRailDashAirCosts[3];
-extern const s32 GrindRailDashAirCostsRingGear;
+constexpr std::array<s32, 3> GrindRailDashInitialCosts = {
+        20000, 25000, 30000
+};
+
+constexpr std::array<f32, 3> GrindRailDashAirCosts = {
+        -333.3f, -416.6f, -500.0f
+};
+
+constexpr std::array<s32, 3> GrindRailDashInitialCostsMechanic = {
+		15000, 18750, 22500
+};
+
+constexpr std::array<f32, 3> GrindRailDashAirCostsMechanic = {
+		-249.97500f, -312.45f, -375.0f
+};
+
+constexpr s32 GrindRailDashAirCostsRingGear = 30;
 
 struct FillerAttackStruct {
-	char filler[0x34];
+	fillerData<0x34>  filler;
 };
 
 struct BoostParticleObject1 {
-	char filler[0x38];
+	fillerData<0x38> filler;
 	Player *player;
-	struct FillerAttackStruct *attackStruct;
+	FillerAttackStruct *attackStruct;
 	u32 unknown;
 	f32 unkfloat;
 };

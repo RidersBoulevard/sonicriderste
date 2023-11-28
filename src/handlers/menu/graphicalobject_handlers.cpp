@@ -4,30 +4,34 @@
 #include "handlers/menu/tournamentrace/stageban_handler.hpp"
 #include "containers/graphicalobject.hpp"
 #include "handlers/music/custom_music.hpp"
+#include "cosmetics/player/exloads.hpp"
+#include "handlers/ingame/customcss.hpp"
+#include "tweaks/player/archetype/character_archetype.hpp"
+#include "handlers/files/packman_handlers.hpp"
 
-// global void Sys2d_DrawObject(void *graphicalObject); /*asm*/
+// ASMDefined void Sys2d_DrawObject(void *graphicalObject); /*asm*/
 
-global void GraphicalObjectHandler_TournamentRace(void *graphicalObject) {
+ASMDefined void GraphicalObjectHandler_TournamentRace(void *graphicalObject) {
+	u8 *active = static_cast<u8 *>(graphicalObject) + 0x57;
+	u32 *activeTimer = static_cast<u32 *>(graphicalObject) + 0x48 / 4;
+	u16 *index = static_cast<u16 *>(graphicalObject) + 0x34 / 2;
+	void *info = static_cast<void *>(*(static_cast<u32 **>(graphicalObject) + 0x40 / 4));
+	void *objectInfo = static_cast<void *>(*(static_cast<u32 **>(info) + 0x18 / 4 + *index));
+
 	BSS_StageBan *bss = &bss_StageBans;
 	void *objectOffsets, *textureData;
 	u32 i, playerIndex, switchCase;
 	u8 textureID;
-	BOOL init = FALSE;
-
-	u8 *active = (u8 *) graphicalObject + 0x57;
-	u32 *activeTimer = (u32 *) graphicalObject + 0x48 / 4;
-	u16 *index = (u16 *) graphicalObject + 0x34 / 2;
-	void *info = (void *) *((u32 *) graphicalObject + 0x40 / 4);
-	void *objectInfo = (void *) *((u32 *) info + 0x18 / 4 + *index);
-
-	if (bss->tournamentRace) {
+	bool init = FALSE;
+	if (bss->tournamentRace != 0u) {
 		init = *activeTimer == 0;
-		if (init)
+		if (init) {
 			*active = 0xC;
+		}
 
-		if (bss_StageBans_isBanned || init) {
-			if (*(u32 *) objectInfo >= 9) { // texture count
-				objectOffsets = (u8 *) objectInfo + 0xC;
+		if ((bss_StageBans_isBanned != 0u) || init) {
+			if (*static_cast<u32 *>(objectInfo) >= 9) { // texture count
+				objectOffsets = static_cast<u8 *>(objectInfo) + 0xC;
 
 				// update player win count and ban count texture
 				for (i = 0; i < 4; i++) {
@@ -43,12 +47,12 @@ global void GraphicalObjectHandler_TournamentRace(void *graphicalObject) {
 						switch (switchCase) {
 							case 0:
 								// p1 ban count
-								objectOffsets = (u32 *) objectOffsets + 1; // ban count never goes over 10 so skip it
+								objectOffsets = static_cast<u32 *>(objectOffsets) + 1; // ban count never goes over 10 so skip it
 
 								textureData = (void *) *(u32 *) objectOffsets;
 								objectOffsets = (u32 *) objectOffsets + 1;
 
-								textureID = 0x8D + bss->player1_banCount;
+								textureID = 0x8D + bss->player_banCount[0];
 								*((u8 *) textureData + 0xB) = textureID;
 								break;
 							case 1:
@@ -75,7 +79,7 @@ global void GraphicalObjectHandler_TournamentRace(void *graphicalObject) {
 								textureData = (void *) *(u32 *) objectOffsets;
 								objectOffsets = (u32 *) objectOffsets + 1;
 
-								textureID = 0x8D + bss->player2_banCount;
+								textureID = 0x8D + bss->player_banCount[1];
 								*((u8 *) textureData + 0xB) = textureID;
 								break;
 							case 1:
@@ -98,42 +102,36 @@ global void GraphicalObjectHandler_TournamentRace(void *graphicalObject) {
 
 			}
 		}
-		Sys2d_DrawObject((GraphicalObject*)graphicalObject);
+		Sys2d_DrawObject(static_cast<GraphicalObject*>(graphicalObject));
 	}
 
 }
 
-global void GraphicalObjectHandler_DebugMenuText(void *graphicalObject) {
+ASMDefined void GraphicalObjectHandler_DebugMenuText(void *graphicalObject) {
     DebugMenuData *debugMenu = &DebugMenu_Data;
-    void *textTexture = gpasTexList_SubFont;
+    void *textTexture = gpasTexList_SubFont.unk0;
 
-    Sys2d_DrawObject((GraphicalObject*)graphicalObject);
+    Sys2d_DrawObject(static_cast<GraphicalObject*>(graphicalObject));
 
     DebugMenu_RenderDescription();
 
     for (u32 i = 0, y = 100; i < debugMenu->maximumItems; i++, y += 20) {
-        u32 rgba, textID;
-        DebugOptions options = debugMenu->page1Options[i];
+		const RGBA rgba = debugMenu->selectedItemRow == i ? 0xFF0000FF : ~0U;
 
-        if (debugMenu->selectedItemRow == i) {
-            rgba = 0xFF0000FF;
-        } else {
-            rgba = ~0U;
-        }
+		auto options = debugMenu->page1Options[i];
+        auto textID = DebugMenu_FetchTextIDAllToggles(options);
 
-        textID = DebugMenu_FetchTextIDAllToggles(&options);
-
-        RenderText(20, y, rgba, 240, 0, i, &DebugMenu_TextData.textData[0], textTexture, -1.0f);
-        RenderText(270, y, rgba, 240, 0, textID, &DebugMenu_TextData.extraTextData[0], textTexture, -1.0f);
+        RenderText(20, y, rgba, 240, 0, i, DebugMenu_TextData.textData.data(), textTexture, -1.0f);
+        RenderText(270, y, rgba, 240, 0, textID, DebugMenu_TextData.extraTextData.data(), textTexture, -1.0f);
     }
 }
 
-global void GraphicalObjectHandler_DisplayMusicTextMenu(void *graphicalObject) {
-    void *textTexture = gpasTexList_SubFont;
+ASMDefined void GraphicalObjectHandler_DisplayMusicTextMenu(void *graphicalObject) {
+    void *textTexture = gpasTexList_SubFont.unk0;
 
-    Sys2d_DrawObject((GraphicalObject*)graphicalObject);
+	Sys2d_DrawObject(static_cast<GraphicalObject*>(graphicalObject));
 
-    u32 musicTextID = bss_CustomMusicID + 1;
+    const u32 musicTextID = bss_CustomMusicID + 1;
 
     RenderText(20, 20, ~0U, 240, 0, 0, &CustomMusicTextData.textDataHeader, textTexture, -100.0f);
     RenderText(172, 20, ~0U, 480, 0, musicTextID, &CustomMusicTextData.textDataHeader, textTexture, -100.0f);
@@ -141,7 +139,7 @@ global void GraphicalObjectHandler_DisplayMusicTextMenu(void *graphicalObject) {
 
 #define GAMELANGUAGE_COUNT 6
 
-global s32 geMessageLanguage;
+ASMDefined s32 geMessageLanguage;
 
 constexpr std::array<u8, GAMELANGUAGE_COUNT> MessageTexts1 = {
         0xE,
@@ -198,11 +196,11 @@ constexpr std::array<std::array<u8, 20>, GAMELANGUAGE_COUNT> ModeTitleTexts = {
 };
 
 // function decompiled
-global void GraphicalObjectHandler_ModeTitle(GraphicalObject *gobject) {
+ASMDefined void GraphicalObjectHandler_ModeTitle(GraphicalObject *gobject) {
     void *object1ptr = static_cast<u8*>(gp2DSys) + (gobject->cullingGroup * 8) +  0x6000;
     void **object1addr = static_cast<void**>(object1ptr);
     auto *object1 = static_cast<TitleSequenceObject1*>(*object1addr);
-    gobject->active = gobject->active | 8;
+    gobject->active = true;
     gobject->textureIDs[0].textureSlot1 = ModeTitleTexts[geMessageLanguage][object1->currentMode];
     gobject->textureIDs[1].textureSlot1 = 0x1A;
     gobject->textureIDs[0].textureSlot2 = MessageTexts1[geMessageLanguage];
@@ -210,4 +208,172 @@ global void GraphicalObjectHandler_ModeTitle(GraphicalObject *gobject) {
     gobject->textureIDs[0].textureSlot3 = MessageTexts2[geMessageLanguage];
     gobject->textureIDs[1].textureSlot3 = 0xF;
     Sys2d_DrawObject(gobject);
+}
+
+ASMDefined void HandleSys2dAnimationObject1(GraphicalObject *object, u32 index, u8* stateptr, u32 incrementAmount);
+
+ASMDefined void GraphicalObjectHandler_EXLoadButtonCSS(GraphicalObject *gobject) {
+    void *object1ptr = static_cast<u8*>(gp2DSys) + (gobject->cullingGroup * 8) +  0x6000;
+    void **object1addr = static_cast<void**>(object1ptr);
+    auto *object1 = static_cast<CSSObject*>(*object1addr);
+
+    const u8 playerIndex = gobject->idStruct.idIndex;
+    switch (object1->state) {
+        case 0:
+            gobject->extraTransformObjectID = 24;
+            gobject->unk60 = 5;
+            gobject->extraTransformIndex = playerIndex;
+            break;
+        default:
+            if (object1->cssSelectionState[playerIndex] == 0) {
+                gobject->active = false;
+            } else {
+                const Player &player = players[playerIndex];
+
+                if (object1->cssSelectionState[playerIndex] == 1) {
+                    // in character select
+                    gobject->active = CheckPlayerHoveringOverPossibleEXLoad(player, OnlyCharacter);
+                } else if (object1->cssSelectionState[playerIndex] == 2 || object1->cssSelectionState[playerIndex] == 3) {
+                    // in gear select
+                    gobject->active = CheckPlayerHoveringOverPossibleEXLoad(player, OnlyGear);
+                } else {
+                    gobject->active = false;
+                }
+            }
+            break;
+    }
+
+    // this function handles all of the object's animation per CSS object1's state
+    HandleSys2dAnimationObject1(gobject, 0, &object1->state, 0x10000);
+
+    Sys2d_DrawObject(gobject);
+}
+
+ASMDefined u32 func_8003505C(f32);                             /* extern */
+extern u16 lbl_001D37F8[];
+extern f32 lbl_001D3938;
+ASMDefined void lbl_000F9038(GraphicalObject *, u32, u32, u32, u32);
+
+constexpr std::array<u16, 7> ExtraDefaultGearTextID = {
+        760,
+        761,
+        762,
+        763,
+        764,
+        765,
+        522, // variable character, add new characters' IDs before this
+};
+
+// decompiled
+ASMUsed void GraphicalObjectHandler_CSSInformationText(GraphicalObject* gobject) {
+    const u8 playerIndex = gobject->idStruct.idIndex;
+    CSSObject* object = *(static_cast<CSSObject**>(gp2DSys) + ((gobject->cullingGroup * (8/4)) + (0x6000 / 4)));
+
+    switch (object->state) {                        /* irregular */
+        case 0:
+            gobject->extraTransformObjectID = 0x23;
+            gobject->unk60 = 1;
+            gobject->extraTransformIndex = -1;
+            Sys2d_DrawObject(gobject);
+            gobject->unkB4 = func_8003505C(gobject->textureTransform.x);
+            gobject->extraTransformObjectID = 0x22;
+            gobject->unk60 = 3;
+            gobject->extraTransformIndex = -1;
+            gobject->extraTransformIndex = playerIndex;
+            return;
+        case 2:
+            if (object->cssSelectionState[playerIndex] == 3) {
+                Player* player = &players[playerIndex];
+                const s8 gear = static_cast<s8>(player->extremeGear);
+                gobject->active = true;
+
+                u16 text = 0;
+                if (player->character > E10R && player->extremeGear == ExtremeGear::Default) {
+                    // any new characters
+                    text = ExtraDefaultGearTextID[player->character - Silver];
+                } else {
+                    text = lbl_001D37F8[((static_cast<s8>(player->character) + 0x29) * static_cast<int>(gear == 0) - 1) + gear];
+                }
+
+                if (object->visualTrigger[playerIndex] == 1) {
+                    const s32 temp_r3 = static_cast<const s32>(gobject->currentAnimationFrame2);
+                    gobject->currentAnimationFrame2 = static_cast<s32>(((u32) (-temp_r3 | temp_r3) >> 0xCU) & 0x80000);
+                }
+
+                lbl_000F9038(gobject, 0U, 0x10000U, 2U, 0U);
+
+                if (gobject->currentAnimationFrame2 >= 0x80000U) {
+                    Sys2d_DrawObject(gobject);
+                    RenderText(static_cast<s32>(gobject->textureTransform.x),
+                               static_cast<s32>(gobject->textureTransform.y),
+                               gobject->unkB0,
+                               gobject->unkB4,
+                               0U,
+                               text,
+                               gasSubFont + 1,
+                               gpasTexList_SubFont.unk4,
+                               lbl_001D3938 + gobject->textureTransform.z);
+                    return;
+                }
+            } else if (object->cssSelectionState[playerIndex] == 1 && PlayerCharacterInformationBox[playerIndex]) {
+                // in character selection
+                gobject->active = true;
+
+                if (object->visualTrigger[playerIndex] == 1) {
+                    const s32 temp_r3 = static_cast<const s32>(gobject->currentAnimationFrame2);
+                    gobject->currentAnimationFrame2 = static_cast<s32>(((u32) (-temp_r3 | temp_r3) >> 0xCU) & 0x80000);
+                }
+
+                lbl_000F9038(gobject, 0U, 0x10000U, 2U, 0U);
+
+                Player* player = &players[playerIndex];
+                if (gobject->currentAnimationFrame2 >= 0x80000U && player->character < TotalCharacterAmount) {
+                    u16 text;
+                    auto exLoads = FetchEnabledEXLoadIDs(*player);
+                    auto exLoadSlotIndex = Player_EXLoadData[player->input->port][CharacterEXLoadMode].exLoadIndex;
+                    auto exLoadSlot = CharacterEXLoadDataSlots[exLoadSlotIndex];
+
+                    if (exLoads.characterExLoadID != 0 && EXLoadArchetypes[exLoads.characterExLoadID] != NoEXLoadArchetype
+                        && CheckIfEXLoadCanBeApplied(*player, exLoadSlot)) {
+                        text = EXLoadArchetypes[exLoads.characterExLoadID];
+                        if (exLoads.characterExLoadID == SelkadoomEXLoad) {text = 10;} // Special version of combat text
+                    } else if (player->character == Emerl) {
+                        text = 9;
+                    } else if (player->character == Shadow) {
+                        text = 10;
+                    } else {
+                        u32 index;
+                        if (player->character == E10G &&
+                            (exLoads.characterExLoadID == E10BEXLoad || exLoads.characterExLoadID == E10REXLoad)) {
+                            index = E10R;
+                        } else {
+                            index = player->character;
+                        }
+                        text = AllCharacterArchetypes[index];
+                    }
+
+                    Sys2d_DrawObject(gobject);
+
+                    RenderText(static_cast<s32>(gobject->textureTransform.x),
+                               static_cast<s32>(gobject->textureTransform.y),
+                               gobject->unkB0,
+                               gobject->unkB4,
+                               0U,
+                               text,
+                               &CharacterInformationFont.textDataHeader,
+                               gpasTexList_SubFont.unk4,
+                               lbl_001D3938 + gobject->textureTransform.z);
+                    return;
+                }
+            } else {
+                gobject->active = false;
+                if (object->cssSelectionState[playerIndex] < 3U) {
+                    gobject->currentAnimationFrame2 = 0;
+                    gobject->unk5C = 0;
+                }
+                case 1:
+                    return;
+            }
+            break;
+    }
 }

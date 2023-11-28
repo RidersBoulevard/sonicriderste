@@ -24,7 +24,7 @@ void CustomCodehandler_Player(Player *player) {
 namespace CustomCodehandler {
 	constexpr auto bssMaxSize = 0x400;
 	static std::array<u32, 2> injectedCodeAmount{};
-	static std::array<std::array<char, bssMaxSize>, 4> bss{};               // multidimensional std::array sizes need to be defined backwards
+	static m2darray<char, 4, bssMaxSize> bss{};
 	static std::array<u16, 4> bssFreeSpace{bssMaxSize, bssMaxSize, bssMaxSize, bssMaxSize};
 	static std::array<u16, 4> bssSlotAmount{0, 0, 0, 0};
 
@@ -35,12 +35,12 @@ namespace CustomCodehandler {
 	};
 
 	// Maybe this would be better using std::variant?
-	std::array<InjectInfo<InjectorPtr>, 64> injectedCodes; // NOLINT(readability-magic-numbers)
-	std::array<InjectInfo<InjectorPlayerPtr>, 64> injectedPlayerCodes; // NOLINT(readability-magic-numbers)
+	std::array<InjectInfo<InjectorPtr>, 64> injectedCodes;            // NOLINT(readability-magic-numbers)
+	std::array<InjectInfo<InjectorPlayerPtr>, 64> injectedPlayerCodes;// NOLINT(readability-magic-numbers)
 
 	template<typename Injector>
 	void InitializeInjectedCode(InjectInfo<Injector> &info, Injector function, const u32 &bssType) {
-		//struct InjectInfo *info = &(injectedCodes[codetype][injectedCodeAmount[codetype]]);
+		//InjectInfo *info = &(injectedCodes[codetype][injectedCodeAmount[codetype]]);
 
 		info.function = function;
 		info.bssPointer = nullptr;
@@ -143,16 +143,21 @@ namespace CustomCodehandler {
 	}
 
 	void InvokeInjectedCodes() {
-		for(u32 i = 0; i < injectedCodeAmount[EveryFrameInjectedCode]; i++) {
-			reinterpret_cast<InjectorPtr>(injectedCodes[i].function)(
-			        injectedCodes[i].bssPointer, reinterpret_cast<void *>(&CustomCodehandler_Retrieve));
+		const std::span injectedCodeList = std::span(injectedCodes).subspan(0, injectedCodeAmount[EveryFrameInjectedCode]);
+		for(const auto &injectedCode: injectedCodeList) {
+			reinterpret_cast<InjectorPtr>(injectedCode.function)(
+			        injectedCode.bssPointer,
+			        reinterpret_cast<void *>(&CustomCodehandler_Retrieve));
 		}
 	}
 
 	void InvokeInjectedCodes(Player *player) {
-		for(u32 i = 0; i < injectedCodeAmount[InGameInjectedCode]; i++) {
-			reinterpret_cast<InjectorPlayerPtr>(injectedPlayerCodes[i].function)(
-			        injectedPlayerCodes[i].bssPointer, reinterpret_cast<void *>(&CustomCodehandler_Retrieve), player);
+		const std::span injectedCodeList = std::span(injectedPlayerCodes).subspan(0, injectedCodeAmount[InGameInjectedCode]);
+		for(const auto &injectedCode: injectedCodeList) {
+			reinterpret_cast<InjectorPlayerPtr>(injectedCode.function)(
+			        injectedCode.bssPointer,
+			        reinterpret_cast<void *>(&CustomCodehandler_Retrieve),
+			        player);
 		}
 	}
 }// namespace CustomCodehandler

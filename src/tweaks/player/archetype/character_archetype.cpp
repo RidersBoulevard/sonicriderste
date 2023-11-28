@@ -4,8 +4,7 @@
 USED void Player_CharacterArchetype(Player *player) {
     CharacterArchetypes archetype = AllCharacterArchetypes[player->character];
 
-    EnabledEXLoads exLoads{};
-    FetchEnabledEXLoadIDs(player, exLoads);
+    const EnabledEXLoads exLoads = FetchEnabledEXLoadIDs(*player);
 
     if (exLoads.characterExLoadID != NoneEXLoad) {
         CharacterArchetypes const newArchetype = EXLoadArchetypes[exLoads.characterExLoadID];

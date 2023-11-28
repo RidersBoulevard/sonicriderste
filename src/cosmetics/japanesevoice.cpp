@@ -1,19 +1,27 @@
-#include "context.hpp"
+#include "lib/stdlib.hpp"
+#include "lib/thread.hpp"
 
-global char str_VOICE_E_AFS;
-global char str_VOICE_AFS;
-global void lbl_8009E734(u32, void*, u32, void*);
-global u32 lbl_8009E398(u32);
-global void* lbl_10026720;
-global u8 lbl_1001A6E4;
-global u32 GameLanguage;
+ASMDefined char str_VOICE_E_AFS;
+ASMDefined char str_VOICE_AFS;
+ASMDefined void lbl_8009E734(u32, void*, u32, void*);
+ASMDefined u32 lbl_8009E398(u32);
+ASMDefined void* lbl_10026720;
+ASMDefined u8 lbl_1001A6E4;
+ASMDefined u32 GameLanguage;
 
+//#define ThreadClassTesting
+
+#ifndef ThreadClassTesting
 void *JapaneseVoices_Thread;
+#endif
+#ifdef ThreadClassTesting
+std::unique_ptr<Thread> JapaneseVoices_Thread;
+#endif
 
 void JapaneseVoiceToggleHandler() {
     char *filename;
 
-    if (RuleSettings & 0x100) {
+    if ((RuleSettings & 0x100) != 0) {
         // japanese voices
         GameLanguage = 0;
         filename = &str_VOICE_AFS;
@@ -26,18 +34,31 @@ void JapaneseVoiceToggleHandler() {
     lbl_8009E734(0, filename, 0, &lbl_10026720);
     lbl_1001A6E4 += 1;
 
-    do {
+    while (lbl_8009E398(0) != 3){}
 
-    } while (lbl_8009E398(0) != 3);
-
-    nnFree(JapaneseVoices_Thread);
+#ifdef ThreadClassTesting
+	JapaneseVoices_Thread->Stop();
+	JapaneseVoices_Thread.reset();
+#endif
+#ifndef ThreadClassTesting
+	nnFree(JapaneseVoices_Thread);
     OSCancelThread(_OSGetCurrentContext());
+#endif
 }
 
 ASMUsed void CreateJapaneseVoiceToggleThread() {
-    void *thread = aligned_malloc(32, 10000);
-    void *threadMain = (u8 *)thread + 1000;
+#ifdef ThreadClassTesting
+	JapaneseVoices_Thread = std::make_unique<Thread>(JapaneseVoiceToggleHandler);
+	JapaneseVoices_Thread->Start();
+#endif
+#ifndef ThreadClassTesting
+	static constexpr auto stackOffset = 3000;
+	static constexpr auto stackSize = 4096;
+	static constexpr auto endOfStack = stackOffset+stackSize;
+    void *thread = aligned_malloc(32, sizeof(Thread));
+   // void *threadMain = (u8*)thread + 1000;
     JapaneseVoices_Thread = thread;
-    OSCreateThread(threadMain, &JapaneseVoiceToggleHandler, 0, (u8*)thread+4000+4096, 4096, 31, 1);
-    OSResumeThread(threadMain);
+    OSCreateThread(thread, &JapaneseVoiceToggleHandler, 0, (u8*)thread+endOfStack, stackSize, 31, 1);
+    OSResumeThread(thread);
+#endif
 }

@@ -6,13 +6,13 @@ const f32 OllieKingGear_BoostSpeeds[7] = {pSpeed(200.0f), pSpeed(210.0f), pSpeed
 const f32 OllieKingGear_KickdashSpeeds[3] = {pSpeed(50.0f), pSpeed(65.0f), pSpeed(80.0f)};
 const f32 OllieKingGear_KickdashCap[3] = {pSpeed(310.0f), pSpeed(320.0f), pSpeed(330.0f)};
 
-struct OKGInfo PlayerOKGInfo[8];
+OKGInfo PlayerOKGInfo[8];
 
-void Player_OllieKingGear(struct Player *player) {
+void Player_OllieKingGear(Player *player) {
     u8 controllerPort = player->input->port;
-    struct EnabledEXLoads exLoads; 
+    EnabledEXLoads exLoads;
     FetchEnabledEXLoadIDs(player, &exLoads);
-    struct OKGInfo *okgInfo = &PlayerOKGInfo[player->index];
+    OKGInfo *okgInfo = &PlayerOKGInfo[player->index];
     if (exLoads.gearExLoadID != OllieKingGearEXLoad) return;
 
     if (player->state == StartLine) 

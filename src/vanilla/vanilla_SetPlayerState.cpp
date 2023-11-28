@@ -33,8 +33,8 @@ void func_SetPlayerActionType(Player *player, u32 state) {
 	u8 temp_r7;
 	u8 temp_r8;
 	u8 temp_r9;
-	struct ParticleObject1 *temp_r10;
-	struct PlayerCameraStruct *temp_r3;
+	ParticleObject1 *temp_r10;
+	PlayerCameraStruct *temp_r3;
 	u32 phi_r5;
 	f32 phi_f2;
 	f32 phi_f2_2;

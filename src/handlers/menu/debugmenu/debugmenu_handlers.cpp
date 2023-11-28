@@ -1,18 +1,17 @@
 #include "debugmenu_handlers.hpp"
 #include "debugmenu.hpp"
-#include "macros.hpp"
 
-#define MUTED_VOLUME 0
-#define DEFAULT_VOLUME 0x4026
-#define PAUSED_VOLUME 0x40C
+constexpr auto MUTED_VOLUME = 0;
+constexpr auto DEFAULT_VOLUME = 0x4026;
+constexpr auto PAUSED_VOLUME = 0x40C;
 
 struct AudioProperties{
-	char filler[0x64];
+	fillerData<0x64> filler;
 	u16 volume;
-	char filler2[0x8E];
+	fillerData<0x8E> filler2;
 };
 
-global AudioProperties lbl_801BBE60;
+ASMDefined AudioProperties lbl_801BBE60;
 
 inline void SetAudioVolume(u16 volume, bool isMusicDisabled){
 	AudioProperties *propertiesRightChannel = &lbl_801BBE60 + 0x3E;
@@ -28,21 +27,22 @@ inline void SetAudioVolume(u16 volume, bool isMusicDisabled){
 }
 
 void DebugMenuHandler_DisableMusic(){
-	bool isMusicDisabled = DebugMenu_CheckOption(DisableMusic);
+	bool isMusicDisabled = DebugMenu_CheckOption(DebugMenuOptions::DisableMusic);
 	if(isMusicDisabled){
 		SetAudioVolume(MUTED_VOLUME, isMusicDisabled);
 	}else{
 		SetAudioVolume(DEFAULT_VOLUME, isMusicDisabled);
 	}
-
 }
 
-global void *gsTexSrc_Game2D_00;
-global void *lbl_001C2C88;
-global void *lbl_001C2C7C;
+ASMDefined void *gsTexSrc_Game2D_00;
+ASMDefined void *lbl_001C2C88;
+ASMDefined void *lbl_001C2C7C;
 
-global void DrawTimer(u32 minutes, u32 seconds, u32 milliSeconds, u32 timeTextureRGBA, u32 numberTextureRGBA);
+ASMDefined void DrawTimer(u32 minutes, u32 seconds, u32 milliSeconds, u32 timeTextureRGBA, u32 numberTextureRGBA);
 
+#include "macros.h"
+#include "riders/gamemode.hpp"
 void DrawTimerExtra(u32 minutes,
                     u32 seconds,
                     u32 milliSeconds,
@@ -707,24 +707,64 @@ void DrawTimerExtra(u32 minutes,
 			);
 }
 
-global u32 gu32ViewportNum;
+ASMDefined u32 gu32ViewportNum;
 ASMUsed void
 DebugMenuHandler_TimerActivity(u32 minutes, u32 seconds, u32 milliSeconds, u32 timeTextureRGBA, u32 numberTextureRGBA){
-	if(DebugMenu_CheckOption(TimerActivity_ActiveInSingleplayer)){
+	if(DebugMenu_CheckOption(DebugMenuOptions::TimerActivity_ActiveInSingleplayer)){
 		if(gu32ViewportNum == 1 || CurrentGameMode == BattleMode){
 			DrawTimer(minutes, seconds, milliSeconds, timeTextureRGBA, numberTextureRGBA);
 		}
-	}else if(DebugMenu_CheckOption(TimerActivity_ActiveIn1v1)){
+	}else if(DebugMenu_CheckOption(DebugMenuOptions::TimerActivity_ActiveIn1v1)){
 		if(gu32ViewportNum == 2 || CurrentGameMode == BattleMode){
 			DrawTimer(minutes, seconds, milliSeconds, timeTextureRGBA, numberTextureRGBA);
 		}
-	}else if(DebugMenu_CheckOption(TimerActivity_ActiveIn1v1Middle)){
+	}else if(DebugMenu_CheckOption(DebugMenuOptions::TimerActivity_ActiveIn1v1Middle)){
 		if(gu32ViewportNum == 2){
 			DrawTimerExtra(minutes, seconds, milliSeconds, timeTextureRGBA, numberTextureRGBA, 0, 171);
 		}
-	}else if(DebugMenu_CheckOption(TimerActivity_ActiveIn3OrMorePlayers)){
+	}else if(DebugMenu_CheckOption(DebugMenuOptions::TimerActivity_ActiveIn3OrMorePlayers)){
 		if(gu32ViewportNum >= 3 || CurrentGameMode == BattleMode){
 			DrawTimer(minutes, seconds, milliSeconds, timeTextureRGBA, numberTextureRGBA);
 		}
 	}
+}
+
+inline u8 FetchGameState() {
+	for(const auto &currentObject : getObjectList()){
+		// try to find GameCtrl task
+		if (currentObject.object_group == 1) {
+			return currentObject.state;
+		}
+	}
+
+    return 0xFF;
+}
+
+ASMUsed bool DebugMenuHandler_DisableHUD() {
+    if (DebugMenu_CheckOption(DebugMenuOptions::DisableHUDPartial)) {
+        const u8 gameState = FetchGameState();
+        return gameState == 6 || gameState == 7;
+    }
+    if (DebugMenu_CheckOption(DebugMenuOptions::DisableHUDFull)) {
+        const u8 gameState = FetchGameState();
+        return gameState == 6 || gameState == 7 || gameState == 0xA;
+    }
+
+    return false;
+}
+
+void DebugMenuHandler_InfiniteAir(Player *player) {
+    if (DebugMenu_CheckOption(DebugMenuOptions::InfiniteAir) && !player->specialFlags.hasAny(ringGear)){
+		player->currentAir = player->gearStats[player->level].maxAir;
+	}
+}
+
+void DebugMenuHandler_InfiniteRings(Player *player) {
+    if (DebugMenu_CheckOption(DebugMenuOptions::InfiniteRings)) {
+        if (player->specialFlags.hasAny(ringGear)) {
+			player->currentAir = player->gearStats[player->level].maxAir;
+		} else {
+			player->rings = 1000;// to account for more than 100 max ring gears lol
+		}
+    }
 }

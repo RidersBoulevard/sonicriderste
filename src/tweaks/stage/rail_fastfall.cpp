@@ -1,6 +1,7 @@
-#include "context.hpp"
+#include "riders/player.hpp"
+#include "riders/stage.hpp"
 
-constexpr f32 data_C241155C[17] = {
+constexpr std::array<f32, 17> data_C241155C = {
     0.0f, // test stage
     0.05f, // metal city
     0.15f, // splash canyon

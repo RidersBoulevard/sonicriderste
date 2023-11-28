@@ -1,10 +1,12 @@
 #include "zbutton.hpp"
+#include "lib/stdlib.hpp"
 
 // Z Button Out Of Turb Retracts Air/Rings
 
 inline void ZTurbulenceRetractAir(Player *player) {
-    if (player->specialFlags & ringGear) {
-	    s32 air = player->currentAir - 3300; // 3 rings
+    if (player->specialFlags.hasAny(ringGear)) {
+	    // s32 air = player->currentAir - 3300; // 3 rings
+	    s32 air = player->currentAir - (player->gearStats[player->level].maxAir * 3) / 100; // 3 rings
         player->currentAir = clamp(air, 0);
         
     } else {
@@ -26,17 +28,21 @@ ASMUsed void Player_ZTurbulenceRetractAir(Player *player) {
 ASMUsed void Player_SetInvulnerabilityFromZTurbulence(Player *player) {
     if (player->previousState == TurbulenceRide && player->unk105D == 1) 
     // turbulence was left via L and R exit
-    player->tornadoInvulnerabilityTimer = 30;
+    {
+        player->tornadoInvulnerabilityTimer = 30;
+        const Player &turbPlayer = players[player->closestTurbulenceIndex];
+        if (turbPlayer.extremeGear == ExtremeGear::SlideBooster) ZTurbulenceRetractAir(player);
+    }
 }
 
 void Player_IgnoreTurbulenceHandler(Player *player) {
     Controller *controls = player->input;
-    BOOL updatedYButton;
-    u32 holdButtons = controls->holdFaceButtons;
-    u32 toggleButtons = controls->toggleFaceButtons;
-    BOOL isZButton = (holdButtons & ZButton) ? TRUE : FALSE;
-    BOOL isYButton = (toggleButtons & YButton) ? TRUE : FALSE;
+    const auto &holdButtons = controls->holdFaceButtons;
+    const auto &toggleButtons = controls->toggleFaceButtons;
+    const bool isZButton = holdButtons.hasAny(ZButton);
+    const bool isYButton = toggleButtons.hasAny(YButton);
 
-    updatedYButton = player->y_toggle ^= isYButton;
-    player->ignoreTurbulence = isZButton ^ updatedYButton;
+	const bool updatedYButton = player->y_toggle ^= isYButton;
+    if (player->statusEffectFlags.hasAny(BallAndChainStatus)) player->ignoreTurbulence = true; //  ball and chain disables turb
+    else player->ignoreTurbulence = isZButton ^ updatedYButton;
 }

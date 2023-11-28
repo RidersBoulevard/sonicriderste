@@ -1,14 +1,14 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/player.hpp"
 
-#define DashPadParticle 0xB112
+constexpr auto DashPadParticle = 0xB112;
 
 struct PlayerWindParticles {
 	// 0x4C in size
-	u32 data[0x13];
+	std::array<u32, 0x13> data;
 };
 
-global PlayerWindParticles playerWindParticles[];
+ASMDefined PlayerWindParticles playerWindParticles[];
 
 void lbl_Slipstream(Player *player);

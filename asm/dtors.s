@@ -1,4 +1,4 @@
-.include "macros.inc"
+#include "macros.S"
 
 .section .dtors, "wa"  # 0x800E2F40 - 0x800E2F60
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/player.hpp"
 
-extern "C" void Player_ZTurbulenceRetractAir(struct Player *player);
-extern "C" void Player_SetInvulnerabilityFromZTurbulence(struct Player *player);
-void Player_IgnoreTurbulenceHandler(struct Player *player);
+ASMDefined void Player_ZTurbulenceRetractAir(Player *player);
+ASMDefined void Player_SetInvulnerabilityFromZTurbulence(Player *player);
+void Player_IgnoreTurbulenceHandler(Player *player);

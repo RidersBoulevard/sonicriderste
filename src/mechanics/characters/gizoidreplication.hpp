@@ -1,19 +1,24 @@
 #pragma once
 
-#include "main.hpp"
+#include "riders/player.hpp"
+#include "types.hpp"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-struct GizoidReplicationInfo {
-	f32 timer;
-	f32 enableDelayTimer; // used mainly for slipstream and turbulence to delay enabling GR
-	BOOL isEnabled;
-	Player *slipstreamPlayer; // if using slipstream, will store the player pointer of 1st place in slipstream range, otherwise 0
-	u32 currentType; // 0 if none
+enum GRStates {
+	GR_None,
+	GR_BumpingIntoPlayerState,
+	GR_AttackingPlayerState,
+	GR_TurbSlipstreamState
 };
-#pragma GCC diagnostic pop
 
-extern GizoidReplicationInfo PlayerGizoidReplication[8];
+struct GizoidReplicationInfo {
+	f32 timer = 0;
+	f32 enableDelayTimer = 0;          // used mainly for slipstream and turbulence to delay enabling GR
+	Player *slipstreamPlayer = nullptr;// if using slipstream, will store the player pointer of 1st place in slipstream range, otherwise nullptr
+	bool isEnabled = false;
+	Flag<Type> currentType = {};
+};
+
+extern std::array<GizoidReplicationInfo, MaxPlayerCount> PlayerGizoidReplication;
 extern const f32 GR_TypeShortcutSpeedMultiplier;
 extern const f32 GR_TypeShortcutSpeedMultiplierDual;
 

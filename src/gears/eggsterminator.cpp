@@ -4,11 +4,11 @@
 
 EggInfo PlayerEggsterminator[8];
 
-void Player_Eggsterminator(struct Player *player) {
+void Player_Eggsterminator(Player *player) {
     u8 controllerPort = player->input->port;
-    struct EnabledEXLoads exLoads; 
+    EnabledEXLoads exLoads;
     FetchEnabledEXLoadIDs(player, &exLoads);
-    struct EggInfo *EggInfo = &PlayerEggsterminator[player->index];
+    EggInfo *EggInfo = &PlayerEggsterminator[player->index];
 
     if (exLoads.gearExLoadID != E99EXLoad) return;
 

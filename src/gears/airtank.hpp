@@ -1,15 +1,20 @@
 #pragma once
 
-#include "context.hpp"
+#include "types.hpp"
+#include "riders/player.hpp"
+#include "handlers/player/specialflagtweaks.hpp"
+#include "lib/stdlib.hpp"
+
+#include <array>
 
 struct AirTankInfo {
-	u32 itemStorage[3];
+	std::array<u32, 3> itemStorage;
     u32 stoSize;
     u32 itemUsed;
 };
 
-extern struct AirTankInfo PlayerAirTankInfo[8];
+extern std::array<AirTankInfo, MaxPlayerCount> PlayerAirTankInfo;
 
-extern "C" u32 AntiItemCampHandler(struct Player *player, u32 item);
+ASMUsed u32 AntiItemCampHandler(Player *player, u32 item);
 
-extern "C" void Player_AirTank(struct Player *player);
+ASMUsed void Player_AirTank(Player *player);

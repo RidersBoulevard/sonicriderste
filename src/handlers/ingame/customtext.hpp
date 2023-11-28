@@ -1,6 +1,7 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/player.hpp"
+#include "riders/gamemode.hpp"
 
 struct SubFont {
 	void *textDataHeader;
@@ -8,14 +9,18 @@ struct SubFont {
 	void *padding;
 };
 
-global void* lbl_100178D4[3][4];
-global u32 geGame_ModeDetail;
+struct SubFontTexList {
+    void* unk0;
+    void* unk4;
+};
 
-global f32 lbl_001D2E7C;
-global void* gpasTexList_SubFont;
-global SubFont gasSubFont[];
+ASMDefined m2darray<void*, 3, 4> lbl_100178D4;
 
-extern void* CustomTextArchiveFile[];
+ASMDefined f32 lbl_001D2E7C;
+ASMDefined SubFontTexList gpasTexList_SubFont;
+ASMDefined SubFont gasSubFont[];
 
-BOOL Player_IsHUDVisible(const Player &player);
+extern std::array<void*, 2> CustomTextArchiveFile;
+
+bool Player_IsHUDVisible(const Player &player);
 ASMUsed void Player_SuperTailsRenderText();

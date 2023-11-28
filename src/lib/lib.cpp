@@ -20,13 +20,13 @@ void Custom_CreateHUDElement(void* textureStructs, u32 textureID, u32 textureRGB
     CreateHUDElement(hud->screenX, hud->screenY, xLength, yLength, textureRGBA, 0, textureBoundaries.data());
 }
 
-void GetPlayerPositionRotationMatrix(Player &player, Matrix3x3 &out) {
+void GetPlayerPositionRotationMatrix(Player &player, Matrix3x3F &out) {
     auto *mtxList = gpsaMtxList_Player[player.index];
-    Matrix3x3 *mtx = mtxList + 2;
+	Matrix3x3F *mtx = mtxList + 2;
     nnMultiplyMatrix(&player.unkC4, mtx, out);
 }
 
-std::array<u8, 35> MikuAnimationMap = {
+constexpr std::array<u8, 35> MikuAnimationMap = {
         0x01,
         0x02,
         0x0A,
@@ -64,43 +64,16 @@ std::array<u8, 35> MikuAnimationMap = {
         0xFF,
 };
 
-std::array<u8, TotalCharacterAmount+1> CharacterAnimationFiles = {
-        0x0,
-        0x1,
-        0x2,
-        0x3,
-        0x4,
-        0x5,
-        0x6,
-        0x7,
-        0x8,
-        0x9,
-        0xA,
-        0xB,
-        0xC,
-        0xD,
-        0xE,
-        0xF,
-        0x10,
-        0xA, // silver
-        0x0, // metal sonic
-        0x1, // emerl
-        0x6, // blaze
-        0x2, // chaos
-        0x8, // tikal
-        0xA, // variable character
-};
-
 ASMUsed u32 SetupCustomAnimationArchive(u8 *packManStart, u32 *packManOffsetStart, u32 playerIndex) {
     u32 setupFileCount = 0;
     Player &player = players[playerIndex];
     AttackObjReadManager &attackObj = gsAttackObjReadManager[playerIndex];
 
-    u8 character = CharacterAnimationFiles[player.character];
-    u8 gearType = player.gearType;
+    const u8 &character = CharacterAnimationFiles[player.character];
+    auto gearType = player.gearType;
 
-    if (player.extremeGear == OpaOpa) {
-        gearType = 3;
+    if (player.extremeGear == ExtremeGear::OpaOpa) {
+        gearType = static_cast<GearType>(3);
         attackObj.motptrsID = (character * 5) + gearType;
         attackObj.character = 0x11;
     }
@@ -124,28 +97,33 @@ ASMUsed u32 SetupCustomAnimationArchive(u8 *packManStart, u32 *packManOffsetStar
         return setupFileCount;
     }
 
-    u32 exclusiveMotionIndex = player.gearType * 0x200 + tu16ExclusiveMotionNo;
+    const u32 exclusiveMotionIndex = player.gearType * 0x200 + tu16ExclusiveMotionNo;
     u32 *exclusiveMotions = reinterpret_cast<u32*>(&gpsaMotion_PlayerNeo[exclusiveMotionIndex]);
 
     while (true) {
-        u32 offset = *packManOffsetStart;
+        const u32 offset = *packManOffsetStart;
         packManOffsetStart++;
         utilBinSetUpMotion(exclusiveMotions, packManStart + offset);
 
         setupFileCount++;
         exclusiveMotions++;
 
-        u32 motionIndex = tu16ExclusiveMotionNo;
+        const u32 motionIndex = tu16ExclusiveMotionNo;
         tu16ExclusiveMotionNo++;
 
-        u8 animationID = *idInfo;
+        const u8 animationID = *idInfo;
         player.animationIDMap[animationID] = motionIndex;
 
         idInfo++;
 
-        if (*idInfo == 0xFF)
-            break;
+        if (*idInfo == 0xFF) {
+			break;
+		}
     }
 
     return setupFileCount;
+}
+
+Vector3F MatrixExtractTranslation(Matrix3x3F *m) {
+    return {m->field[3], m->field[7], m->field[11]};
 }

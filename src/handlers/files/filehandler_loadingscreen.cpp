@@ -1,26 +1,26 @@
-#include "context.hpp"
 #include "filehandler_dat.hpp"
+#include "main.hpp"
+#include "riders/gamemode.hpp"
 
-void* CustomTextArchiveFile[2];
+#include <span>
 
-global {
+std::array<void*, 2> CustomTextArchiveFile;
+
+ASMDefined {
     extern void* lbl_801AFC64; /*asm*/
     void* texList_NormalSuperTails;
     void* texList_NormalSuperNeoMetal;
 }
 
-void init_text_table(u32 table[]) {
-    u32 textAmount = table[2];
-    u32 i=0;
-    u32 *textptr = &table[3];
+void init_text_table(std::span<u32> table) {
+	u32 *textptr = &table[3];
     u32 *startptr = &table[0];
 
-    while (i < textAmount)
-    {
-        *textptr = reinterpret_cast<u32>(startptr) + *textptr;
-        textptr++;
-        i++;
-    }
+	const u32 &textAmount = table[2];
+	for(u32 i = 0; i < textAmount; i++){
+		*textptr = reinterpret_cast<u32>(startptr) + *textptr;
+		textptr++;
+	}
 }
 
 ASMUsed void LoadingScreenFileHandler() {
@@ -58,8 +58,7 @@ ASMUsed void LoadingScreenFileHandler() {
     neoMetalTextures = DumpFile("P4T", 1);
     SetupGVRTextureArchive(neoMetalTextures, &offset, &texList_NormalSuperNeoMetal, 0);
 
-    if (CurrentGameMode == FreeRace || CurrentGameMode == WorldGrandPrix)
-    {
+    if (CurrentGameMode == FreeRace || CurrentGameMode == WorldGrandPrix){
         file2 = DumpPackManFile("SVB", 0);
         SetArchiveBinary((char *)file2, 0, 0);
         file3 = DumpPackManFile("SVBE", 0);

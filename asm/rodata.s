@@ -1,4 +1,4 @@
-.include "macros.inc"
+#include "macros.S"
 
 .section .rodata, "wa"  # 0x800E2F60 - 0x800ED2E0
 

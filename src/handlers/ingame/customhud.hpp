@@ -1,14 +1,14 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/object.hpp"
 
 struct EmerlTypeIconObject1 {
-    u8 opacity[4];
-    bool isFullyOpaque[4]; // used for the "blinking" effect
-    [[gnu::unused]] char empty[0x17];
+    std::array<u8, 4> opacity;
+    std::array<bool, 4> isFullyOpaque; // used for the "blinking" effect
+    [[gnu::unused]] fillerData<0x17> empty;
     [[gnu::unused]] bool endOfStruct;
 };
 static_assert(sizeof(EmerlTypeIconObject1) == 0x20);
 
-global Object* gpsCurrentTask;
-global void* texList_GTSE_0;
+ASMDefined ObjectNode * gpsCurrentTask;
+ASMDefined void* texList_GTSE_0;

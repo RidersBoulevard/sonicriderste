@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.13)
 project(SonicRidersTE CXX ASM)
 
 set(CXX_STANDARD 23)
-
-set(OPTIMIZATION_FLAGS -O3)
 set(WARNING_FLAGS
 		#-Werror    # Turns all warnings into errors # Would not recommend enabling unless you're planning to fix *every* warning
 		-Wall   # Enable most warning messages.
@@ -40,28 +38,27 @@ set(WARNING_FLAGS
 option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." TRUE)
 
 set(DOL_SOURCES     # main
-		asm/init.s
-		asm/text.s
-		asm/lib.s
-		src/containers/vector3.cpp
+		asm/init.S
+		asm/text.S
+		asm/lib.S
+		# src/containers/vector3.cpp
 		src/tweaks/stage/stage_changes.cpp
-		asm/ctors.s
-		asm/dtors.s
-		asm/rodata.s
-		asm/data.s
-		asm/bss.s
-		asm/sdata.s
-		asm/sbss.s
-		asm/sdata2.s
-		asm/sbss2.s
-		asm/_Main/text.s
-		asm/_Main/rodata.s
-		asm/_Main/data.s
-		asm/_Main/bss.s
+		asm/ctors.S
+		asm/dtors.S
+		asm/rodata.S
+		asm/data.S
+		asm/bss.S
+		asm/sdata.S
+		asm/sbss.S
+		asm/sdata2.S
+		asm/sbss2.S
+		asm/_Main/text.S
+		asm/_Main/rodata.S
+		asm/_Main/data.S
+		asm/_Main/bss.S
 		src/tedata.cpp
 		src/lib/operators.cpp
 		src/handlers/files/filehandler_loadingscreen.cpp
-		src/tweaks/player/type_amount.cpp
 		src/mechanics/slipstream.cpp
 		src/mechanics/fastfall.cpp
 		src/handlers/music/custom_music.cpp
@@ -87,8 +84,7 @@ set(DOL_SOURCES     # main
 		src/handlers/player/zignoretornado.cpp
 		src/tweaks/stage/segaillusion/chuchurocket_dashpanel.cpp
 		src/tweaks/stage/custompowerobjecttimer.cpp
-		src/tweaks/stage/collisiontweaks.cpp
-		src/tweaks/player/weight.cpp
+        src/tweaks/player/weight.cpp
 		src/handlers/player/antiitemcamp.cpp
 		src/tweaks/player/jumpinrun.cpp
 		src/cosmetics/player/jumpchargeparticlevisibility.cpp
@@ -139,7 +135,6 @@ set(DOL_SOURCES     # main
 		src/gears/slidebooster.cpp
 		src/mechanics/archetype/superleap.cpp
 		src/mechanics/characters/gizoidreplication.cpp
-		src/lib/sound.cpp
 		src/tweaks/player/archetype/boostarchetypejcbc.cpp
 		src/handlers/customcodehandler.cpp
 		src/handlers/customcodehandler_func.cpp
@@ -166,11 +161,57 @@ set(DOL_SOURCES     # main
 		src/handlers/ingame/customhud.cpp
 		src/mechanics/archetype/afterburner.cpp
         src/handlers/player/voicelines.cpp
-		src/handlers/player/voicelines.hpp)           # main
+		src/handlers/ingame/customcss.cpp
+		src/cosmetics/player/supersonicaura.cpp
+		src/tweaks/player/runspeed.cpp
+		src/handlers/menu/randomstage.cpp
+		src/handlers/menu/randomstage.hpp
+		src/cosmetics/player/skinsystem.cpp
+		# src/lib/sound.cpp
+		src/lib/thread.cpp src/lib/thread.hpp
+		src/handlers/player/specialflagtweaks.cpp
+        src/handlers/files/load_deduplicated.cpp) # main
+
+set(STANDALONE_HEADERS # This is only here to make sure that headers actually include the things it needs, by "compiling" them standalone.
+		include/compare_many.hpp
+		include/flags.hpp
+		include/globalDefs.hpp
+		include/macros.h
+		include/main.hpp
+		include/types.hpp
+		include/riders/character.hpp
+		include/riders/collision.hpp
+		include/riders/controller.hpp
+		include/riders/gear.hpp
+		include/riders/player.hpp
+		include/riders/general_flags.hpp
+		include/riders/stage.hpp
+		include/riders/tricks.hpp
+		include/riders/gamemode.hpp
+		include/riders/object.hpp
+		include/riders/hud.hpp
+        include/endian.hpp)
 
 #====================================================================================
 # Extra plumbing stuff. Hopefully nothing in here will need to be changed
 #====================================================================================
+
+#Set default build type to be release. add `-DCMAKE_BUILD_TYPE=debug` to cmake command to configure a debug build
+set(release_build_type "Release")
+set(debug_build_type "Debug")
+# Set a default build type if none was specified
+set(default_build_type ${release_build_type})
+
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+	#message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
+	set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
+			STRING "Choose the type of build." FORCE)
+	# Set the possible values of build type for cmake-gui
+	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
+			"Debug" "Release")
+endif()
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(DEVKITPRO $ENV{DEVKITPRO} CACHE PATH "Path to the main DevKitPro tools directory")
 
@@ -179,42 +220,53 @@ include(${DEVKITPRO}/cmake/GameCube.cmake)
 include(${DEVKITPRO}/cmake/Platform/NintendoGameCube.cmake)
 
 set(CMAKE_CXX_STANDARD ${CXX_STANDARD})
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)     # Enforces the standard we set instead of silently using an older standard if not available
+set(CMAKE_CXX_EXTENSIONS ON)            # Enables the use of compiler-specific extensions
 
-unset(CMAKE_CXX_STANDARD_LIBRARIES)
-set(CMAKE_CXX_STANDARD_LIBRARIES "")
+add_executable(main ${DOL_SOURCES} ${STANDALONE_HEADERS})
+
+#unset(CMAKE_CXX_STANDARD_LIBRARIES)
+#set(CMAKE_CXX_STANDARD_LIBRARIES "")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_INIT}")
 
-add_compile_options(${OPTIMIZATION_FLAGS} ${WARNING_FLAGS} -memb -g0)
-
-get_filename_component(ASMINCLUDE asm ABSOLUTE)
-add_compile_options(-Wa,-D,-I${ASMINCLUDE}) # For inline asm
-
-link_directories(${DEVKITPRO}/libogc/lib/cube)
-include_directories(${DEVKITPRO}/libogc/include/)
-
-include_directories(src include)
+#set(OPTIMIZATION_FLAGS -O3)
+set(CMAKE_CXX_FLAGS_DEBUG "-g3 -Ofast -DDEBUG -save-temps -fverbose-asm")
+set(CMAKE_CXX_FLAGS_RELEASE "-g0 -Ofast -DNDEBUG")
 
 set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS_INIT}")
+set(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+set(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+
+target_compile_options(main PUBLIC ${WARNING_FLAGS} -memb)
+
+get_filename_component(ASMINCLUDE asm ABSOLUTE)
+get_filename_component(DOLINCLUDE dolinclude ABSOLUTE) # For any binary files included directly into the dol
+get_filename_component(CINCLUDE include ABSOLUTE)
+target_compile_options(main PUBLIC -Wa,-D,-I${ASMINCLUDE},-I${CINCLUDE},-I${DOLINCLUDE}) # For inline asm
+
+target_link_directories(main PUBLIC ${DEVKITPRO}/libogc/lib/cube)
+target_include_directories(main PUBLIC ${DEVKITPRO}/libogc/include/)
+
+target_include_directories(main PUBLIC src include)
 
 if (${FORCE_COLORED_OUTPUT})
 	#if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	add_compile_options(-fdiagnostics-color=always)
+	target_compile_options(main PUBLIC -fdiagnostics-color=always)
 	#elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	#	add_compile_options (-fcolor-diagnostics)
 	#endif ()
 endif ()
-
-add_executable(main ${DOL_SOURCES})
 
 get_filename_component(STATICLCF static.lcf ABSOLUTE)
 get_filename_component(PARSEMAPPY tools/parse_map.py ABSOLUTE)
 
 target_link_options(main PRIVATE -T ${STATICLCF} -Wl,-Map=main.map,-d,--wrap=malloc)
 
-target_link_libraries(main m)
+if("${CMAKE_BUILD_TYPE}" STREQUAL "${debug_build_type}")
+	target_link_libraries(main PUBLIC db)
+endif ()
+target_link_libraries(main PUBLIC ogc m)
 
 find_program(ELF2DOL NAMES ELF2DOL elf2dol HINTS "tools/build")
 if (NOT ELF2DOL)
@@ -252,6 +304,11 @@ add_custom_command(
 #[[
 set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR})
 
+install(TARGETS main
+		RUNTIME DESTINATION data/sys)
+
+install(TARGETS _Main
+		RUNTIME DESTINATION data/files)
 ]]
 
 # Uncomment to list all variables in the project

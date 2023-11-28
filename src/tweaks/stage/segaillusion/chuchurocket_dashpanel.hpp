@@ -1,22 +1,22 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/player.hpp"
 
-constexpr f32 ChuChuDashPanelSpeeds[] = {
-		pSpeed(20),
-		pSpeed(0),
-		pSpeed(100),
+constexpr std::array ChuChuDashPanelSpeeds = {
+        pSpeed(20),
+        pSpeed(0),
+        pSpeed(100),
 };
 
 struct ChuChuRocketDashPanel {
-	char filler[0x38];
+	fillerData<0x38> filler;
 	f32 speed;
-	char filler2[0x8];
+	fillerData<0x8> filler2;
 	struct ChuChuRocketDashPanelProperties *properties;
 };
 
 struct ChuChuRocketDashPanelProperties {
-	char filler[0x40];
+	fillerData<0x40> filler;
 	u32 id;
 };
 

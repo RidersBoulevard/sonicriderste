@@ -1,6 +1,6 @@
 #include "skyroadturbfix.hpp"
 // unused
-void Player_SkyRoadTurbFix(struct Player *player)
+void Player_SkyRoadTurbFix(Player *player)
 {
     u32 turbulenceBool, playerCount;
     playerCount = InGamePlayerCount;

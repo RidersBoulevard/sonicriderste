@@ -1,18 +1,17 @@
-#include "context.hpp"
 #include "slidebooster.hpp"
 
 ASMUsed u32 Player_SlideBoosterCantLeaveTurbulence(Player *player){
-	const Player &turbPlayer = players[player->closestTurbulenceIndex];
-	u32 canLeaveTurbulence = turbPlayer.extremeGear != SlideBooster;
-	return canLeaveTurbulence;
+	return 1;
+	// const Player &turbPlayer = players[player->closestTurbulenceIndex];
+	// return static_cast<u32>(turbPlayer.extremeGear != ExtremeGear::SlideBooster);
 }
 
 ASMUsed void Player_SlideBooster(Player *player){
-	if(player->extremeGear != SlideBooster) return;
+	if(player->extremeGear != ExtremeGear::SlideBooster) { return; }
 	if(player->characterArchetype == BoostArchetype){
-		player->gearStats[0].boostSpeed = pSpeed(285.0f);
-		player->gearStats[1].boostSpeed = pSpeed(325.0f);
-		player->gearStats[2].boostSpeed = pSpeed(425.0f);
+		player->gearStats[0].boostSpeed = pSpeed(290.0f);
+		player->gearStats[1].boostSpeed = pSpeed(340.0f);
+		player->gearStats[2].boostSpeed = pSpeed(390.0f);
 	}
 
 	if(player->characterArchetype == LateBooster){

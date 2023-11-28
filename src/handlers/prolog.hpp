@@ -1,8 +1,8 @@
 #pragma once
 
-#include "context.hpp"
+#include "globalDefs.hpp"
 
-global struct lbl_001D78C8 {
+ASMDefined struct lbl_001D78C8 {
 	u32 int1;
 	u32 int2;
 	u32 int3;
@@ -18,29 +18,29 @@ global struct lbl_001D78C8 {
 } lbl_001D78C8;
 
 
-global void *lbl_100066C0;
-global void TitleSequence_Task();
-global u32 lbl_8021BB84;
-global u32 lbl_8021BB68;
-global u32 gaNnViewRotInvertMtx[50];
+ASMDefined void *lbl_100066C0;
+ASMDefined void TitleSequence_Task();
+ASMDefined u32 lbl_8021BB84;
+ASMDefined u32 lbl_8021BB68;
+ASMDefined std::array<u32, 50> gaNnViewRotInvertMtx;
 
-global u32 OSGetTick();
-global void lbl_0004D1A4(u32);
-global void lbl_00175C7C();
-global void InitCamPalette(u32);
-global void InitCamera(u32);
-global void nnInitLight();
-global void InitLight(u32);
-global void nnSetClipScreenCoordinates(u32 []);
-global void lbl_000B7BFC();
-global void lbl_001514A8();
-global void lbl_800645A8(void *, f32, f32, f32, f32, f32, f32);
-global void lbl_80006778();
-global void lbl_0004F404();
-global void gNp_TaskDone(u32 stage, Player *player, PlayerCameraStruct *camera);
-global void lbl_0014C080();
-global void func_800303B0(u32);
-global void gNp_VWaitTrans();
-global void lbl_000B766C();
-global void lbl_000375B4();
-global void ReadAsyncReadFileData(u32);
+ASMDefined u32 OSGetTick();
+ASMDefined void lbl_0004D1A4(u32);
+ASMDefined void lbl_00175C7C();
+ASMDefined void InitCamPalette(u32);
+ASMDefined void InitCamera(u32);
+ASMDefined void nnInitLight();
+ASMDefined void InitLight(u32);
+ASMDefined void nnSetClipScreenCoordinates(u32 []);
+ASMDefined void lbl_000B7BFC();
+ASMDefined void lbl_001514A8();
+ASMDefined void lbl_800645A8(void *, f32, f32, f32, f32, f32, f32);
+ASMDefined void lbl_80006778();
+ASMDefined void lbl_0004F404();
+ASMDefined void gNp_TaskDone();
+ASMDefined void lbl_0014C080();
+ASMDefined void func_800303B0(u32);
+ASMDefined void gNp_VWaitTrans();
+ASMDefined void lbl_000B766C();
+ASMDefined void lbl_000375B4();
+ASMDefined void ReadAsyncReadFileData(u32);

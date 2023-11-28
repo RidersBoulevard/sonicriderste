@@ -1,4 +1,4 @@
-#include "context.hpp"
+#include "riders/player.hpp"
 
 ASMUsed f32 Player_TurbulenceTrickSpeed(Player *player) {
     f32 newTrickSpeed;

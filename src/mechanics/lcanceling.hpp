@@ -1,8 +1,8 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/player.hpp"
 
-global void OffroadJumpParticleTask();
+ASMDefined void OffroadJumpParticleTask();
 
 struct PlayerLCancelInfo {
 	u8 frameWindow;
@@ -10,7 +10,7 @@ struct PlayerLCancelInfo {
 };
 
 struct OffroadParticleObject1 {
-	char filler[0x30];
+	fillerData<0x30> filler;
 	u8 playerIndex;
 };
 

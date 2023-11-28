@@ -10,17 +10,17 @@ const u32 DynamoLevelRings[3] = {15, 30, 60};
 
 // u32 airTankFrameCounter = 0;
 
-struct WindmasterInfo PlayerWMInfo[8];
+WindmasterInfo PlayerWMInfo[8];
 
 // const f32 WM_RailJumpDelay = toFrames(0.34);
 
-void Player_Dynamo(struct Player *player) {
+void Player_Dynamo(Player *player) {
 
     u8 controllerPort = player->input->port;
-    struct EnabledEXLoads exLoads; 
+    EnabledEXLoads exLoads;
     FetchEnabledEXLoadIDs(player, &exLoads);
     
-    struct WindmasterInfo *wmInfo = &PlayerWMInfo[player->index];
+    WindmasterInfo *wmInfo = &PlayerWMInfo[player->index];
 
     if (exLoads.gearExLoadID != WindmasterJetEXLoad) return;
     

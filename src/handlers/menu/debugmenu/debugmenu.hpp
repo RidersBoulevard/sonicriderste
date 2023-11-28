@@ -1,75 +1,79 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/controller.hpp"
+#include "riders/object.hpp"
+#include <optional>
 
-enum DebugMenuOptionsPage1 {
-    DisableMusic,
-    MagneticImpulse,
-    Autopilot,
-    ExtremeDetach,
-    TornadoIgnore,
-    TimerActivity_ActiveInSingleplayer,
-    TimerActivity_ActiveIn1v1,
-    TimerActivity_ActiveIn1v1Middle,
-    TimerActivity_ActiveIn3OrMorePlayers,
+namespace DebugMenuOptions {
+	enum Page1 {
+		DisableMusic,                        //= 1 << 0,
+		MagneticImpulse,                     //= 1 << 1,
+		Autopilot,                           //= 1 << 2,
+		ExtremeDetach,                       //= 1 << 3,
+		TornadoIgnore,                       //= 1 << 4,
+		TimerActivity_ActiveInSingleplayer,  //= 1 << 5,
+		TimerActivity_ActiveIn1v1,           //= 1 << 6,
+		TimerActivity_ActiveIn1v1Middle,     //= 1 << 7,
+		TimerActivity_ActiveIn3OrMorePlayers,//= 1 << 8,
+		DisableHUDPartial,
+		DisableHUDFull,
+		InfiniteAir,
+		InfiniteRings,
+		AlwaysMaxMI
+	};
+	constexpr auto PAGE1OPTIONCOUNT = 10;
+	constexpr auto DefaultPage1Options = 1 << MagneticImpulse
+	                                     | 1 << Autopilot
+	                                     | 1 << TornadoIgnore
+	                                     | 1 << TimerActivity_ActiveInSingleplayer
+	                                     | 1 << ExtremeDetach;
+}// namespace DebugMenuOptions
+
+struct DebugMenuData {
+	std::array<std::span<u8>, DebugMenuOptions::PAGE1OPTIONCOUNT> page1Options;
+
+	u8 state = 0;
+	u8 selectedItemRow = 0;
+	u8 selectedItemColumn = 0;
+	u8 maximumItems = 0;
+
+	// bit field that corresponds to enum DebugMenuOptions
+	u32 toggledPageOptions = DebugMenuOptions::DefaultPage1Options;
 };
-#define DEBUGMENU_DEFAULTPAGE1OPTIONS \
-((1 << MagneticImpulse) | \
-(1 << Autopilot) | \
-(1 << TornadoIgnore) | \
-(1 << TimerActivity_ActiveInSingleplayer) | \
-(1 << ExtremeDetach))
 
-typedef struct DebugOptions {
-    u32 optionCount;
-    u8 *options;
-} DebugOptions;
-
-typedef struct DebugMenuData {
-    u8 state;
-    u8 selectedItemRow;
-    u8 selectedItemColumn;
-    u8 maximumItems;
-
-    DebugOptions page1Options[6];
-
-    // bit field that corresponds to enum DebugMenuOptions
-    u32 toggledPageOptions;
-} DebugMenuData;
-
-typedef struct Text2dFileData {
-    void *textData[2];
-    void *extraTextData[2];
-} Text2dFileData;
+struct Text2dFileData {
+	std::array<void *, 2> textData;
+	std::array<void *, 2> extraTextData;
+};
 
 struct AllPlayerInputs {
-    u32 holdButtons;
-    u32 toggleButtons;
+	Flag<Buttons> holdButtons;
+	Flag<Buttons> toggleButtons;
 };
 
 struct TitleSequenceObject1 {
-    char filler[0xD];
-    s8 currentButtonIndex;
-    s8 lastButtonIndex;
-    s8 currentMode;
+	fillerData<0xD> filler;
+	s8 currentButtonIndex;
+	s8 lastButtonIndex;
+	s8 currentMode;
 };
 
 struct Text2dFileHeader {
-    u16 width;
-    u16 height;
-    u32 unknown;
-    u32 textCount;
+	u16 width;
+	u16 height;
+	u32 unknown;
+	u32 textCount;
 };
 
 extern Text2dFileData DebugMenu_TextData;
 extern DebugMenuData DebugMenu_Data;
 
 bool DebugMenu_CheckOption(u32 option);
-void DebugMenu_ToggleOption(DebugOptions *options);
-void DebugMenu_ToggleOptionSet(DebugOptions *options, u32 direction);
-void DebugMenu_HandleAllToggles(DebugOptions *options, u32 direction);
-u32 DebugMenu_FetchTextIDAllToggles(DebugOptions *options);
-extern "C" void DebugMenu_Handler(struct Object *object, struct AllPlayerInputs *inputs);
-s32 DebugMenu_FetchOptionFromOptionSet(DebugOptions *options);
+void DebugMenu_ToggleOption(std::span<u8> options);
+void DebugMenu_ToggleOptionSet(std::span<u8> options, u32 direction);
+void DebugMenu_HandleAllToggles(std::span<u8> options, u32 direction);
+u32 DebugMenu_FetchTextIDAllToggles(std::span<u8> options);
+ASMUsed void DebugMenu_Handler(ObjectNode *object, AllPlayerInputs *inputs);
+std::optional<u8> DebugMenu_FetchOptionFromOptionSet(std::span<u8> options);
 u32 DebugMenu_FetchTextID(u32 option);
-extern "C" void DebugMenu_RenderDescription();
+ASMUsed void DebugMenu_RenderDescription();

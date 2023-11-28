@@ -1,8 +1,9 @@
 #pragma once
 
-#include "context.hpp"
+#include "riders/character.hpp"
+#include "riders/player.hpp"
 
-constexpr CharacterArchetypes AllCharacterArchetypes[] = {
+constexpr std::array<CharacterArchetypes, TotalCharacterAmount> AllCharacterArchetypes = {
 		LateBooster, // sonic
 		CombatArchetype, // tails
 		CombatArchetype, // knuckles
@@ -13,11 +14,11 @@ constexpr CharacterArchetypes AllCharacterArchetypes[] = {
 		AllRounder, // eggman
 		AllRounder, // cream
 		DriftArchetype, // rouge
-		AllRounder, // shadow
+		CombatArchetype, // shadow
 		SuperSonicArchetype, // super sonic
 		TopSpeedArchetype, // nights
 		LateBooster, // aiai
-		CombatArchetype, // ulala
+		AllRounder, // ulala
 		NoTypeArchetype, // e10g
 		DriftArchetype, // e10b/e10r
 		TricksterArchetype, // silver

@@ -1,4 +1,4 @@
-.include "macros.inc"
+#include "macros.S"
 
 .section .text, "ax"  # 0x800055E0 - 0x800E2F20
 

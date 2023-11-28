@@ -1,6 +1,9 @@
 #include "cosmetics/player/exloads.hpp"
 #include "gears/airtank.hpp"
+#include "gears/hangon.hpp"
 #include "lib/stdlib.hpp"
+#include "riders/gamemode.hpp"
+#include "riders/object.hpp"
 
 ASMUsed u32 AntiItemCampHandler(Player *player, u32 item) {
 	EnabledEXLoads exLoads;
@@ -9,11 +12,12 @@ ASMUsed u32 AntiItemCampHandler(Player *player, u32 item) {
         if (player->state == StartLine) {
             item = SpeedShoes;
         } else {
-            if ((player->extremeGear == SuperHangOn && player->level4) && player->last_itemBox_random) {
+            if ((player->extremeGear == ExtremeGear::SuperHangOn && player->gearSpecificFlags[SuperHangOn::Level4]) && player->last_itemBox_random) {
                 item = SpeedShoes;
             }
 
-            if (player->extremeGear == HangOn && player->last_itemBox_random && item == SpeedShoes) {
+            if (player->extremeGear == ExtremeGear::HangOn && player->last_itemBox_random && item == SpeedShoes
+                && exLoads.gearExLoadID != HangOnATEXLoad) {
                 // experimental, replaces speed shoes with ten ring box instead
                 item = TenRings; 
             }
@@ -36,7 +40,7 @@ ASMUsed u32 AntiItemCampHandler(Player *player, u32 item) {
                 }
             }
             
-            // struct AirTankInfo *ATInfo = &PlayerAirTankInfo[player->index];
+            // AirTankInfo *ATInfo = &PlayerAirTankInfo[player->index];
             // if (player->extremeGear == AirTank && ATInfo->itemUsed == 0) {
                 
             //     // experimental, air tank item storage

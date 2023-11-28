@@ -1,19 +1,20 @@
-#include "context.hpp"
 #include "cosmetics/player/exloads.hpp"
 
 ASMUsed u32 Player_NonLevelupGears(Player *player, u32 specialFlags) {
     //u8 controllerPort = player->input->port;
-    EnabledEXLoads exLoads{};
-    FetchEnabledEXLoadIDs(player, exLoads);
+    const EnabledEXLoads exLoads = FetchEnabledEXLoadIDs(*player);
     if (isSuperCharacter(*player, Tails) || // super tails
 		isSuperCharacter(*player, MetalSonic) || // super metal
-        player->extremeGear == CoverF ||
-        player->extremeGear == CoverS ||
-        player->extremeGear == CoverP ||
-        exLoads.gearExLoadID == StardustSpeederEXLoad
-        // exLoads.gearExLoadID == E99EXLoad ||
+        player->extremeGear == ExtremeGear::CoverF ||
+        player->extremeGear == ExtremeGear::CoverS ||
+        player->extremeGear == ExtremeGear::CoverP ||
+        exLoads.gearExLoadID == StardustSpeederEXLoad ||
+        exLoads.gearExLoadID == E99EXLoad ||
+        exLoads.gearExLoadID == HangOnATEXLoad
+        //||
         // exLoads.gearExLoadID == TheBeastEXLoad
-        )
-        specialFlags |= ringGear;
+        ) {
+		specialFlags |= ringGear;
+	}
     return specialFlags;
 }

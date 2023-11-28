@@ -1,30 +1,33 @@
 #include "grindraildash.hpp"
-#include "lib/sound.hpp"
 #include "cosmetics/player/exloads.hpp"
+#include "gears/blastGaugeGears.hpp"
+#include "lib/sound.hpp"
+#include "lib/stdlib.hpp"
+#include "riders/object.hpp"
 
-global u32 lbl_10017B18;
-global f32 lbl_001C40C0;
-global u32 lbl_10017F34; // boost particle visibility
+ASMDefined u32 lbl_10017B18;
+ASMDefined f32 lbl_001C40C0;
+ASMDefined u32 lbl_10017F34;// boost particle visibility
 
-global void lbl_00048604();
-global void lbl_000CD4C8(); // boost particle func
-global void InitBoostParticleTask(Player *player); // another boost particle func
+ASMDefined void lbl_00048604();
+ASMDefined void lbl_000CD4C8();                       // boost particle func
+ASMDefined void InitBoostParticleTask(Player *player);// another boost particle func
 
-global struct lbl_001E73E4{
-	struct FillerAttackStruct filler[3];
+ASMDefined struct FillerAttackStructArray {
+	std::array<FillerAttackStruct, 3> filler;
 } lbl_001E73E4;
 
-global struct lbl_001E739C{
+ASMDefined struct Thing {
 	f32 someFloat;
-	char filler[0x14];
+	fillerData<0x14> filler;
 } lbl_001E739C;
 
-global struct gsAttackObjReadManager{
+ASMDefined struct GsAttackObjReadManager {
 	u8 filler;
 	u8 character;
 } gsAttackObjReadManager;
 
-struct RingLossObject1{
+struct RingLossObject1 {
 	/* 0x0 */ f32 unk0;
 	/* 0x4 */ f32 unk4;
 	/* 0x8 */ f32 unk8;
@@ -44,89 +47,83 @@ struct RingLossObject1{
 	/* 0x40 */ u32 unk40;
 };
 
-constexpr s32 GrindRailDashInitialCosts[3] = {
-		20000, 25000, 30000
-};
-
-constexpr f32 GrindRailDashAirCosts[3] = {
-		-333.3f, -416.6f, -500.0f
-};
-
-constexpr s32 GrindRailDashAirCostsRingGear = 30;
-
-void Player_InitBoostParticles(Player *player){
-	struct gsAttackObjReadManager *attackPreset = &gsAttackObjReadManager + player->index;
-	struct lbl_001E739C *thing = &lbl_001E739C + player->level;
-	struct lbl_001E73E4 *attackStruct = &lbl_001E73E4 + attackPreset->character;
+void Player_InitBoostParticles(Player *player) {
+	GsAttackObjReadManager *attackPreset = &gsAttackObjReadManager + player->index;
+	Thing *thing = &lbl_001E739C + player->level;
+	FillerAttackStructArray *attackStruct = &lbl_001E73E4 + attackPreset->character;
 	FillerAttackStruct *attackStructLevel = &(attackStruct->filler[player->level]);
 
 	BoostParticleObject1 *object1;
 
-	lbl_10017F34 &= ~(1 << player->index); // make boost particle visible
+	lbl_10017F34 &= ~(1 << player->index);// make boost particle visible
 	InitBoostParticleTask(player);
-	object1 = (BoostParticleObject1 *) SetTask(&lbl_000CD4C8, 0xB018, 2)->object;
+	object1 = (BoostParticleObject1 *) SetTask(&lbl_000CD4C8, ObjectGroups::BoostParticle, 2)->object;
 	object1->player = player;
 	object1->attackStruct = attackStructLevel;
 	object1->unkfloat = thing->someFloat;
 	object1->unknown = 0;
 }
 
-void Player_GrindRailDashHandler(Player *player){
-	EnabledEXLoads exLoads;
-	FetchEnabledEXLoadIDs(player, exLoads);
+void Player_GrindRailDashHandler(Player *player) {
+	EnabledEXLoads exLoads = FetchEnabledEXLoadIDs(*player);
+	BlastGaugeInfo *bgInfo = &PlayerBlastGaugeInfo[player->index];
 
-	if(player->state == RailGrind){
-		if(player->grindRailDash != 2){
-			if(player->input->toggleFaceButtons & (LButton)){
+	if(player->state == RailGrind) {
+		if(player->grindRailDash != 2) {
+			if(player->input->toggleFaceButtons.hasAny(LButton)) {
 				// initial cost
 				player->grindRailDash = 1;
-				PlayAudioFromDAT(Sound::SFX::RailHoopDash); // dash sfx
+				PlayAudioFromDAT(Sound::SFX::RailHoopDash);// dash sfx
 				Player_InitBoostParticles(player);
-				if(player->specialFlags & ringGear){
+				if(player->specialFlags.hasAny(ringGear)) {
 					if(player->character == SuperSonic
-					   && player->shortcutAirGainMultiplier > 0
+					   && bgInfo->currentGauge > 0
 					   && exLoads.gearExLoadID != HyperSonicEXLoad){
-						player->shortcutAirGainMultiplier -= GrindRailDashInitialCosts[player->level];
-						if(player->shortcutAirGainMultiplier < 0) player->shortcutAirGainMultiplier = 0;
-					}else{
+						bgInfo->currentGauge -= GrindRailDashInitialCosts[player->level];
+						if(bgInfo->currentGauge < 0) bgInfo->currentGauge = 0;
+					} else {
 						s32 newAir = player->currentAir - (player->gearStats[player->level].maxAir * 5) / 100;
 						player->currentAir = clamp(newAir, 0);
 					}
 				}else{
-					player->changeInAir_gain -= GrindRailDashInitialCosts[player->level];
+					if (player->characterArchetype == Mechanic) {
+						player->changeInAir_gain -= GrindRailDashInitialCostsMechanic[player->level];
+					} else player->changeInAir_gain -= GrindRailDashInitialCosts[player->level];
 				}
-			}else if(player->input->holdFaceButtons & (LButton) && player->grindRailDash == 1){
-				if(player->currentAir > 0){
+			} else if(player->input->holdFaceButtons.hasAny(LButton) && player->grindRailDash == 1) {
+				if(player->currentAir > 0) {
 					player->speed += pSpeed(2);
 					f32 newMI;
 					if(player->character == SuperSonic
-					   && player->shortcutAirGainMultiplier > 0
+					   && bgInfo->currentGauge > 0
 					   && exLoads.gearExLoadID != HyperSonicEXLoad){
-						newMI = player->magneticImpulse_timer; // essentially does nothing with blast gauge
-					}else{
+						newMI = player->magneticImpulse_timer;// essentially does nothing with blast gauge
+					} else {
 						newMI = player->magneticImpulse_timer - 6.0f;
 					}
 					player->magneticImpulse_timer = clamp(newMI, 0.f);
-				}else{ player->grindRailDash = 2; }
-			}else if(player->grindRailDash == 1){
+				} else {
+					player->grindRailDash = 2;
+				}
+			} else if(player->grindRailDash == 1) {
 				player->grindRailDash = 2;
 			}
 		}
-	}else if(player->grindRailDash != 0){
+	} else if(player->grindRailDash != 0) {
 		player->grindRailDash = 0;
 	}
 }
 
-void Player_RingLossVisualsSFX(Player *player){
+void Player_RingLossVisualsSFX(Player *player) {
 	lbl_10017B18 = gu32GameCnt;
 	Sound::PlaySound(Sound::ID::IDKSFX, 0x39);
 
 	u32 rings = player->rings;
-	if(rings == 0) return;
-	if(rings > 8) rings = 8;
-	for(u32 i = 0; i < rings; i++){
-		auto *object = SetTask(lbl_00048604, 0x7D65, 2);
-		auto *object1 = (RingLossObject1 *) object->object;
+	if(rings == 0) { return; }
+	if(rings > 8) { rings = 8; }
+	for(u32 i = 0; i < rings; i++) {
+		auto *object = SetTask(lbl_00048604, ObjectGroups::RingLoss, 2);
+		auto *object1 = static_cast<RingLossObject1 *>(object->object);
 
 		object1->unk0 = player->x;
 		object1->unk4 = player->y + lbl_001C40C0;
@@ -144,7 +141,7 @@ void Player_RingLossVisualsSFX(Player *player){
 	}
 }
 
-ASMUsed void RingLoss_OnAttack(Player *player){
+ASMUsed void RingLoss_OnAttack(Player *player) {
 	EnabledEXLoads exLoads;
 	FetchEnabledEXLoadIDs(player, exLoads);
 
@@ -154,47 +151,54 @@ ASMUsed void RingLoss_OnAttack(Player *player){
 	//     player->rings = ringRetain;
 	//     return;
 	// }
-	if(player->specialFlags & ringGear || player->extremeGear == CoverP){
-		s32 lossPercentage;
-		u32 coverPLoss;
-		
-		if (player->extremeGear != CoverP) 
-		{
-			if(player->rings > 170){ lossPercentage = 65; }
-			else if(player->rings > 150){ lossPercentage = 60; }
-			else if(player->rings > 130){ lossPercentage = 55; }
-			else if(player->rings > 100){ lossPercentage = 50; }
-			else if(player->rings > 70){ lossPercentage = 40; }
-			else if(player->rings > 40){ lossPercentage = 35; }
-			else if(player->rings > 15){ lossPercentage = 25; }
-			else{ lossPercentage = 1; }
-			s32 newRings = (player->currentAir * (100 - lossPercentage)) / 100;
+	if(player->specialFlags.hasAny(ringGear)) {
+		u32 lossPercentage = 0;
+		switch(player->rings){
+			case 0 ... 15:
+				lossPercentage = 1;
+				break;
+			case 16 ... 40:
+				lossPercentage = 25;
+				break;
+			case 41 ... 70:
+				lossPercentage = 35;
+				break;
+			case 71 ... 100:
+				lossPercentage = 40;
+				break;
+			case 101 ... 130:
+				lossPercentage = 50;
+				break;
+			case 131 ... 150:
+				lossPercentage = 55;
+				break;
+			case 151 ... 170:
+				lossPercentage = 60;
+				break;
+			default:
+			case 171 ... ~0U:
+				lossPercentage = 65;
+				break;
+		}
+		//if(player->extremeGear != ExtremeGear::CoverP) {
+			const s32 newRings = (player->currentAir * (100 - static_cast<s32>(lossPercentage))) / 100;
 			player->currentAir = newRings;
-		}
-		else 
-		{
-			if(player->rings > 170){ coverPLoss = 65; }
-			else if(player->rings > 150){ coverPLoss = 60; }
-			else if(player->rings > 130){ coverPLoss = 55; }
-			else if(player->rings > 100){ coverPLoss = 50; }
-			else if(player->rings > 70){ coverPLoss = 40; }
-			else if(player->rings > 40){ coverPLoss = 35; }
-			else if(player->rings > 15){ coverPLoss = 25; }
-			else{ coverPLoss = 1; }
-			u32 newCoverPRings = (player->rings * (100 - coverPLoss)) / 100;
-			player->rings = newCoverPRings;
-		}
-	}else{
-		s32 newRings = s32(((player->rings * 85) / 100) - 10);
+		//} else {
+		//	const u32 newCoverPRings = (player->rings * (100 - lossPercentage)) / 100;
+		//	player->rings = newCoverPRings;
+		//}
+	} else {
+		const auto newRings = static_cast<s32>(((player->rings * 85) / 100) - 10);
 		player->rings = static_cast<u32>(clamp(newRings, 0));
 	}
-
 }
 
-ASMUsed void Player_GrindRailAttack(Player *attackingPlayer, Player *attackedPlayer){
-	if(!(attackedPlayer->specialFlags & ringGear) &&
-	   ((attackedPlayer->state == RailGrind) & (attackingPlayer->state == RailGrind) &
-	    (attackingPlayer->grindRailDash))){
+ASMUsed void Player_GrindRailAttack(Player *attackingPlayer, Player *attackedPlayer) {
+	if((!attackedPlayer->specialFlags.hasAny(ringGear)) &&
+	   (attackedPlayer->state == RailGrind) &&
+	   (attackingPlayer->state == RailGrind) &&
+	   (attackingPlayer->grindRailDash != 0)
+	   ) {
 		Player_RingLossVisualsSFX(attackedPlayer);
 		RingLoss_OnAttack(attackedPlayer);
 		attackedPlayer->changeInAir_gain -= 30000;

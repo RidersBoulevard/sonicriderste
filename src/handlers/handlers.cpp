@@ -33,16 +33,19 @@
 #include "mechanics/autopilot.hpp"
 #include "gears/hypersonic.hpp"
 #include "mechanics/archetype/afterburner.hpp"
+#include "handlers/player/specialflagtweaks.hpp"
+#include "gears/blastGaugeGears.hpp"
 //#include "gears/faster.hpp"
 //#include "gears/hyperhangon.hpp"
 //#include "gears/slidebooster.hpp"
 //#include "gears/olliekinggear.hpp"
 //#include "gears/dynamo.hpp"
 //#include "gears/turbostar.hpp"
-//#include "gears/airtank.hpp"
+// #include "gears/airtank.hpp"
 //#include "gears/eggsterminator.hpp"
+#include "handlers/menu/debugmenu/debugmenu_handlers.hpp"
 
-// global void Player_Autopilot(struct Player *player); // _Main/text.s ; C240F4D8
+// ASMDefined void Player_Autopilot(Player *player); // _Main/text.s ; C240F4D8
 
 ASMUsed void PlayerHandler(Player *player) {
     // this is just a main function that calls all the handlers
@@ -98,4 +101,18 @@ ASMUsed void PlayerHandler(Player *player) {
     Player_IgnoreTurbulenceHandler(player);
     Player_AirOutButton(player);
     Player_Afterburner(player);
+    Player_windcatcher(player);
+    // Player_ZGSuperSonic(player);
+    // Player_Excalibur(player);
+    // Player_HangOnAT(player);
+    // Player_NeoII(player);
+    // Player_SuperStorm(player);
+    Player_lightBoardEffect(player);
+    Player_moneyCrisis(player);
+    Player_storeFlagInfo(player);
+    Player_checkGearIfUsesBlastGauge(player);
+    Player_resetGauge(player);
+    Player_TornadoBoostApplications(player);
+    DebugMenuHandler_InfiniteAir(player);
+    DebugMenuHandler_InfiniteRings(player);
 }

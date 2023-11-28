@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstddef>
-#include <array>
-
-#include "context.hpp"
 #include "customcodehandler_func.hpp"
+#include "riders/player.hpp"
+
+#include <array>
+#include <cstddef>
 
 using InjectorPtr = void (*)(void *, void *);
 using InjectorPlayerPtr = void (*)(void *, void *, Player *);

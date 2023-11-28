@@ -1,4 +1,4 @@
-.include "macros.inc"
+#include "macros.S"
 
 .section .bss  # 0x80125E00 - 0x8021CFA4
 
@@ -947,14 +947,6 @@ lbl_80218EA8:
 .global lbl_80219200
 lbl_80219200:
 	.skip 0x26C0
-
-.global bss_StageChanges
-bss_StageChanges:
-	.skip 0x4
-
-.global bss_TornadoTest
-bss_TornadoTest:
-	.skip 0x48
 
 .global __bss_rom_end__
 __bss_rom_end__:

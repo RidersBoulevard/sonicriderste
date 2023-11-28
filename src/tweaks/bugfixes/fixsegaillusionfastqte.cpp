@@ -1,7 +1,8 @@
-#include "context.hpp"
+#include "riders/object.hpp"
+#include "riders/player.hpp"
 
 // Declared in ASM
-global {
+ASMDefined {
     void lbl_0008C528(Player*);
     void lbl_001A3594(); // sega illusion qte update func
 }

@@ -1,149 +1,122 @@
-#include "context.hpp"
-#include "containers/vector3.hpp"
-#include "lib/sound.hpp"
+#include "stage_changes.hpp"
 #include "mechanics/magneticimpulse.hpp"
-
-global u32 data_stageChanges[];
-global f32 data_TornadoSlingshot[];
-global u8 bss_StageChanges[];
-//global f32 bss_TornadoTest[];
+#include "riders/gamemode.hpp"
+#include "riders/object.hpp"
+#include "riders/player.hpp"
+#include "riders/stage.hpp"
 
 // this structure for object1 will be specifically used for this code
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 struct TornadoObject {
-	u32 origin_x; // floats
-	u32 origin_y;
-	u32 origin_z;
+	f32 origin_x;
+	f32 origin_y;
+	f32 origin_z;
 	struct unknown *unknown;
 	f32 current_x;
 	f32 current_y;
 	f32 current_z;
-	char filler[0x20];
-	u8 playerIndex; // only for tornadoes, determines which player's tornado it is via index
-	char filler2[0x3];
+	fillerData<0x20> filler;
+	u8 playerIndex;// only for tornadoes, determines which player's tornado it is via index
+	fillerData<0x3> filler2;
 	u8 tornadoLevel;
-	char filler3[0x8];
+	fillerData<0x8> filler3;
 	u32 item_icon;
 };
 #pragma GCC diagnostic pop
 
-inline void lbl_update_item(Object *object, u32 item) {
+inline void lbl_update_item(ObjectNode *object, u32 item) {
 	auto *object1 = static_cast<Object1 *>(object->object);
 	object->item_id = item;
 	object1->item_icon = item;
 }
 
-std::array<f32, 3> TornadoSlingshotDistances = {
-        5.0f, // level 1 tornado
-        6.0f, // level 2
-        14.0f // level 3
-};
+static void func_TornadoSlingshot(ObjectNode *object) {
+	auto *object1 = static_cast<TornadoObject *>(object->object);
+	static std::array<u8, 4> Timers __attribute((section ("SBSS"))) = {0};
 
-static void func_TornadoSlingshot(Player *player, Object *object, PlayerCameraStruct *camera) {
-	// should be compiled using CW 1.2.5
-	auto *object1 = reinterpret_cast<TornadoObject *>(object->object);
-	// it is assumed that the player pointer passed in points to the first player
-	// it is assumed that the passed in player camera struct points to the first player's camera
-	Vector3 rotation, forward, directionToTornado, delta;
-	u32 i;
-	f32 angle, distance, deltax, deltay, deltaz;
-	u8 *bss = bss_StageChanges;
-	u32 playercount = InGamePlayerCount;
-
-	for (i = 0; i < playercount; i++) {
-		if (player[i].ignoreTurbulence == FALSE && player[i].playerType == FALSE) {
-			u8 index = player[i].index;
-			u8 timer = bss[index];
-			if (timer != 0) {
-				bss[index] = timer - 1;
+	for(auto &player : getCurrentPlayerList()) {
+		if(!player.ignoreTurbulence && !player.playerType) {
+			const u8 &index = player.index;
+			u8 &timer = Timers[index];
+			if(timer != 0) {
+				timer--;
 				continue;
 			}
-
-			if (index == object1->playerIndex) {
+			if(index == object1->playerIndex) {
 				continue;
 			}
-
-			deltax = player[i].x - object1->current_x;
-			deltay = player[i].y - object1->current_y;
-			deltaz = player[i].z - object1->current_z;
-
-			distance = deltax * deltax + deltay * deltay + deltaz * deltaz;
-
-			rotation.x = player[i].verticalRotation;
-			rotation.y = player[i].horizontalRotation;
-			rotation.z = player[i].rotationRoll;
-
-			forward = Vector3_GetForwardVectorForRidersRotation(rotation);
-
-			delta.x = deltax;
-			delta.y = deltay;
-			delta.z = deltaz;
-
-			directionToTornado = Vector3_Normalize(delta);
-
-			angle = Vector3_CalculateAngle(forward, directionToTornado);
-
-			if (TornadoSlingshotDistances[object1->tornadoLevel] < distance) {
+			const Vector3F delta{
+					player.x - object1->current_x,
+					player.y - object1->current_y,
+					player.z - object1->current_z
+			};
+			const f32 distance = delta.x * delta.x + delta.y * delta.y + delta.z * delta.z;
+			constexpr std::array<f32, 3> TornadoSlingshotDistances = {
+					5.0f,// level 1 tornado
+					6.0f,// level 2
+					14.0f// level 3
+			};
+			if(TornadoSlingshotDistances[object1->tornadoLevel] < distance) {
 				continue;
 			}
-
-			bss[index] = 30; // 30 frames
-
+			timer = 30;// 30 frames
+			const Vector3F rotation{
+					player.verticalRotation,
+					player.horizontalRotation,
+					player.rotationRoll
+			};
+			const Vector3F forward = rotation.getForwardVectorForRidersRotation();
+			const Vector3F directionToTornado = delta.normalized();
+			const f32 angle = forward.calculateAngle(directionToTornado);
 			// angle at which you're "looking" at the tornado and won't slingshot
-            if (0.7f > angle) {
+			if(angle < 0.7f) {
 				continue;
 			}
-
-			if (player[i].state == Stun) {
+			if(player.state == Stun) {
 				continue;
 			}
+			player.speed += pSpeed(60) + MI::scaleUsingCurrentMI(player, pSpeed(60));
 
-			player[i].speed += pSpeed(60) + ScaleUsingCurrentMI(*player, pSpeed(60));
-            player[i].reciproExtendTimer = 0;
+			// set recipro extends, both the vanilla one and the special one
+			player.specialReciproExtend = true;
+			player.reciproExtendTimer = 0;
 
-			//camera = PlayerCameraStruct[index];
-			camera = &camera[index];
-			camera->cameraPreset = 130; // boost state camera preset
-			camera->cameraPresetProperty = 0x0;
+			auto& camera = playerCameraStruct[index];
+			camera.cameraPreset = 130;// boost state camera preset
+			camera.cameraPresetProperty = 0x0;
 
-			//bss[index] = 10; // 10 frames
-			player[i].dreamTrail_timer = 30;
+			player.dreamTrail_timer = 30;
 			PlayAudioFromDAT(Sound::SFX::TornadoSlingshot);
-
-			//tornadobss[index*2] = distance;
-			//tornadobss[index*2+1] = angle;
 		}
 	}
 }
 
-ASMUsed void func_StageChanges(u32 currentStage, Player *player, Object *object, PlayerCameraStruct *camera) {
-	if (!object->object) {
-		return;
+ASMUsed void func_StageChanges(ObjectNode *currentObject) {
+	if(!isInGame()) { return; }
+	if(currentObject == nullptr) { return; }
+	if(currentObject->object == nullptr) { return; }
+
+	auto *object1 = static_cast<Object1 *>(currentObject->object);
+
+	const u16 &object_type = currentObject->object_type;
+	if(object_type == 0x1E || object_type == 0x1F) {
+		func_TornadoSlingshot(currentObject);
 	}
 
-	auto *object1 = static_cast<Object1 *>(object->object);
-
-	u16 object_type = object->object_type;
-	if (object_type == 0x1E || object_type == 0x1F) {
-		func_TornadoSlingshot(player, object, camera);
-	}
-
-	u16 object_id = object->object_id;
-	u32 i;
-	u32 *data = data_stageChanges;
-	switch (currentStage) {
+	const u16 &object_id = currentObject->object_id;
+	switch(CurrentStage) {
 		case GreenCave: {
-			if (object_id == 0xE8 && object_type == FlightRing) {
-				object1->x_rotation = s32(0xFFFFF06D);
-			} else if (object_type == ItemBox) {
-				switch (object_id) {
+			if(object_id == 0xE8 && object_type == FlightRing) {
+				object1->rotation.x = static_cast<s32>(0xFFFFF06D);
+			} else if(object_type == ItemBox) {
+				switch(object_id) {
 					case 0xBB:
-						lbl_update_item(object, HundredAir);
+						lbl_update_item(currentObject, HundredAir);
 						break;
 					case 0xBC:
 					case 0xBD:
-						lbl_update_item(object, SpeedShoes);
+						lbl_update_item(currentObject, SpeedShoes);
 						break;
 					default:
 						break;
@@ -152,168 +125,130 @@ ASMUsed void func_StageChanges(u32 currentStage, Player *player, Object *object,
 			break;
 		}
 		case WhiteCave: {
-			if (object_id == 0xC4 && object_type == WhiteCaveWeb) {
-				if (object->state != 1) {
-					object->state = 1;
+			if(object_id == 0xC4 && object_type == WhiteCaveWeb) {
+				if(currentObject->state != 1) {
+					currentObject->state = 1;
 				}
-			} else if (object_id >= 0x1C && object_id <= 0x1E && object_type == DashPanel) {
-				i = object_id - 0x1C; // generate index
-				i *= 6;
-				i += 11; // index into correct portion of data section
-				auto *obj1 = static_cast<Object1 *>(object->object);
-				obj1->x = data[i];
-				obj1->y = data[i + 1];
-				obj1->z = data[i + 2];
-
-				obj1->x_rotation = static_cast<s32>(data[i + 3]);
-				obj1->y_rotation = static_cast<s32>(data[i + 4]);
-				obj1->z_rotation = static_cast<s32>(data[i + 5]);
+			} else if(object_id >= 0x1C && object_id <= 0x1E && object_type == DashPanel) {
+				const u32 index = object_id - 0x1C;// generate index
+				auto *obj1 = static_cast<Object1 *>(currentObject->object);
+				auto& [pos, rot] = data_stageChanges.whiteCaveDashPanels[index]; // https://en.cppreference.com/w/cpp/language/structured_binding
+				obj1->pos = pos;
+				obj1->rotation = rot;
 			}
 			break;
 		}
 		case EggFactory: {
-			if (object_id >= 0x104 && object_id <= 0x106 && object_type == DashPanel) {
-				i = object_id - 0x104; // generate index
-				i += 29; // index into correct portion
-				auto *obj1 = static_cast<Object1 *>(object->object);
-				obj1->z = data[i];
-				obj1->x = data[32];
-			} else if (object_id >= 0x125 && object_id <= 0x126 && object_type == FlightRing) {
-				i = object_id - 0x125;
-				i *= 6;
-				i += 33;
-				auto *obj1 = static_cast<Object1 *>(object->object);
-				obj1->x = data[i];
-				obj1->y = data[i + 1];
-				obj1->z = data[i + 2];
-
-				obj1->x_rotation = static_cast<s32>(data[i + 3]);
-				obj1->y_rotation = static_cast<s32>(data[i + 4]);
-				obj1->z_rotation = static_cast<s32>(data[i + 5]);
+			if(object_id >= 0x104 && object_id <= 0x106 && object_type == DashPanel) {
+				const u32 index = object_id - 0x104;// generate index
+				auto *obj1 = static_cast<Object1 *>(currentObject->object);
+				obj1->pos.z = data_stageChanges.eggFactoryDashPanelZPos[index];
+				obj1->pos.x = data_stageChanges.eggFactoryDashPanelXPos;
+			} else if(object_id >= 0x125 && object_id <= 0x126 && object_type == FlightRing) {
+				const u32 index = object_id - 0x125;
+				auto *obj1 = static_cast<Object1 *>(currentObject->object);
+				auto& [pos, rot] = data_stageChanges.eggFactoryFlyRings[index];
+				obj1->pos = pos;
+				obj1->rotation = rot;
 			}
 			break;
 		}
 
 		case RedCanyon: {
-			if (object_id >= 0xA4 && object_id <= 0xA7 && object_type == DashPanel) {
-				i = 0xA7 - object_id;
-				i *= 2;
-				i += 45;
-				auto *obj1 = static_cast<Object1 *>(object->object);
-				obj1->x = data[i];
-				obj1->y = data[53];
-				obj1->z = data[i + 1];
+			if(object_id >= 0xA4 && object_id <= 0xA7 && object_type == DashPanel) {
+				const u32 index = 0xA7 - object_id;
+				auto *obj1 = static_cast<Object1 *>(currentObject->object);
+				auto& [x, z] = data_stageChanges.redCanyonDashPanelXZPositions[index];
+				obj1->pos.x = x;
+				obj1->pos.y = data_stageChanges.redCanyonDashPanelYPos;
+				obj1->pos.z = z;
 
-				obj1->y_rotation = static_cast<s32>(0xFFFFF5A0);
+				obj1->rotation.y = static_cast<s32>(0xFFFFF5A0);
 			}
 			break;
 		}
-			/*
-			case IceFactory:
-			{
-				if (object_id >= 0x135 && object_id <= 0x136 && object_type == DashPanel) {
-					if (object->state != 1)
-					{
-						object->state = 1;
-					}
-				}
-				break;
-			}
-
-			case SandRuins:
-			{
-				if (object_id >= 0x11F && object_id <= 0x121 && object_type == DashPanel) {
-					if (object->state != 1)
-					{
-						object->state = 1;
-					}
-				}
-				break;
-			}
-			*/
 		default:
 			break;
 	}
 
-	if (object_type != ItemBox) { return; }
+	if(object_type != ItemBox) { return; }
 
-	switch (currentStage) {
+	switch(CurrentStage) {
 		case MetalCity: {
-			if (object_id == 0x2A) {
-				lbl_update_item(object, TwentyRings);
+			if(object_id == 0x2A) {
+				lbl_update_item(currentObject, TwentyRings);
 			}
 			break;
 		}
 		case NightChase: {
-			if (object_id >= 0x67 && object_id <= 0x6E) {
-				lbl_update_item(object, TenRings);
-			} else if (object_id >= 0xFC && object_id <= 0x100) {
-				lbl_update_item(object, RNG);
+			if(object_id >= 0x67 && object_id <= 0x6E) {
+				lbl_update_item(currentObject, TenRings);
+			} else if(object_id >= 0xFC && object_id <= 0x100) {
+				lbl_update_item(currentObject, RNG);
 			}
 			break;
 		}
 		case SegaIllusion: {
-			switch (object_id) {
+			switch(object_id) {
 				case 0xDD:
-					lbl_update_item(object, FiftyAir);
+					lbl_update_item(currentObject, FiftyAir);
 					break;
 				case 0xDC:
-					lbl_update_item(object, ThirtyAir);
+					lbl_update_item(currentObject, ThirtyAir);
 					break;
 				default:
 					break;
 			}
-			if (object_id >= 0xB6 && object_id <= 0xB9) {
-				lbl_update_item(object, TenRings);
-			} else if (object_id >= 0xBA && object_id <= 0xBD) {
-				lbl_update_item(object, FiftyAir);
+			if(object_id >= 0xB6 && object_id <= 0xB9) {
+				lbl_update_item(currentObject, TenRings);
+			} else if(object_id >= 0xBA && object_id <= 0xBD) {
+				lbl_update_item(currentObject, FiftyAir);
 			}
 			break;
 		}
 		case SandRuins: {
-			if (object_id >= 0x1A1 && object_id <= 0x1A4) {
-				lbl_update_item(object, TenRings);
+			if(object_id >= 0x1A1 && object_id <= 0x1A4) {
+				lbl_update_item(currentObject, TenRings);
 			}
-			switch (object_id) {
+			switch(object_id) {
 				case 0x18C:
-					lbl_update_item(object, ThirtyAir);
+					lbl_update_item(currentObject, ThirtyAir);
 					break;
 				case 0x18D:
-					lbl_update_item(object, FiftyAir);
+					lbl_update_item(currentObject, FiftyAir);
 					break;
 				case 0x18E:
-					lbl_update_item(object, HundredAir);
+					lbl_update_item(currentObject, HundredAir);
 					break;
 				default:
 					break;
 			}
 			break;
 		}
-		case SplashCanyon: {
-			if (object_id == 0xCC) {
-				lbl_update_item(object, ThirtyRings);
-			}
-			break;
-		}
+		// case SplashCanyon: {
+		// 	if(object_id == 0xCC) {
+		// 		lbl_update_item(currentObject, ThirtyRings);
+		// 	}
+		// 	break;
+		// }
 		case DigitalDimension: {
-			if (object_id >= 0xC && object_id <= 0xF) {
-				object1->z = data[54];
-			} else if (object_id >= 0x10 && object_id <= 0x13) {
-				lbl_update_item(object, TenRings);
-				i = object_id - 0x10;
-				i *= 3;
-				i += 55;
-
-				auto *obj1 = static_cast<Object1 *>(object->object);
-				obj1->x = data[i];
-				obj1->y = data[i + 1];
-				obj1->z = data[i + 2];
+			if(object_id >= 0xC && object_id <= 0xF) {
+				object1->pos.z = data_stageChanges.digitalDimensionFirstRowZPos;
+			} else if(object_id >= 0x10 && object_id <= 0x13) {
+				lbl_update_item(currentObject, TenRings);
+				const u32 index = object_id - 0x10;
+				auto *obj1 = static_cast<Object1 *>(currentObject->object);
+				auto &itemPos = data_stageChanges.digitalDimensionItemBoxPositions[index];
+				obj1->pos = itemPos;
 			}
 			break;
 		}
 		case SkyRoad: {
-			if (object_id >= 0xD8 && object_id <= 0xDF) {
-				lbl_update_item(object, TenRings);
+			if(object_id >= 0xD8 && object_id <= 0xDF) {
+				lbl_update_item(currentObject, TenRings);
+			}
+			if (object_id >= 0xE0 && object_id <= 0xE7) {
+				lbl_update_item(currentObject, TenRings);
 			}
 			break;
 		}

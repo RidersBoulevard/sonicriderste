@@ -7,8 +7,8 @@
 
 OUTPUT_FORMAT("elf32-powerpc", "elf32-powerpc", "elf32-powerpc");
 OUTPUT_ARCH(powerpc:common);
-EXTERN(__start);
-ENTRY(__start);
+EXTERN(_start);
+ENTRY(_start);
 
 PHDRS
 {
@@ -269,10 +269,14 @@ __stack_end = (__bss_start + SIZEOF(.bss));
 __intrstack_addr = (__stack_addr + 0x4000);
 __intrstack_end = (__stack_addr);
 __Arena1Lo = (__intrstack_addr + 31) & (-32);
-__Arena1Hi = (0x817FEFF0);
 
-__gxregs = (__Arena1Hi + 31) & (-32);
+/* we will set up arena 1 hi thru system init (need to be mindful of the FST living in arena 1 hi) */
+/*__Arena1Hi = (0x817FEFF0);*/
 
+/* we will set up gxregs thru system init, since we don't know arena 1 hi address at link time */
+/*__gxregs = (__Arena1Hi + 31) & (-32);*/
+
+/*
 _init_rom_size = __init_rom_end__ - __init_rom_start__;
 _text_rom_size = __text_rom_end__ - __text_rom_start__;
 _ctors_rom_size = __ctors_rom_end__ - __ctors_rom_start__;
@@ -284,6 +288,7 @@ _sdata_rom_size = __sdata_rom_end__ - __sdata_rom_start__;
 _sbss_rom_size = __sbss_rom_end__ - __sbss_rom_start__;
 _sdata2_rom_size = __sdata2_rom_end__ - __sdata2_rom_start__;
 _sbss2_rom_size = __sbss2_rom_end__ - __sbss2_rom_start__;
+*/
 
 /* for backward compatibility with old crt0 */
 PROVIDE (__stack = (0x817FEFF0));
@@ -296,3 +301,14 @@ PROVIDE(__intrstack_end = __intrstack_end);
 PROVIDE(__Arena1Lo = __Arena1Lo);
 PROVIDE(__Arena1Hi = __Arena1Hi);
 PROVIDE(__gxregs = __gxregs);
+
+/*
+EXTERN(ps_guMtxConcat);
+nnMultiplyMatrix = ps_guMtxConcat;
+
+EXTERN(ps_guVecNormalize);
+nnNormalizeVectorFast = ps_guVecNormalize;
+
+EXTERN(ps_guVecCross);
+nnCrossProductVectorFast = ps_guVecCross;
+*/

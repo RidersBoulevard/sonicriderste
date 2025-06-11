@@ -20,6 +20,10 @@ Below are required MSYS2 terminal packages (in-depth installation is found in th
 * mingw-w64-x86_64-gcc
 * dkp-cmake-common-utils
 
+### Required external libraries
+
+* [SRTE libOGC](https://github.com/Sonic-Riders-Tournament-Edition/libogc-srte) - TE source code is now compiled using a custom version of libOGC rather than the embedded Nintendo Dolphin SDK. Check the [build instructions](#instructions) for compiling this library.
+
 ### Instructions
 
 **These instructions are catered to Windows. Instructions may vary on different operating systems.**
@@ -51,15 +55,23 @@ For maximum compatibility, you should install devkitPro using their graphical in
 #	message(FATAL_ERROR "CMake must be installed and launched from msys2: pacman -S cmake")
 #endif()
 ```
-7. Once that's done, clone the repo to your computer via `git clone` or any other similar way. **(This step doesn't go through the MSYS2 terminal.)**
 
-8. Once cloned, navigate to the `tools` directory in the terminal using the `cd` command. Then run the `makeTools.sh` script via this command: `./makeTools.sh`.
+7. Once that's done, clone the aforementioned custom libOGC library to your computer via `git clone` or any other similar way. **(This step doesn't go through the MSYS2 terminal.)**
 
-9. After that, make a new folder in the root folder of the project, where the build files will be generated in. For example, you can name the folder `build`.
+8. Once cloned, navigate to the cloned directory in the terminal via the `cd` command. Then run `make cuberiders` to build the library. Once it's built, make sure to note down the full absolute path to this cloned directory. You'll need it in the later steps.
 
-10. Navigate into that directory using the `cd` command again. Then run the following command to generate the build files: `$DEVKITPRO/devkitPPC/bin/powerpc-eabi-cmake ../`
+9. Then, clone the source code repository to your computer. **(This step doesn't go through the MSYS2 terminal.)**
 
-11. Run `ninja` in the same directory to build the DOL file (you can also run `ninja -j$(nproc --all)` for faster build times). The `main.dol` file will be built and compiled into the same build folder you created.
+10. Once cloned, navigate to the `tools` directory in the terminal using the `cd` command. Then run the `makeTools.sh` script via this command: `./makeTools.sh`.
+
+11. After that, make a new folder in the root folder of the project, where the build files will be generated in. For example, you can name the folder `build`.
+
+12. Navigate into that directory using the `cd` command again. This is where you'll need the path to the libOGC library folder mentioned in step 8. Run the following command to generate the build files, replacing `/path/to/libogc` with your noted down path (NOTE: if on Windows, the path's `\` separators must be using `/` instead!): 
+```
+$DEVKITPRO/devkitPPC/bin/powerpc-eabi-cmake -DCUSTOM_LIBOGC_PATH=/path/to/libogc ../
+```
+
+13. Run `ninja` in the same directory to build the DOL file (you can also run `ninja -j$(nproc --all)` for faster build times). The `main.dol` file will be built and compiled into the same build folder you created.
 
 ## Contributions
 

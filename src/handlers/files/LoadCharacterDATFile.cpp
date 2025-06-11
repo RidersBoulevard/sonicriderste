@@ -104,7 +104,7 @@ const char *selectDatFile(Player &player, Language language = GameLanguage) {
 			default: break;
 		}
 	}
-	if(isSuperCharacter(player, Character::MetalSonic)) {
+	if(player.isSuperCharacter(Character::MetalSonic)) {
 		player.characterVoiceID = Sound::ID::NeoMetalSonic;
 		return "10NEO.DAT";
 	}

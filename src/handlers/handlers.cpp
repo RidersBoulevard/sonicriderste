@@ -39,32 +39,41 @@
 //#include "gears/hyperhangon.hpp"
 //#include "gears/slidebooster.hpp"
 //#include "gears/turbostar.hpp"
-// #include "gears/airtank.hpp"
-#include "handlers/menu/debugmenu/debugmenu_handlers.hpp"
+#include "gears/airtank.hpp"
+#include <gears/berserker.hpp>
+
+#include "gears/advantagep.hpp"
+#include "gears/gambler.hpp"
 #include "gears/omnipotence.hpp"
-#include "tweaks/stage/itemrngchange.hpp"
+#include "handlers/menu/debugmenu/debugmenu_handlers.hpp"
+#include "gears/darkness.hpp"
+//#include "tweaks/stage/itemrngchange.hpp"
+#include "mechanics/speed_shoes.hpp"
+
 #include "gears/advantagep.hpp"
 #include "gears/gambler.hpp"
 
 // ASMDefined void Player_Autopilot(Player *player); // _Main/text.s ; C240F4D8
 
-ASMUsed void PlayerHandler(Player *player) {
+ASMUsed void PlayerHandler(Player &player) {
     // this is just a main function that calls all the handlers
 
-    if (player->state != PlayerState::Fly) player->splashCanyonFlyRoute = FALSE;
+    if (player.state != PlayerState::Fly) {
+	    player.splashCanyonFlyRoute = false;
+    }
 
     lbl_Slipstream(player);
     lbl_FastFall(player);
-    HyperSonic_RainbowLighting(player);
+    // HyperSonic_RainbowLighting(player);
     Player_DeathPlane(player);
-    Player_TimerHandler(*player);
+    Player_TimerHandler(player);
     Player_Autopilot(player);
-    Player_MagneticImpulseTimer(*player);
+    Player_MagneticImpulseTimer(player);
     Player_BeginnerOmegaBoost(player);
     Player_CoverF(player);
     Player_Fastest(player);
-    Player_SuperTailsTransformation(*player);
-    Player_SuperMetalTransformation(*player);
+    Player_SuperTailsTransformation(player);
+    Player_SuperMetalTransformation(player);
     Player_CheckBeginnerAirOut(player);
     Player_GrindRailDashHandler(player);
     Player_FlyHoopDashHandler(player);
@@ -85,34 +94,29 @@ ASMUsed void PlayerHandler(Player *player) {
     Player_BoostArchetypeJCBC(player);
     Player_SpeedBalancerResetBoostSpeed(player);
     CustomCodehandler_Player(player);
-    Player_HyperdriveHandler(player);
+    Player_HyperdriveHandler2(&player);
     Player_HyperSonicUpdatePlayerStats(player);
     Player_HyperSonicTotalLinkCalc(player);
     Player_HyperSonicRingStream(player);
-    // Player_Faster(player);
-    // Player_HyperHangOn(player);
-    // Player_TheProfessional(player);
+    Player_Faster(player);
     Player_SlideBooster(player);
     Player_TurboStar(player);
-    // Player_AirTank(player);
-    // Player_TheBeast(player);
+    Player_AirTank(player);
     Player_IgnoreTurbulenceHandler(player);
     Player_AirOutButton(player);
     Player_Afterburner(player);
-    Player_windcatcher(player);
-    // Player_ZGSuperSonic(player);
-    // Player_NeoII(player);
-    // Player_SuperStorm(player);
     Player_lightBoardEffect(player);
     Player_moneyCrisis(player);
     Player_storeFlagInfo(player);
-    Player_BlastGaugeUpdateStatus(*player);
-    // Player_TornadoBoostApplications(player);
+    Player_BlastGaugeUpdateStatus(player);
     DebugMenuHandler_InfiniteAir(player);
     DebugMenuHandler_InfiniteRings(player);
     Player_SuperShadow(player);
     Player_Omnipotence(player);
-    RNGChangesReset(player);
     Player_AdvantageP(player);
     Player_GamblerBoost(player);
+	Player_BerserkerSpeedCheck(&player);
+	Player_SuperMetalIII(player);
+	Player_Darkness(player);
+	// Player_HandleSpeedShoes(player); // tap to speed shoe
 }

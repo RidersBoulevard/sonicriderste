@@ -1,0 +1,8 @@
+CompileFlags:
+  Remove:
+  - '-mogc'
+  - '-mmultiple'
+  - '-mhard-float'
+  - '-memb'
+  - '-meabi'
+  - '-ffunction-sections'

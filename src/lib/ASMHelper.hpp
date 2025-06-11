@@ -48,6 +48,7 @@
  *
  */
 
+// ReSharper disable once CppMissingIncludeGuard
 #include "macros.h"
 
 #define ASMHELPER_ALLOCSTACKFRAME \

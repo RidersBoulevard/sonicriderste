@@ -13,4 +13,4 @@ struct AdvantagePInfo {
 
 extern std::array<AdvantagePInfo, MaxPlayerCount> PlayerAdvantagePInfo;
 
-void Player_AdvantageP(Player *player);
+void Player_AdvantageP(Player &player);

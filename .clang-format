@@ -57,10 +57,10 @@ NamespaceIndentation: All
 ReflowComments: false
 SpaceAfterCStyleCast: true
 SpaceAfterTemplateKeyword: false
-SpaceBeforeParens: Never
+SpaceBeforeParens: ControlStatements
 SpaceBeforeRangeBasedForLoopColon: false
 SpacesInAngles: false
 SpacesInContainerLiterals: false
 TabWidth: 4
-UseTab: Always
+UseTab: Never
 ...

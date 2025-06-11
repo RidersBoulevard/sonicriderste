@@ -8,16 +8,15 @@
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "readability-magic-numbers"
-ASMUsed void func_SetPlayerActionType(Player *playerPtr, u32 stateInt) {
+ASMUsed void func_SetPlayerActionType(Player &player, u32 stateInt) {
 	constexpr f32 zero = 0.0F;
 	auto newState = static_cast<PlayerState>(stateInt);
 
-	Player &player = *playerPtr;
 	auto &playerState = player.state;
 	auto &previousState = player.previousState;
 	if((playerState != PlayerState::Death && player.unk1037 != std::to_underlying(PlayerState::Retire)) || stateInt == std::to_underlying(PlayerState::Cruise)) {
 		if(playerState == PlayerState::Unknown2) {
-			lbl_00187ED0(playerPtr);
+			lbl_00187ED0(player);
 		}
 		player.unk1044 = player.qteState;
 		player.qteState = previousState;
@@ -31,13 +30,13 @@ ASMUsed void func_SetPlayerActionType(Player *playerPtr, u32 stateInt) {
 			//Fly, Jump, Fall, Run, QTE, TurbulenceRide, QTE2) || (playerState >= FrontflipRamp && playerState <= ManualRamp)
 			if(if_all(playerState, std::is_neq, PlayerState::AttackedByPlayer, PlayerState::AttackingPlayer, PlayerState::Jump)) {
 				if (player.characterArchetype == CharacterArchetype::Boost) {
-					if(if_any(previousState, std::is_eq, PlayerState::AttackedByPlayer, PlayerState::AttackingPlayer) || beingAttackedAndNotCruising) {lbl_Player_BoostEndFunction(playerPtr);}
+					if(if_any(previousState, std::is_eq, PlayerState::AttackedByPlayer, PlayerState::AttackingPlayer) || beingAttackedAndNotCruising) {lbl_Player_BoostEndFunction(player);}
 					else if(if_all(previousState, std::is_neq, PlayerState::Jump, PlayerState::Fall, PlayerState::FrontflipRamp, PlayerState::BackflipRamp, PlayerState::HalfPipeTrick, PlayerState::ManualRamp, PlayerState::RailGrind, PlayerState::Fly) &&
 					   if_all(playerState, std::is_neq, PlayerState::Jump, PlayerState::Fall, PlayerState::FrontflipRamp, PlayerState::BackflipRamp, PlayerState::HalfPipeTrick, PlayerState::ManualRamp, PlayerState::Fly)){
-						lbl_Player_BoostEndFunction(playerPtr);
+						lbl_Player_BoostEndFunction(player);
 					}
 				} else {
-					lbl_Player_BoostEndFunction(playerPtr);
+					lbl_Player_BoostEndFunction(player);
 				}
 			}
 		}
@@ -57,7 +56,7 @@ ASMUsed void func_SetPlayerActionType(Player *playerPtr, u32 stateInt) {
 		}
 		switch(playerState) {
 			case PlayerState::QTE: {
-				const auto &gearSpecialFlags = player.gearptr->specialFlags;
+				//const auto &gearSpecialFlags = player.gearptr->specialFlags;
 				player.unkB08 = 0x80F;
 				player.unkB2C = zero;
 				player.unkB28 = zero;
@@ -67,7 +66,7 @@ ASMUsed void func_SetPlayerActionType(Player *playerPtr, u32 stateInt) {
 			case PlayerState::Cruise:
 				if(beingAttacked) {
 					playerState = PlayerState::AttackedByPlayer;
-					lbl_0009195C(playerPtr);
+					lbl_0009195C(&player);
 				} else {
 					const auto &playerSpecialFlags = player.specialFlags;
 					constexpr auto otherFlags = 0x2400U;
@@ -142,7 +141,7 @@ ASMUsed void func_SetPlayerActionType(Player *playerPtr, u32 stateInt) {
 					lbl_10087C40 = static_cast<s32>(gu32GameCnt);
 					Sound::PlaySound(Sound::ID::IDKSFX, 0x02);
 				}
-				if((RuleSettings & 0x40'0000) == 0) {
+				if(!ruleSettings.unk22) {
 					auto playerSpecialFlags = player.specialFlags;
 
 					bool legendRampNight = (CurrentStage == NightChase 
@@ -152,10 +151,10 @@ ASMUsed void func_SetPlayerActionType(Player *playerPtr, u32 stateInt) {
 					bool legendRampSand = (CurrentStage == SandRuins
 					&& player.currentCollision->boundScale == 114.946144104004f);
 
-					// (isSuperCharacter(player, Knuckles) &&
+					// (player.isSuperCharacter(Knuckles) &&
 					// 	 player.last_movementFlags.hasAny(boosting)) ||
 
-					if ((isSuperCharacter(player, Character::Knuckles) &&
+					if ((player.isSuperCharacter(Character::Knuckles) &&
 						 player.last_movementFlags.hasAny(MovementFlags::boosting)) ||
 						 (CurrentStage == DarkDesert && playerState == PlayerState::BackflipRamp) ||
 						 player.specialReciproExtend || 
@@ -304,15 +303,15 @@ ASMUsed void func_SetPlayerActionType(Player *playerPtr, u32 stateInt) {
 			}
 			case PlayerState::TurbulenceRide: {
 				if(player.flags.hasAny(static_cast<PlayerFlags>(0x100))) {
-					func_ClearPlayerMotionTable(playerPtr);
-					func__RegistPlayerMotionTable(playerPtr, 1, 0, 10.0f, 0.0f);
-					func__RegistPlayerMotionTable(playerPtr, 0x46, 8, 10.0f, 0.0f);
-					func_StartPlayerMotionTable(playerPtr);
+					func_ClearPlayerMotionTable(player);
+					func__RegistPlayerMotionTable(player, 1, 0, 10.0f, 0.0f);
+					func__RegistPlayerMotionTable(player, 0x46, 8, 10.0f, 0.0f);
+					func_StartPlayerMotionTable(player);
 				}
 				const auto &gearSpecialFlags = player.gearptr->specialFlags;
 				player.unkB08 = 0x1C0603;
 				player.unkB08 = player.unkB08 & (~0U - (((static_cast<u32>(static_cast<SpecialFlags>(gearSpecialFlags)) >> 4U) & 1) * 0x2400));
-				func_GetDirectTrickBonus(playerPtr, 1);
+				func_GetDirectTrickBonus(player, 1);
 				player.flags &= static_cast<PlayerFlags>(0xFFFF7F7F);
 				player.trickFail |= 8;
 				player.unk1033 = 0;
@@ -320,7 +319,7 @@ ASMUsed void func_SetPlayerActionType(Player *playerPtr, u32 stateInt) {
 			}
 			case PlayerState::Death:
 				if(CurrentGameMode == 0x190U) {
-					lbl_000FC114(playerPtr);
+					lbl_000FC114(player);
 				}
 				break;
 			default:
@@ -328,29 +327,29 @@ ASMUsed void func_SetPlayerActionType(Player *playerPtr, u32 stateInt) {
 		}
 
 		if(((player.unkBB4 >> 8U) & 1 & (((static_cast<u32>(static_cast<PlayerFlags>(player.flags)) >> 8U) & 1) ^ 1) & static_cast<u32>(Gears[player.extremeGear].model == 0xF)) != 0) {
-			auto *mcparticle = &gsParFullParam_MagicCarpet;
+			auto &mcparticle = gsParFullParam_MagicCarpet;
 
-			ParticleObject1 *temp_r10 = (reinterpret_cast<ParticleObject *>(SetTask(&func_Particle_Task, gsParFullParam_MagicCarpet.unk6, 2)))->object1;
+			ParticleObject1 &temp_r10 = *reinterpret_cast<ParticleObject *>(SetTask(&func_Particle_Task, gsParFullParam_MagicCarpet.unk6, Object1Sizes::x80))->object1;
 
-			temp_r10->unk72 = player.index;
-			temp_r10->unk0 = mcparticle->unk74;
-			temp_r10->unk4 = mcparticle->unk78;
-			temp_r10->unk8 = mcparticle->unk7C;
-			temp_r10->unk30 = mcparticle->unk98;
-			temp_r10->unk34 = mcparticle->unk9C;
-			temp_r10->unk38 = mcparticle->unkA0;
-			temp_r10->unk3C = mcparticle->unk8C;
-			temp_r10->unk40 = mcparticle->unk90;
-			temp_r10->unk44 = mcparticle->unk94;
-			temp_r10->unk10 = mcparticle->unk80;
-			temp_r10->unk14 = mcparticle->unk84;
-			temp_r10->unk18 = mcparticle->unk88;
-			temp_r10->unk48 = &gcosNnSystemVecZeroFast;
-			temp_r10->unk60 = mcparticle;
-			temp_r10->unk68 = static_cast<u32>(gpsTexList_Particle);
-			temp_r10->unk6C = &player.unkC4;
-			temp_r10->unk73 = -1;
-			temp_r10->unk74 = 0;
+			temp_r10.unk72 = player.index;
+			temp_r10.unk0 = mcparticle.unk74;
+			temp_r10.unk4 = mcparticle.unk78;
+			temp_r10.unk8 = mcparticle.unk7C;
+			temp_r10.unk30 = mcparticle.unk98;
+			temp_r10.unk34 = mcparticle.unk9C;
+			temp_r10.unk38 = mcparticle.unkA0;
+			temp_r10.unk3C = mcparticle.unk8C;
+			temp_r10.unk40 = mcparticle.unk90;
+			temp_r10.unk44 = mcparticle.unk94;
+			temp_r10.unk10 = mcparticle.unk80;
+			temp_r10.unk14 = mcparticle.unk84;
+			temp_r10.unk18 = mcparticle.unk88;
+			temp_r10.unk48 = &gcosNnSystemVecZeroFast;
+			temp_r10.unk60 = &mcparticle;
+			temp_r10.unk68 = static_cast<u32>(gpsTexList_Particle);
+			temp_r10.unk6C = &player.unkC4;
+			temp_r10.unk73 = -1;
+			temp_r10.unk74 = 0;
 			player.unkBAC |= 0x4000;
 			player.unk1065 = 0x1E;
 		}

@@ -2,9 +2,7 @@
 
 #include "riders/player.hpp"
 
-ASMDefined void *gpsaObject_Player; // pointer to character model data
-
-void HyperSonic_RainbowLighting(Player *player);
+void HyperSonic_RainbowLighting(Player &player);
 
 struct RGBModule {
 	f32 R;
@@ -33,6 +31,9 @@ struct Lighting {
 };
 
 struct HyperSonic_ColorState {
-	u8 state;
+	enum color : u8{
+		red, blue, green, yellow, white, violet
+	};
+	color state;
 	u8 transitionFrames;
 };

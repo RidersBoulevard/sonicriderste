@@ -22,7 +22,7 @@ USED void Player_CharacterArchetype(Player *player) {
         }
     }
 
-    if (isSuperCharacter(*player, Character::MetalSonic)) {
+    if (player->isSuperCharacter(Character::MetalSonic)) {
         archetype = CharacterArchetype::None;
     }
 

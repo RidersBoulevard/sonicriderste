@@ -1,6 +1,7 @@
 #include "lib.hpp"
 #include "cosmetics/player/exloads.hpp"
 #include <array>
+#include "nn/ninjanext.hpp"
 
 void Custom_CreateHUDElement(void* textureStructs, u32 textureID, u32 textureRGBA, const HUDStruct *hud, const f32 aspectRatio) {
     InitTextureHook(textureStructs, textureID);
@@ -33,9 +34,9 @@ void Custom_CreateHUDElement(void* textureStructs, u32 textureID, u32 textureRGB
     CreateHUDElement(hud->screenX, hud->screenY, xLength, yLength, textureRGBA, 0, textureBoundaries.data());
 }
 
-void GetPlayerPositionRotationMatrix(Player &player, Matrix3x3F &out) {
+void GetPlayerPositionRotationMatrix(Player &player, Matrix3x4F &out) {
     auto *mtxList = gpsaMtxList_Player[player.index];
-	Matrix3x3F *mtx = mtxList + 2;
+	Matrix3x4F *mtx = mtxList + 2;
     nnMultiplyMatrix(&player.unkC4, mtx, out);
 }
 
@@ -76,6 +77,21 @@ constexpr std::array<u8, 35> MikuAnimationMap = {
         0x20,
         0xFF,
 };
+
+ASMUsed u16 LoadPlayerCustomAnimationDeferred(Player &player, void *animationFile) {
+    const u16 currentMotionNo = tu16ExclusiveMotionNo;
+    const u32 exclusiveMotionIndex = std::to_underlying(player.gearType) * 0x200 + currentMotionNo;
+    void *exclusiveMotion = &gpsaMotion_PlayerNeo[exclusiveMotionIndex];
+
+    utilBinSetUpMotion(exclusiveMotion, animationFile);
+
+    tu16ExclusiveMotionNo++;
+    return currentMotionNo;
+}
+
+ASMUsed void LoadPlayerCustomAnimationID(Player &player, void *animationFile, const u8 id) {
+    player.animationIDMap[id] = LoadPlayerCustomAnimationDeferred(player, animationFile);
+}
 
 ASMUsed u32 SetupCustomAnimationArchive(u8 *packManStart, u32 *packManOffsetStart, u32 playerIndex) {
     u32 setupFileCount = 0;
@@ -137,6 +153,6 @@ ASMUsed u32 SetupCustomAnimationArchive(u8 *packManStart, u32 *packManOffsetStar
     return setupFileCount;
 }
 
-Vector3F MatrixExtractTranslation(Matrix3x3F *m) {
+Vector3F MatrixExtractTranslation(Matrix3x4F *m) {
     return {m->field[3], m->field[7], m->field[11]};
 }

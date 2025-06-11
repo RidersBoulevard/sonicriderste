@@ -9,4 +9,4 @@ namespace TurboStar{
 	};
 }
 
-void Player_TurboStar(Player *player);
+void Player_TurboStar(Player &player);

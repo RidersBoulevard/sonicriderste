@@ -1,7 +1,7 @@
 #include "containers/graphicalobject.hpp"
 #include "riders/object.hpp"
 #include "lib/calculate_date.hpp"
-#include "main.hpp"
+#include "riders/gamemode.hpp"
 
 // Functions for some April Fools shenanigans
 
@@ -10,8 +10,8 @@ extern Sys_2dObjectTableData lbl_10087EC4;
 
 ASMUsed void AprilFools_EnableMotionBlur() {
 	if(!Date::GetCurrentDate().CheckAprilFools()) { return; }
-	if ((RuleSettings & 0x80) == 0) {
-		SetTask(&MotionBlur, ObjectGroups::MotionBlur, 0);
+	if (!ruleSettings.unk7) {
+		SetTask(&MotionBlur, ObjectGroups::MotionBlur, Object1Sizes::None);
 	}
 }
 

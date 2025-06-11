@@ -43,8 +43,8 @@ lbl_100066C0:
 .global lbl_10006700
 lbl_10006700:
     .skip 0x100
-.global lbl_10006800
-lbl_10006800:
+.global gaNnProjMtx44
+gaNnProjMtx44:
     .skip 0x140
 .global lbl_10006940
 lbl_10006940:
@@ -774,8 +774,8 @@ lbl_1000E040:
 .global lbl_1000E098
 lbl_1000E098:
     .skip 0x300
-.global lbl_1000E398
-lbl_1000E398:
+.global gpsTopPlayer
+gpsTopPlayer:
     .skip 0x28
 .global players
 players:
@@ -783,17 +783,17 @@ players:
 .global lbl_10017840
 lbl_10017840:
     .skip 0x4
-.global lbl_10017844
-lbl_10017844:
+.global gpsTimerTask
+gpsTimerTask:
     .skip 0x4
-.global lbl_10017848
-lbl_10017848:
+.global gpsRankTask
+gpsRankTask:
     .skip 0x4
 .global lbl_1001784C
 lbl_1001784C:
     .skip 0x4
-.global lbl_10017850
-lbl_10017850:
+.global gpsInfoTask
+gpsInfoTask:
     .skip 0x4
 .global lbl_10017854
 lbl_10017854:
@@ -822,8 +822,8 @@ gpsTrickTask:
 .global gpsBonusTask
 gpsBonusTask:
     .skip 0x10
-.global lbl_10017904
-lbl_10017904:
+.global gpsParamTask
+gpsParamTask:
     .skip 0x1C
 .global CurrentGameMode
 CurrentGameMode:
@@ -886,15 +886,24 @@ lbl_10017955:
     .skip 0xB
 .global lbl_10017960
 lbl_10017960:
-    .skip 0x24
+    .skip 0x14
+.global lbl_10017974
+lbl_10017974:
+    .skip 0x10
 .global lbl_10017984
 lbl_10017984:
-    .skip 0xDC
+    .skip 0xC
+.global lbl_10017990
+lbl_10017990:
+    .skip 0xD0
 .global lbl_10017A60
 lbl_10017A60:
-    .skip 0x48
-.global lbl_10017AA8
-lbl_10017AA8:
+    .skip 0x18
+.global lbl_10017A78
+lbl_10017A78:
+    .skip 0x30
+.global gu32Game_StGateFlag
+gu32Game_StGateFlag:
     .skip 0x8
 .global AllPlayerInput
 AllPlayerInput:
@@ -1674,8 +1683,8 @@ lbl_1008CEE0:
 .global gu8StoryCupNo
 gu8StoryCupNo:
     .skip 0x4
-.global lbl_1008CEE8
-lbl_1008CEE8:
+.global gpu8StoryMallocedHiAddr
+gpu8StoryMallocedHiAddr:
     .skip 0x4
 .global lbl_1008CEEC
 lbl_1008CEEC:
@@ -1692,8 +1701,8 @@ lbl_1008CF50:
 .global lbl_1008CF68
 lbl_1008CF68:
     .skip 0xC
-.global lbl_1008CF74
-lbl_1008CF74:
+.global gu8WorldGPCupNo
+gu8WorldGPCupNo:
     .skip 0xC
 .global lbl_1008CF80
 lbl_1008CF80:

@@ -1736,8 +1736,8 @@ lbl_001D9358:
     .4byte lbl_00034B6C
     .4byte lbl_00034C54
     .4byte 0x00000000
-.global RuleSettings
-RuleSettings:
+.global ruleSettings
+ruleSettings:
     # 0x1D9378
     .4byte 0x02A8FF03
 .global lbl_001D937C
@@ -1746,8 +1746,8 @@ lbl_001D937C:
     .4byte 0x00000000
     .4byte 0x00000000
     .4byte 0x00000000
-.global lbl_001D9388
-lbl_001D9388:
+.global tasStartBasePos
+tasStartBasePos:
     # 0x1D9388
     .4byte 0x3F800000
     .4byte 0x00000000
@@ -16075,44 +16075,44 @@ lbl_001E62E8:
     .4byte 0x00000000
     .4byte 0x00000000
     .4byte 0x00000000
-.global lbl_001E62F8
-lbl_001E62F8:
+.global gpActionFunc
+gpActionFunc:
     # 0x1E62F8
-    .4byte lbl_00072DD0
+    .4byte Action_Empty
     .4byte Action_Start
-    .4byte lbl_00072A68
-    .4byte lbl_00071D0C
-    .4byte lbl_001ABB98
+    .4byte Action_Goal
+    .4byte Action_ReStart
+    .4byte Action_Retire
     .4byte Action_Ground
-    .4byte lbl_00070A48
-    .4byte lbl_00070124
+    .4byte Action_Jump
+    .4byte Action_Fall
     .4byte Action_TrickFlip
     .4byte Action_TrickFlip
-    .4byte lbl_00074818
+    .4byte Action_TrickSpin
     .4byte Action_TrickAir
     .4byte Action_TrickMini
     .4byte Action_TrickTurb
     .4byte Action_TrickTurb
-    .4byte lbl_00075608
+    .4byte Action_TrickFailed
     .4byte Action_Turbulence
-    .4byte lbl_0007CF70
-    .4byte lbl_0007B6CC
-    .4byte lbl_0007A608
+    .4byte Action_Path
+    .4byte Action_SkillSpeed
+    .4byte Action_SkillFly
     .4byte 0x00000000
     .4byte Action_Attack
     .4byte Action_Damage
-    .4byte lbl_00093CC0
-    .4byte lbl_0007C908
+    .4byte Action_ObstacleDamage
+    .4byte Action_Path_LR_Move
     .4byte Action_Walk
-    .4byte lbl_0006FD2C
-    .4byte lbl_00187B10
-    .4byte lbl_0006F998
-    .4byte lbl_0006F4B4
+    .4byte Action_StGateDamage
+    .4byte Action_AntennaDamage
+    .4byte Action_GateTimeOver
+    .4byte Action_DLineDamage
     .4byte 0x00000000
     .4byte 0x00000000
     .4byte 0x00000000
-.global lbl_001E637C
-lbl_001E637C:
+.global cosWalkSpeed
+cosWalkSpeed:
     # 0x1E637C
     .4byte 0x3E3DA12F
     .4byte 0x3EBDA12F
@@ -16954,24 +16954,24 @@ lbl_001E6DE8:
     .4byte 0x00000000
     .4byte 0x00000214
     .4byte 0x00000000
-.global lbl_001E6E5C
-lbl_001E6E5C:
+.global ItemBox_JumpTable
+ItemBox_JumpTable:
     # 0x1E6E5C, switch table of item functions
-    .4byte lbl_00089EB8
-    .4byte lbl_00089F10
-    .4byte lbl_00089F68
-    .4byte lbl_00089FC0
-    .4byte lbl_00089FD8
-    .4byte lbl_00089FF4
-    .4byte lbl_0008A010
-    .4byte lbl_0008A054
-    .4byte lbl_0008A06C
-    .4byte lbl_0008A09C # bomb
-    .4byte lbl_0008A0B4 # ball and chain
-    .4byte lbl_0008A158
-    .4byte lbl_00089F0C
-    .4byte lbl_00089F0C
-    .4byte lbl_00089EB8
+    .4byte ItemBox_Ring_Ten
+    .4byte ItemBox_Ring_Twenty
+    .4byte ItemBox_Ring_Thirty
+    .4byte ItemBox_Air_Thirty
+    .4byte ItemBox_Air_Fifty
+    .4byte ItemBox_Air_Hundred
+    .4byte ItemBox_SpeedShoes_old
+    .4byte ItemBox_Magnet
+    .4byte ItemBox_Invincibility
+    .4byte ItemBox_Bomb
+    .4byte ItemBox_BallAndChain
+    .4byte ItemBox_ShowUI # RNG
+    .4byte ItemBox_ShowUI # HundredRings
+    .4byte ItemBox_ShowUI # MaxAir
+    .4byte ItemBox_Ring_Ten # FiveRings
 .global lbl_001E6E98
 lbl_001E6E98:
     # 0x1E6E98
@@ -17511,7 +17511,7 @@ lbl_001E73E4:
     .4byte 0x00000605
     .4byte 0x2A1100FF
     .4byte 0x00000000
-    .4byte 0x3FB33333
+    .4byte 0x3FB33333 # lvl 2
     .4byte 0x00000000
     .4byte 0x3DCCCCCD
     .4byte 0x00000000
@@ -17524,7 +17524,7 @@ lbl_001E73E4:
     .4byte 0x02000D0D
     .4byte 0x291100FF
     .4byte 0x00000000
-    .4byte 0x3FA66666
+    .4byte 0x3FA66666 # lvl 3
     .4byte 0x00000000
     .4byte 0x3E4CCCCD
     .4byte 0x00000000
@@ -17628,7 +17628,7 @@ lbl_001E73E4:
     .4byte 0x00000807
     .4byte 0x110F00FF
     .4byte 0x00000000
-    .4byte 0x3FE66666
+    .4byte 0x3FE66666 # lvl 2
     .4byte 0x00000000
     .4byte 0xBF800000
     .4byte 0x00000000
@@ -17641,7 +17641,7 @@ lbl_001E73E4:
     .4byte 0x02000303
     .4byte 0x290F00FF
     .4byte 0x00000000
-    .4byte 0x3FD9999A
+    .4byte 0x3FD9999A # lvl 3
     .4byte 0x00000000
     .4byte 0x3F333333
     .4byte 0x00000000
@@ -17739,7 +17739,7 @@ lbl_001E73E4:
     .4byte 0x00000000
     .4byte 0xBE19999A
     .4byte 0x42C80000
-    .single 3.5 // Hitbox Size
+    .single 3 // Hitbox Size
     .4byte 0x00003FFF
     .4byte 0x00000A02
     .4byte 0x00000201
@@ -17752,20 +17752,20 @@ lbl_001E73E4:
     .4byte 0x00000000
     .4byte 0x00000000
     .4byte 0x43480000
-    .single 3.5 // Hitbox Size
+    .single 3 // Hitbox Size
     .4byte 0x00007FFF
     .4byte 0x00011100
     .4byte 0xFF001111
     .4byte 0x292900FF
     .4byte 0x00000000
-    .4byte 0x3FB33333
+    .4byte 0x3FB33333 // Shadow Lvl 3
     .4byte 0x00000000
     .4byte 0x3F19999A
     .4byte 0x3E19999A
     .4byte 0x00000000
     .4byte 0xBE4CCCCD
     .4byte 0x00000000
-    .4byte 0x40400000
+    .single 4 // Hitbox Size
     .4byte 0x00003FFF
     .4byte 0x00021405
     .4byte 0x01001415
@@ -21438,7 +21438,7 @@ Gears:
     .2byte 0x05DC # ring cost in gear shop
     .4byte 0x00000000 # unknown
     .4byte 0x3A4A4587 # acceleration
-    .4byte 0x3E0E38EB # top speed (additive)
+    .4byte 0x3E3425F2 # top speed (additive) 0x3E0E38EB 0x3E3425F2 0x3E4BDA13
     .4byte 0xC1A00000 # off road speed
     .4byte 0x00000000 # speed and handling multiplier
     .4byte 0x3DCCCCCD # weight
@@ -21458,7 +21458,7 @@ Gears:
     .4byte 0x00000000 # air gain multiplier (tricks)
     .4byte 0x00000000 # air gain multiplier (shortcuts)
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
-    .4byte 0x04000000 # special flags
+    .4byte 0x00000000 # special flags # 0x04000000
     .4byte 0x40000000 # air cost multiplier when charging jump
     .4byte 0x000186A0 # level 1 max air
     .4byte 0x00000010 # level 1 passive air drain
@@ -21466,21 +21466,21 @@ Gears:
     .4byte 0x000061A8 # level 1 boost cost
     .4byte 0x000061A8 # level 1 tornado cost
     .4byte 0x3E6D097B # level 1 speed gained from a drift dash
-    .4byte 0x3F6D097B # level 1 boost speed 0x3F6F95CF 0x3F72F694
+    .4byte 0x3F6F95CF # level 1 boost speed 0x3F72F694 0x3F6D097B
     .4byte 0x000249F0 # level 2 max air
     .4byte 0x00000010 # level 2 passive air drain
     .4byte 0x00000103 # level 2 drift air cost
     .4byte 0x00007530 # level 2 boost cost
     .4byte 0x00007530 # level 2 tornado cost
     .4byte 0x3EBDA12F # level 2 speed gained from a drift dash
-    .4byte 0x3F884BDA # level 2 boost speed 0x3F8B429A
+    .4byte 0x3F899204 # level 2 boost speed 0x3F8B429A 0x3F884BDA
     .4byte 0x00030D40 # level 3 max air
     .4byte 0x00000010 # level 3 passive air drain
     .4byte 0x00000153 # level 3 drift air cost
     .4byte 0x00009C40 # level 3 boost cost
     .4byte 0x00009C40 # level 3 tornado cost
     .4byte 0x3EED097B # level 3 speed gained from a drift dash
-    .4byte 0x3F9425ED # level 3 boost speed 0x3F971CEB
+    .4byte 0x3F956C17 # level 3 boost speed 0x3F971CEB 0x3F9425ED
     .byte 0x05 # shown dash (tempo) stat
     .byte 0x03 # shown limit (efficiency) stat
     .byte 0x02 # shown power (combat) stat
@@ -21922,7 +21922,7 @@ Gears:
     .2byte 0x01F4 # ring cost in gear shop
     .4byte 0x00000000 # unknown
     .4byte 0x3B6A4587 # acceleration
-    .4byte 0x3E638E6D # top speed (additive) 0x3E638E6D, 0x3E3425ED
+    .4byte 0x3D7684BE # top speed (additive) 0x3E638E6D, 0x3E3425ED, 0x3E2F684C, 0x3E3425ED  0x3E638E39
     .4byte 0x41200000 # off road speed OG: 0xC1200000
     .4byte 0x00000000 # speed and handling multiplier
     .4byte 0x3E19999A # weight
@@ -21943,28 +21943,28 @@ Gears:
     .4byte 0x00000000 # air gain multiplier (shortcuts)
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
     .4byte 0x00094400 # special flags OG: 0x00094400
-    .4byte 0x40400000 # air cost multiplier when charging jump OG: 0x40400000 0xBF800000
-    .4byte 0x000F4240 # level 1 max air
-    .4byte 0xFFFFFF4C # level 1 passive air drain
-    .4byte 0x000002A3 # level 1 drift air cost OG: 0x000002A3 0x000001FA
-    .4byte 0x000B71B0 # level 1 boost cost OG: 0x000B71B0, 0x0007A120
-    .4byte 0x000186A0 # level 1 tornado cost
+    .4byte 0x40400000 # air cost multiplier when charging jump OG: 0x40400000 0xBF800000 0xC0400000
+    .4byte 0x000186A0 # level 1 max air // Goodbye, AK. 0x000F4240
+    .4byte 0xFFFFFFEE # level 1 passive air drain // 0xFFFFFF4C
+    .4byte 0x00000043 # level 1 drift air cost OG: 0x000002A3 0x000001FA
+    .4byte 0x000124F8 # level 1 boost cost OG: 0x000B71B0, 0x0007A120, 0x00002710
+    .4byte 0x00001388 # level 1 tornado cost // 0x000186A0
     .4byte 0x3EED097B # level 1 speed gained from a drift dash
     .4byte 0x4005559B # level 1 boost speed OG: 0x4005559B, 0x3FED097B
-    .4byte 0x000249F0 # level 2 max air
+    .4byte 0x000186A0 # level 2 max air
     .4byte 0x00000010 # level 2 passive air drain
     .4byte 0x000000FA # level 2 drift air cost
     .4byte 0x00007530 # level 2 boost cost
     .4byte 0x00007530 # level 2 tornado cost
     .4byte 0x3EBDA12F # level 2 speed gained from a drift dash
-    .4byte 0x4005559B # level 2 boost speed OG: 0x4005559B, 0x3FED097B
-    .4byte 0x00030D40 # level 3 max air
+    .4byte 0x3F8E38E4 # level 2 boost speed OG: 0x4005559B, 0x3FED097B 0x3F8E38E4
+    .4byte 0x000186A0 # level 3 max air
     .4byte 0x00000010 # level 3 passive air drain
     .4byte 0x0000014D # level 3 drift air cost
     .4byte 0x00009C40 # level 3 boost cost
     .4byte 0x00009C40 # level 3 tornado cost
     .4byte 0x3EED097B # level 3 speed gained from a drift dash
-    .4byte 0x4005559B # level 3 boost speed OG: 0x4005559B, 0x3FED097B
+    .4byte 0x3F9A12F7 # level 3 boost speed OG: 0x4005559B, 0x3FED097B
     .byte 0x02 # shown dash (tempo) stat
     .byte 0x03 # shown limit (efficiency) stat
     .byte 0x03 # shown power (combat) stat
@@ -22063,7 +22063,7 @@ Gears:
     .4byte 0x00000000 # air gain multiplier (tricks)
     .4byte 0x00000000 # air gain multiplier (shortcuts)
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
-    .4byte 0x00000090 # special flags
+    .4byte 0x04000090 # special flags // 0x00000090 0x00000080
     .4byte 0x40000000 # air cost multiplier when charging jump
     .4byte 0x000186A0 # level 1 max air
     .4byte 0x00000010 # level 1 passive air drain
@@ -22305,7 +22305,7 @@ Gears:
     .4byte 0x00000000 # air gain multiplier (tricks)
     .4byte 0x00000000 # air gain multiplier (shortcuts)
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
-    .4byte 0x01000000 # special flags
+    .4byte 0x00000000 # special flags # 0x01000000
     .4byte 0x40000000 # air cost multiplier when charging jump
     .4byte 0x000186A0 # level 1 max air
     .4byte 0x00000010 # level 1 passive air drain
@@ -22327,7 +22327,7 @@ Gears:
     .4byte 60000 # level 3 boost cost
     .4byte 0x00009C40 # level 3 tornado cost
     .4byte 0x3E3DAD52 # level 3 speed gained from a drift dash
-    .single 1.73611111 # level 3 boost speed # 1.852314814814815
+    .single 1.852314814814815 # level 3 boost speed # 1.73611111
     .byte 0x04 # shown dash (tempo) stat
     .byte 0x06 # shown limit (efficiency) stat
     .byte 0x01 # shown power (combat) stat
@@ -22768,9 +22768,9 @@ Gears:
     .byte 0x11 # model id
     .2byte 0x05DC # ring cost in gear shop
     .4byte 0x00000000 # unknown
-    .4byte 0x3A7BEB9E # acceleration
-    .4byte 0x3E1C7DEA # top speed (additive)
-    .4byte 0x41200000 # off road speed
+    .4byte 0x00000000 # acceleration 0x3A7BEB9E
+    .4byte 0x3D8E5129 # top speed (additive) 0x3E1C7DEA
+    .4byte 0x00000000 # off road speed 0x41200000
     .4byte 0x00000000 # speed and handling multiplier
     .4byte 0xBEE66666 # weight
     .4byte 0x00000000 # extra type attribute
@@ -22789,7 +22789,7 @@ Gears:
     .4byte 0x00000000 # air gain multiplier (tricks)
     .4byte 0x00000000 # air gain multiplier (shortcuts)
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
-    .4byte 0x00000104 # special flags
+    .4byte 0x00800104 # special flags
     .4byte 0x40000000 # air cost multiplier when charging jump
     .4byte 0x000186A0 # level 1 max air
     .4byte 0x00000010 # level 1 passive air drain
@@ -22811,7 +22811,7 @@ Gears:
     .4byte 0x00009C40 # level 3 boost cost
     .4byte 0x00009C40 # level 3 tornado cost
     .4byte 0x3EED097B # level 3 speed gained from a drift dash
-    .single 1.20379996299744 # level 3 boost speed # OG: 1.180555555555556
+    .single 1.20379996299744 # level 3 boost speed # OG: 1.180555555555556 1.20379996299744
     .byte 0x05 # shown dash (tempo) stat
     .byte 0x03 # shown limit (efficiency) stat
     .byte 0x04 # shown power (combat) stat
@@ -22890,7 +22890,7 @@ Gears:
     .2byte 0x0000 # ring cost in gear shop
     .4byte 0x00000000 # unknown
     .4byte 0x3FAED098 # acceleration
-    .4byte 0x3E638E6D # top speed (additive)
+    .4byte 0x3E3425F2 # top speed (additive) 0x3E638E6D
     .4byte 0x41A00000 # off road speed
     .4byte 0x00000000 # speed and handling multiplier
     .4byte 0x00000000 # weight
@@ -22915,7 +22915,7 @@ Gears:
     .4byte 0x0001ADB0 # level 1 max air
     .4byte 0x00000010 # level 1 passive air drain
     .4byte 0x0000000A # level 1 drift air cost
-    .4byte 0x00004074 # level 1 boost cost 0x00002AF8
+    .4byte 0x000030D4 # level 1 boost cost 0x00002AF8 0x00004074
     .4byte 0x00001388 # level 1 tornado cost
     .4byte 0x3EED097B # level 1 speed gained from a drift dash
     .4byte 0x3F9A161E # level 1 boost speed
@@ -23010,7 +23010,7 @@ Gears:
     .byte 0x13 # model id
     .2byte 0x0320 # ring cost in gear shop
     .4byte 0x00000000 # unknown
-    .4byte 0x3A7BEB9E # acceleration
+    .4byte 0x39CA4587 # acceleration 0x3A7BEB9E
     .4byte 0x3E3DAD52 # top speed (additive)
     .4byte 0x00000000 # off road speed
     .4byte 0x00000000 # speed and handling multiplier
@@ -23034,26 +23034,26 @@ Gears:
     .4byte 0x00000000 # special flags
     .4byte 0x40000000 # air cost multiplier when charging jump
     .4byte 0x000186A0 # level 1 max air
-    .4byte 0xFFFFFFC4 # level 1 passive air drain
+    .4byte 0xFFFFFFCE # level 1 passive air drain
     .4byte 0x000000BA # level 1 drift air cost
     .4byte 0x0000BE6E # level 1 boost cost # 0x0000FDE8 0x00007EF4 0x0000BE6E 0x0000B1BC
     .4byte 0x00004E20 # level 1 tornado cost, OG: 0x000061A8
     .4byte 0x3E6D097B # level 1 speed gained from a drift dash
-    .4byte 0x3F884BDA # level 1 boost speed # 0x3F884BDA 0x3F856481 0x3F825ED1
+    .4byte 0x3F85C28F # level 1 boost speed # 0x3F856481 0x3F825ED1 0x3F884BDA
     .4byte 0x000249F0 # level 2 max air
-    .4byte 0xFFFFFF94 # level 2 passive air drain
+    .4byte 0xFFFFFF9E # level 2 passive air drain
     .4byte 0x0000010E # level 2 drift air cost
     .4byte 0x00011DA5 # level 2 boost cost # 0x00017CDC 0x0000BE6E 0x00011DA5 0x00010A9A
     .4byte 0x00005DC0 # level 2 tornado cost, OG: 0x00007530
     .4byte 0x3EBDA12F # level 2 speed gained from a drift dash
-    .4byte 0x3F912F68 # level 2 boost speed # 0x3F912F68 0x3F971D3F 0x3F9425ED
+    .4byte 0x3F8E38E4 # level 2 boost speed # 0x3F971D3F 0x3F9425ED 0x3F912F68
     .4byte 0x00030D40 # level 3 max air
-    .4byte 0xFFFFFF64 # level 3 passive air drain
+    .4byte 0xFFFFFF6E # level 3 passive air drain
     .4byte 0x00000161 # level 3 drift air cost
     .4byte 0x00017CDC # level 3 boost cost # 0x0001FBD0 0x0000FDE8 0x00017CDC 0x00016378
     .4byte 0x00007D00 # level 3 tornado cost, OG: 00009C40
     .4byte 0x3EED097B # level 3 speed gained from a drift dash
-    .4byte 0x3F9A12F7 # level 3 boost speed # 0x3F9A12F7 0x3FA2F685 0x3FA00000
+    .4byte 0x3F971D3F # level 3 boost speed # 0x3FA2F685 0x3FA00000 0x3F9A12F7
     .byte 0x05 # shown dash (tempo) stat
     .byte 0x05 # shown limit (efficiency) stat
     .byte 0x03 # shown power (combat) stat
@@ -23615,7 +23615,7 @@ Gears:
     .byte 0x18 # model id
     .2byte 0x09C4 # ring cost in gear shop
     .4byte 0x00000000 # unknown
-    .4byte 0xB9CA4587 # acceleration
+    .4byte 0x00000000 # acceleration // 0xB9CA4587
     .4byte 0x00000000 # top speed (additive)
     .4byte 0x00000000 # off road speed
     .4byte 0x00000000 # speed and handling multiplier
@@ -23858,7 +23858,7 @@ Gears:
     .2byte 0x03E8 # ring cost in gear shop
     .4byte 0x00000000 # unknown
     .4byte 0x00000000 # acceleration # OG: 0xB9CA4587
-    .4byte 0xBD3DA12F # top speed (additive)
+    .4byte 0x00000000 # top speed (additive) # 0xBD3DA12F
     .4byte 0xC1200000 # off road speed
     .4byte 0x00000000 # speed and handling multiplier
     .4byte 0x3EB33333 # weight
@@ -23879,7 +23879,7 @@ Gears:
     .4byte 0x00000000 # air gain multiplier (shortcuts)
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
     .4byte 0x00000000 # special flags
-    .4byte 0x40000000 # air cost multiplier when charging jump
+    .4byte 0xC1200000 # air cost multiplier when charging jump # 0x40000000
     .4byte 0x00036EE8 # level 1 max air
     .4byte 0x00000010 # level 1 passive air drain
     .4byte 0x000000C8 # level 1 drift air cost
@@ -23999,7 +23999,7 @@ Gears:
     .4byte 0xBE19999A # air gain multiplier (tricks)
     .4byte 0xBE19999A # air gain multiplier (shortcuts)
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
-    .4byte 0x00020001 # special flags
+    .4byte 0x00020000 # special flags
     .4byte 0x40000000 # air cost multiplier when charging jump
     .4byte 0x000186A0 # level 1 max air
     .4byte 0x00000010 # level 1 passive air drain
@@ -24014,7 +24014,7 @@ Gears:
     .4byte 0x0000C350 # level 2 boost cost
     .4byte 0x00007530 # level 2 tornado cost
     .4byte 0x3EBDA12F # level 2 speed gained from a drift dash
-    .4byte 0x3F9426AB # level 2 boost speed
+    .4byte 0x3F971D3F # level 2 boost speed 0x3F9426AB
     .4byte 0x00030D40 # level 3 max air
     .4byte 0x00000008 # level 3 passive air drain
     .4byte 0x0000011B # level 3 drift air cost
@@ -24249,21 +24249,21 @@ Gears:
     .4byte 0x000061A8 # level 1 boost cost
     .4byte 0x000061A8 # level 1 tornado cost
     .4byte 0x3E6D097B # level 1 speed gained from a drift dash
-    .4byte 0x3F697B42 # level 1 boost speed 0x3F671C86
+    .4byte 0x3F671C86 # level 1 boost speed 0x3F697B42
     .4byte 0x000249F0 # level 2 max air
     .4byte 0x00000010 # level 2 passive air drain
     .4byte 0x000000FA # level 2 drift air cost
     .4byte 0x00007530 # level 2 boost cost
     .4byte 0x00007530 # level 2 tornado cost
     .4byte 0x3EBDA12F # level 2 speed gained from a drift dash
-    .4byte 0x3F8684BE # level 2 boost speed 0x3F8555C5
+    .4byte 0x3F8555C5 # level 2 boost speed  0x3F8684BE
     .4byte 0x00030D40 # level 3 max air
     .4byte 0x00000010 # level 3 passive air drain
     .4byte 0x0000014D # level 3 drift air cost
     .4byte 0x00009C40 # level 3 boost cost
     .4byte 0x00009C40 # level 3 tornado cost
     .4byte 0x3EED097B # level 3 speed gained from a drift dash
-    .4byte 0x3F925ED1 # level 3 boost speed 0x3F912FC2
+    .4byte 0x3F912FC2 # level 3 boost speed  0x3F925ED1
     .byte 0x03 # shown dash (tempo) stat
     .byte 0x04 # shown limit (efficiency) stat
     .byte 0x03 # shown power (combat) stat
@@ -24492,7 +24492,7 @@ Gears:
     .4byte 0x000061A8 # level 1 tornado cost
     .4byte 0x3E6D097B # level 1 speed gained from a drift dash
     .4byte 0x3F6D097B # level 1 boost speed
-    .4byte 0x0001FBD0 # level 2 max air
+    .4byte 0x000249F0 # level 2 max air 0x0001FBD0
     .4byte 0x00000010 # level 2 passive air drain
     .4byte 0x000000FA # level 2 drift air cost
     .4byte 0x00007530 # level 2 boost cost
@@ -24613,7 +24613,7 @@ Gears:
     .4byte 0x00001388 # level 1 tornado cost
     .4byte 0x3E0E38E4 # level 1 speed gained from a drift dash
     .4byte 0x3F6D097B # level 1 boost speed
-    .4byte 0x0001FBD0 # level 2 max air
+    .4byte 0x000249F0 # level 2 max air 0x0001FBD0
     .4byte 0x00000010 # level 2 passive air drain
     .4byte 0x000000FA # level 2 drift air cost
     .4byte 0x00007530 # level 2 boost cost
@@ -24947,7 +24947,7 @@ Gears:
     .2byte 0x0000 # ring cost in gear shop
     .4byte 0x00000000 # unknown
     .4byte 0x00000000 # acceleration
-    .4byte 0x00000000 # top speed (additive)
+    .4byte 0x3D3DA12F # top speed (additive)
     .4byte 0x00000000 # off road speed 0xC1200000
     .4byte 0x00000000 # speed and handling multiplier
     .4byte 0xBEB33333 # weight
@@ -25310,7 +25310,7 @@ Gears:
     .2byte 0x03E8 # ring cost in gear shop
     .4byte 0x00000000 # unknown
     .4byte 0x3ACA4587 # acceleration
-    .4byte 0x3E3425ED # top speed (additive) # Top speed now 210, OG line: 0xBD3DA12F 0x3E638E39
+    .4byte 0x3E4BDA13 # top speed (additive) # Top speed now 210, OG line: 0xBD3DA12F 0x3E638E39, 0x3E3425ED
     .4byte 0xC1A00000 # off road speed
     .4byte 0x00000000 # speed and handling multiplier
     .4byte 0xBECCCCCD # weight
@@ -25330,7 +25330,7 @@ Gears:
     .4byte 0x00000000 # air gain multiplier (tricks)
     .4byte 0x00000000 # air gain multiplier (shortcuts)
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
-    .4byte 0x00090400 # special flags # Temp change, OG: 0x00000000
+    .4byte 0x000B0400 # special flags # Temp change, OG: 0x00000000, 0x00090400
     .4byte 0x40000000 # air cost multiplier when charging jump
     .4byte 0x000186A0 # level 1 max air
     .4byte 0x00000010 # level 1 passive air drain
@@ -25572,7 +25572,7 @@ Gears:
     .4byte 0x00000000 # air gain multiplier (tricks)
     .4byte 0x00000000 # air gain multiplier (shortcuts)
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
-    .4byte 0x04000000 # special flags
+    .4byte 0x00000000 # special flags # 0x04000000
     .4byte 0x40000000 # air cost multiplier when charging jump
     .4byte 0x000186A0 # level 1 max air
     .4byte 0x00000010 # level 1 passive air drain
@@ -25690,7 +25690,7 @@ Gears:
     .4byte 0x00000000 # unknown
     .4byte 0x00000000 # unknown
     .4byte 0x00000000 # how long it takes to generate a drift dash
-    .4byte 0x00000000 # air gain multiplier (tricks)
+    .4byte 0xBE800000 # air gain multiplier (tricks)
     .4byte 0x00000000 # air gain multiplier (shortcuts)
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
     .4byte 0x00000080 # special flags
@@ -27381,9 +27381,9 @@ lbl_001F0308:
 lbl_001F0348:
     # 0x1F0348
     .4byte lbl_000DED48
-    .4byte lbl_000DF1C0
+    .4byte lbl_000DF1C0 # "always on ice" special flag?
     .4byte lbl_000DF904
-    .4byte lbl_000DEEFC
+    .4byte lbl_000DEEFC # runs while turning I'm pretty sure
     .4byte lbl_000DF4D4
     .4byte lbl_000DF904
     .4byte lbl_000DEF04
@@ -29427,8 +29427,8 @@ lbl_001F2014:
     .4byte lbl_0011759C
     .4byte 0x001C7F02
     // New Test Button For Tutorial Mode
-    //.4byte lbl_0011759C
-    //.4byte 0x001C7F03
+    .4byte lbl_0011759C
+    .4byte 0x001C7F03
     // ------------
     .4byte lbl_00116E24
     .4byte 0x00267F01
@@ -29625,7 +29625,7 @@ lbl_001F2254:
     .4byte lbl_00115460
     .4byte lbl_001154D0
     .4byte lbl_00115A88
-    //.4byte lbl_LoadTutorialGamemodeCase // for tutorial gamemode
+    .4byte lbl_LoadTutorialGamemodeCase // for tutorial gamemode
 .global lbl_001F227C
 lbl_001F227C:
     # 0x1F227C
@@ -31108,6 +31108,8 @@ GraphicalObjects_StageSelect:
     .4byte 0x002DC300
     .4byte GraphicalObjectHandler_TournamentRace
     .4byte 0x00330000
+    .4byte GraphicalObjectHandler_TournamentRace
+    .4byte 0x00330001
 .global lbl_001F36E0
 lbl_001F36E0:
     # 0x1F36E0
@@ -31686,8 +31688,8 @@ lbl_001F3D7C:
     .4byte 0x00000000
     .4byte 0x00000000
     .4byte 0x00000000
-.global lbl_001F3DF0
-lbl_001F3DF0:
+.global gs32WorldGPNo
+gs32WorldGPNo:
     # 0x1F3DF0
     .4byte 0xFFFFFFFF
     .4byte 0x00000000
@@ -43169,3 +43171,18 @@ lbl_001FF2A8:
 CharacterMotionFrames:
     .single 0
     .single 0
+
+.global asm_SandRuinsLaunchPositions
+asm_SandRuinsLaunchPositions:
+    // These are default positions, can be modified per mode on C++ side
+    .single 51.099967956543 // X pos, lap 1
+    .single 0.199994996190071 // Y pos, lap 1
+    .single 194.699951171875 // Z pos, lap 1
+
+    .single 33.1000137329102 // X pos, lap 2
+    .single 0 // Y pos, lap 2
+    .single 126.799964904785 // Z pos, lap 2
+
+    .single 24.2000102996826 // X pos, lap 3
+    .single 55.1999969482422 // Y pos, lap 3
+    .single 89.5000076293945 // Z pos, lap 3

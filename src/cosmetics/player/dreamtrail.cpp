@@ -8,7 +8,7 @@ ASMDefined ParticleDetails lbl_001FD468;
 ASMDefined ParticleDetails lbl_001FD510;
 
 void Player_DreamTrailParticles(Player &player) {
-    auto *starParticles = static_cast<ParticleTaskObject1 *>(SetTask(func_Particle_Task, ObjectGroups::Particle, 2)->object);
+    auto *starParticles = static_cast<ParticleTaskObject1 *>(SetTask(func_Particle_Task, ObjectGroups::Particle, Object1Sizes::x80)->object);
     starParticles->unk72 = player.index;
     starParticles->x = 0.0f;
     starParticles->y = 0.0f;
@@ -29,7 +29,7 @@ void Player_DreamTrailParticles(Player &player) {
     starParticles->unk73 = static_cast<u8>(-1);
     starParticles->unk74 = 0;
 
-    auto *lineParticles = static_cast<ParticleTaskObject1 *>(SetTask(func_Particle_Task, ObjectGroups::Particle, 2)->object);
+    auto *lineParticles = static_cast<ParticleTaskObject1 *>(SetTask(func_Particle_Task, ObjectGroups::Particle, Object1Sizes::x80)->object);
     lineParticles->unk72 = player.index;
     lineParticles->x = 0.0f;
     lineParticles->y = 0.0f;

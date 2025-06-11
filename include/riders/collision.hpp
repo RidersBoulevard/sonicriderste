@@ -25,13 +25,15 @@ struct CollisionProperties{
 		SpeedBoost			= 0x04,
 		ForwardFlipRamp		= 0x05,
 		BackFlipRamp		= 0x06,
+		HalfpipeRamp		= 0x08,
 		ManualRamp 			= 0x09,
 		FlightStateTrigger 	= 0x11,
 		OnIce 				= 0x23
 	};
 
-	u16 someOtherProperty = 0;
 	CollisionType type = None;
+	u16 someOtherProperty = 0;
+
 
 	constexpr explicit CollisionProperties(CollisionType collisionType, u16 otherProperty = 0) : someOtherProperty(otherProperty), type(collisionType){}
 	// boilerplate

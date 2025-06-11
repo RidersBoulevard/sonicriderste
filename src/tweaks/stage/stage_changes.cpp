@@ -6,6 +6,7 @@
 #include "riders/stage.hpp"
 #include "gears/blastGaugeGears.hpp"
 #include "handlers/player/specialflagtweaks.hpp"
+#include "handlers/menu/debugmenu/debugmenu.hpp"
 
 // this structure for object1 will be specifically used for this code
 #pragma GCC diagnostic push
@@ -27,14 +28,14 @@ struct TornadoObject {
 };
 #pragma GCC diagnostic pop
 
-inline void lbl_update_item(ObjectNode *object, u32 item) {
+inline void lbl_update_item(ObjectNode *object, const ItemID &item) {
 	auto *object1 = static_cast<Object1 *>(object->object);
 	object->item_id = item;
-	object1->item_icon = item;
+	object1->item_icon = static_cast<u32>(item);
 }
 
 static void func_TornadoSlingshot(ObjectNode *object) {
-	auto *object1 = static_cast<TornadoObject *>(object->object);
+	const auto *object1 = static_cast<TornadoObject *>(object->object);
 	static std::array<u8, 4> Timers __attribute((section ("SBSS"))) = {0};
 
 	for(auto &player : getCurrentPlayerList()) {
@@ -76,8 +77,7 @@ static void func_TornadoSlingshot(ObjectNode *object) {
 				// if (player.state != StartLine && player.state != Stun && !player.statusEffectFlags.hasAny(InvincibilityStatus)) {
 				if (Player_ZIgnoreTornado(&player) == false 
 					&& !player.statusEffectFlags.hasAny(PlayerStatus::InvincibilityStatus)) {
-					Player* tornadoPlayer = &players[object1->playerIndex];
-					if (isSuperCharacter(*tornadoPlayer, Character::Shadow)) {
+					if (Player &tornadoPlayer = players[object1->playerIndex]; tornadoPlayer.isSuperCharacter(Character::Shadow)) {
 						BlastGaugeInfo *bgInfo = &PlayerBlastGaugeInfo[object1->playerIndex];
 						bgInfo->currentGauge += (player.gearStats[player.level].tornadoCost * 3.33);
 					}
@@ -110,24 +110,28 @@ ASMUsed void func_StageChanges(ObjectNode *currentObject) {
 
 	auto *object1 = static_cast<Object1 *>(currentObject->object);
 
-	const u16 &object_type = currentObject->object_type;
-	if(object_type == 0x1E || object_type == 0x1F) {
+	const auto &object_type = currentObject->object_type;
+	if(object_type == static_cast<ObjectTypes>(0x1E) || object_type == static_cast<ObjectTypes>(0x1F)) {
 		func_TornadoSlingshot(currentObject);
 	}
 
-	const u16 &object_id = currentObject->object_id;
+	const auto &object_id = currentObject->object_id;
 	switch(CurrentStage) {
 		case GreenCave: {
-			if(object_id == 0xE8 && object_type == FlightRing) {
+			if((object_id == 0xF4 || object_id == 0xF5) && object_type == ObjectTypes::WhiteCaveWeb) {
+				if(currentObject->state != 1) {
+					currentObject->state = 1;
+				}
+			} else if(object_id == 0xE8 && object_type == ObjectTypes::FlightRing) {
 				object1->rotation.x = static_cast<s32>(0xFFFFF06D);
-			} else if(object_type == ItemBox) {
+			} else if(object_type == ObjectTypes::ItemBox) {
 				switch(object_id) {
 					case 0xBB:
-						lbl_update_item(currentObject, HundredAir);
+						lbl_update_item(currentObject, ItemID::HundredAir);
 						break;
 					case 0xBC:
 					case 0xBD:
-						lbl_update_item(currentObject, SpeedShoes);
+						lbl_update_item(currentObject, ItemID::SpeedShoes);
 						break;
 					default:
 						break;
@@ -136,11 +140,11 @@ ASMUsed void func_StageChanges(ObjectNode *currentObject) {
 			break;
 		}
 		case WhiteCave: {
-			if(object_id == 0xC4 && object_type == WhiteCaveWeb) {
+			if(object_id == 0xC4 && object_type == ObjectTypes::WhiteCaveWeb) {
 				if(currentObject->state != 1) {
 					currentObject->state = 1;
 				}
-			} else if(object_id >= 0x1C && object_id <= 0x1E && object_type == DashPanel) {
+			} else if(object_id >= 0x1C && object_id <= 0x1E && object_type == ObjectTypes::DashPanel) {
 				const u32 index = object_id - 0x1C;// generate index
 				auto *obj1 = static_cast<Object1 *>(currentObject->object);
 				auto& [pos, rot] = data_stageChanges.whiteCaveDashPanels[index]; // https://en.cppreference.com/w/cpp/language/structured_binding
@@ -150,12 +154,12 @@ ASMUsed void func_StageChanges(ObjectNode *currentObject) {
 			break;
 		}
 		case EggFactory: {
-			if(object_id >= 0x104 && object_id <= 0x106 && object_type == DashPanel) {
+			if(object_id >= 0x104 && object_id <= 0x106 && object_type == ObjectTypes::DashPanel) {
 				const u32 index = object_id - 0x104;// generate index
 				auto *obj1 = static_cast<Object1 *>(currentObject->object);
 				obj1->pos.z = data_stageChanges.eggFactoryDashPanelZPos[index];
 				obj1->pos.x = data_stageChanges.eggFactoryDashPanelXPos;
-			} else if(object_id >= 0x125 && object_id <= 0x126 && object_type == FlightRing) {
+			} else if(object_id >= 0x125 && object_id <= 0x126 && object_type == ObjectTypes::FlightRing) {
 				const u32 index = object_id - 0x125;
 				auto *obj1 = static_cast<Object1 *>(currentObject->object);
 				auto& [pos, rot] = data_stageChanges.eggFactoryFlyRings[index];
@@ -166,7 +170,7 @@ ASMUsed void func_StageChanges(ObjectNode *currentObject) {
 		}
 
 		case RedCanyon: {
-			if(object_id >= 0xA4 && object_id <= 0xA7 && object_type == DashPanel) {
+			if(object_id >= 0xA4 && object_id <= 0xA7 && object_type == ObjectTypes::DashPanel) {
 				const u32 index = 0xA7 - object_id;
 				auto *obj1 = static_cast<Object1 *>(currentObject->object);
 				auto& [x, z] = data_stageChanges.redCanyonDashPanelXZPositions[index];
@@ -182,61 +186,61 @@ ASMUsed void func_StageChanges(ObjectNode *currentObject) {
 			break;
 	}
 
-	if(object_type != ItemBox) { return; }
+	if(object_type != ObjectTypes::ItemBox) { return; }
 
 	switch(CurrentStage) {
 		case MetalCity: {
 			if(object_id == 0x2A) {
-				lbl_update_item(currentObject, TwentyRings);
+				lbl_update_item(currentObject, ItemID::TwentyRings);
 			}
 			break;
 		}
 		case NightChase: {
 			if(object_id >= 0x67 && object_id <= 0x6E) {
-				lbl_update_item(currentObject, TenRings);
+				lbl_update_item(currentObject, ItemID::TenRings);
 			} else if(object_id >= 0xFC && object_id <= 0x100) {
-				lbl_update_item(currentObject, RNG);
+				lbl_update_item(currentObject, ItemID::RNG);
 			}
 			break;
 		}
 		case SegaIllusion: {
 			switch(object_id) {
 				case 0xDD:
-					lbl_update_item(currentObject, FiftyAir);
+					lbl_update_item(currentObject, ItemID::FiftyAir);
 					break;
 				case 0xDC:
-					lbl_update_item(currentObject, ThirtyAir);
+					lbl_update_item(currentObject, ItemID::ThirtyAir);
 					break;
 				default:
 					break;
 			}
 			if(object_id >= 0xB6 && object_id <= 0xB9) {
-				lbl_update_item(currentObject, TenRings);
+				lbl_update_item(currentObject, ItemID::TenRings);
 			} else if(object_id >= 0xBA && object_id <= 0xBD) {
-				lbl_update_item(currentObject, FiftyAir);
+				lbl_update_item(currentObject, ItemID::FiftyAir);
 			}
 			break;
 		}
 		case SandRuins: {
 			if((object_id >= 0x1A1 && object_id <= 0x1A4)
 				|| (object_id >= 0x17F && object_id <= 0x182)) {
-				lbl_update_item(currentObject, TenRings);
+				lbl_update_item(currentObject, ItemID::TenRings);
 			}
 			switch(object_id) {
 				case 0x189:
-					lbl_update_item(currentObject, TwentyRings);
+					lbl_update_item(currentObject, ItemID::TwentyRings);
 					break;
 				case 0x18A:
-					lbl_update_item(currentObject, TenRings);
+					lbl_update_item(currentObject, ItemID::TenRings);
 					break;
 				case 0x18C:
-					lbl_update_item(currentObject, FiftyAir);
+					lbl_update_item(currentObject, ItemID::FiftyAir);
 					break;
 				case 0x18D:
-					lbl_update_item(currentObject, FiftyAir);
+					lbl_update_item(currentObject, ItemID::FiftyAir);
 					break;
 				case 0x18E:
-					lbl_update_item(currentObject, HundredAir);
+					lbl_update_item(currentObject, ItemID::HundredAir);
 					break;
 				default:
 					break;
@@ -253,7 +257,7 @@ ASMUsed void func_StageChanges(ObjectNode *currentObject) {
 			if(object_id >= 0xC && object_id <= 0xF) {
 				object1->pos.z = data_stageChanges.digitalDimensionFirstRowZPos;
 			} else if(object_id >= 0x10 && object_id <= 0x13) {
-				lbl_update_item(currentObject, TenRings);
+				lbl_update_item(currentObject, ItemID::TenRings);
 				const u32 index = object_id - 0x10;
 				auto *obj1 = static_cast<Object1 *>(currentObject->object);
 				auto &itemPos = data_stageChanges.digitalDimensionItemBoxPositions[index];
@@ -263,10 +267,10 @@ ASMUsed void func_StageChanges(ObjectNode *currentObject) {
 		}
 		case SkyRoad: {
 			if(object_id >= 0xD8 && object_id <= 0xDF) {
-				lbl_update_item(currentObject, TenRings);
+				lbl_update_item(currentObject, ItemID::TenRings);
 			}
 			if (object_id >= 0xE0 && object_id <= 0xE7) {
-				lbl_update_item(currentObject, TenRings);
+				lbl_update_item(currentObject, ItemID::TenRings);
 			}
 			break;
 		}

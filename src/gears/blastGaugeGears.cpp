@@ -1,6 +1,7 @@
 #include "blastGaugeGears.hpp"
 #include "cosmetics/player/exloads.hpp"
 #include "riders/gamemode.hpp"
+#include "gears/hypersonic.hpp"
 #include "macros.h"
 
 std::array<BlastGaugeInfo, MaxPlayerCount> PlayerBlastGaugeInfo;
@@ -14,9 +15,21 @@ void Player_BlastGaugeUpdateStatus(Player &player) {
     switch (player.extremeGear) {
         using namespace ExtremeGear;
         case ChaosEmerald:
-            player.isBlastGaugeGear = player.character == Character::SuperSonic ||
+            if (player.character == Character::SuperSonic && player.gearExload().exLoadID == EXLoad::HyperSonic) {
+                // if hyperdrive has been activated, they are no longer a blast gauge gear
+	            HyperSonicInfo *hsInfo = &PlayerHyperSonicInfo[player.index];
+                if (hsInfo->hyperdriveEnabled) {
+                    player.isBlastGaugeGear = false;
+                    break;
+                }
+            }
+            player.isBlastGaugeGear = (player.character == Character::SuperSonic) ||
                                       player.character == Character::Shadow ||
                                       (player.character == Character::Tails && player.superFormState >= 1);
+            break;
+
+        case Accelerator:
+            player.isBlastGaugeGear = player.gearExload().exLoadID == EXLoad::HyperHangOn;
             break;
 
         default:

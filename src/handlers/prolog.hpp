@@ -44,3 +44,4 @@ ASMDefined void gNp_VWaitTrans();
 ASMDefined void lbl_000B766C();
 ASMDefined void lbl_000375B4();
 ASMDefined void ReadAsyncReadFileData(u32);
+extern void CreateJapaneseVoiceThread();

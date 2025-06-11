@@ -14,6 +14,7 @@ enum class Language : s32 {
 ASMDefined Language GameLanguage;
 
 ASMDefined void PlayAudioFromDAT(u32);
+ASMDefined void SNDF_SeqIdStop(u32);
 
 namespace Sound{
 	namespace ID{

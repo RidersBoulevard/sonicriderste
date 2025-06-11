@@ -46,7 +46,7 @@ public:
 		T otherFlags = static_cast<T>((zero | ... | flags));
 		return hasAny(otherFlags);
 	}
-	[[nodiscard]] constexpr Flag hasAny(const Flag<T> &flags) const{
+	[[nodiscard]] constexpr Flag hasAny(const Flag &flags) const{
 		return hasAny(flags.value);
 	}
 	template<typename O> requires std::convertible_to<O, T>
@@ -66,7 +66,7 @@ public:
 		T otherFlags = static_cast<T>((zero | ... | flags));
 		return hasAll(otherFlags);
 	}
-	[[nodiscard]] constexpr bool hasAll(const Flag<T> &flags) const{
+	[[nodiscard]] constexpr bool hasAll(const Flag &flags) const{
 		return hasAll(flags.value);
 	}
 	template<typename O> requires std::convertible_to<O, T>
@@ -75,80 +75,83 @@ public:
 	}
 
 	// Boilerplate stuff...
-	[[nodiscard]] constexpr Flag<T> operator~ () const{ return Flag(static_cast<T>(~value)); }
+	[[nodiscard]] constexpr Flag operator~ () const{ return Flag(static_cast<T>(~value)); }
 	template<typename O> requires std::convertible_to<O, T>
-	[[nodiscard]] constexpr Flag<T> operator| (Flag<O> other) const{ return value | static_cast<T>(other.value); }
+	[[nodiscard]] constexpr Flag operator| (Flag<O> other) const{ return value | static_cast<T>(other.value); }
 	template<typename O> requires std::convertible_to<O, T>
-	[[nodiscard]] constexpr Flag<T> operator& (Flag<O> other) const{ return value & static_cast<T>(other.value); }
+	[[nodiscard]] constexpr Flag operator& (Flag<O> other) const{ return value & static_cast<T>(other.value); }
 	template<typename O> requires std::convertible_to<O, T>
-	[[nodiscard]] constexpr Flag<T> operator^ (Flag<O> other) const{ return value ^ static_cast<T>(other.value); }
+	[[nodiscard]] constexpr Flag operator^ (Flag<O> other) const{ return value ^ static_cast<T>(other.value); }
 	template<typename O> requires std::convertible_to<O, T>
-	constexpr Flag<T>& operator|= (Flag<O> other) {
+	constexpr Flag& operator|= (Flag<O> other) {
 		value |= static_cast<T>(other.value);
 		return *this;
 	}
 	template<typename O> requires std::convertible_to<O, T>
-	constexpr Flag<T>& operator&= (Flag<O> other) {
+	constexpr Flag& operator&= (Flag<O> other) {
 		value &= static_cast<T>(other.value);
 		return *this;
 	}
 	template<typename O> requires std::convertible_to<O, T>
-	constexpr Flag<T>& operator^= (Flag<O> other) {
+	constexpr Flag& operator^= (Flag<O> other) {
 		value ^= static_cast<T>(other.value);
 		return *this;
 	}
 	template<typename O> requires std::convertible_to<O, T>
-	[[nodiscard]] constexpr Flag<T> operator<< (Flag<O> other) const{ return value << static_cast<T>(other.value); }
+	[[nodiscard]] constexpr Flag operator<< (Flag<O> other) const{ return value << static_cast<T>(other.value); }
 	template<typename O> requires std::convertible_to<O, T>
-	[[nodiscard]] constexpr Flag<T> operator>> (Flag<O> other) const{ return value >> static_cast<T>(other.value); }
-	[[nodiscard]] constexpr Flag<T> operator| (const std::convertible_to<T> auto &other) const{ return value | static_cast<T>(other); }
-	[[nodiscard]] constexpr Flag<T> operator& (const std::convertible_to<T> auto &other) const{ return value & static_cast<T>(other); }
-	[[nodiscard]] constexpr Flag<T> operator^ (const std::convertible_to<T> auto &other) const{ return value ^ static_cast<T>(other); }
-	constexpr Flag<T>& operator|= (const std::convertible_to<T> auto &other) {
+	[[nodiscard]] constexpr Flag operator>> (Flag<O> other) const{ return value >> static_cast<T>(other.value); }
+	[[nodiscard]] constexpr Flag operator| (const std::convertible_to<T> auto &other) const{ return value | static_cast<T>(other); }
+	[[nodiscard]] constexpr Flag operator& (const std::convertible_to<T> auto &other) const{ return value & static_cast<T>(other); }
+	[[nodiscard]] constexpr Flag operator^ (const std::convertible_to<T> auto &other) const{ return value ^ static_cast<T>(other); }
+	constexpr Flag& operator|= (const std::convertible_to<T> auto &other) {
 		value |= static_cast<T>(other);
 		return *this;
 	}
-	constexpr Flag<T>& operator&= (const std::convertible_to<T> auto &other) {
+	constexpr Flag& operator&= (const std::convertible_to<T> auto &other) {
 		value &= static_cast<T>(other);
 		return *this;
 	}
-	constexpr Flag<T>& operator^= (const std::convertible_to<T> auto &other) {
+	constexpr Flag& operator^= (const std::convertible_to<T> auto &other) {
 		value ^= static_cast<T>(other);
 		return *this;
 	}
-	[[nodiscard]] constexpr Flag<T> operator<< (const std::convertible_to<T> auto &other) const{ return static_cast<T>(value << static_cast<T>(other)); }
-	[[nodiscard]] constexpr Flag<T> operator>> (const std::convertible_to<T> auto &other) const{ return static_cast<T>(value >> static_cast<T>(other)); }
-	constexpr operator T&() { return value; }
+	[[nodiscard]] constexpr Flag operator<< (const std::convertible_to<T> auto &other) const{ return static_cast<T>(value << static_cast<T>(other)); }
+	[[nodiscard]] constexpr Flag operator>> (const std::convertible_to<T> auto &other) const{ return static_cast<T>(value >> static_cast<T>(other)); }
+	template<class Self>
+	[[nodiscard]] constexpr auto operator<=>(this Self &&self, const Flag &other) { return std::forward<Self>(self).value <=> other.value; }
+	template<class Self>
+	[[nodiscard]] constexpr auto operator<=>(this Self &&self, const std::convertible_to<T> auto &other) { return std::forward<Self>(self).value <=> other; }
 	constexpr operator T() const { return value; }
 	constexpr operator bool() const { return value != zero;}
 	constexpr Flag(T val) : value(val){}; // NOLINT(google-explicit-constructor)
 	[[deprecated("Please use static_cast instead of implicitly casting")]]
 	consteval Flag(int val) requires (!std::is_same_v<T, int>) : Flag(static_cast<T>(val)){}; // NOLINT(google-explicit-constructor)
 	constexpr Flag() = default;
-	constexpr Flag(const Flag<T>& other) = default;
-	constexpr Flag(Flag<T>&& other) noexcept = default;
+	constexpr Flag(const Flag& other) = default;
+	constexpr Flag(Flag&& other) noexcept = default;
 	constexpr ~Flag() noexcept = default;
-	constexpr Flag<T>& operator=(const Flag<T> &other) = default;
-	constexpr Flag<T>& operator=(Flag<T> &&other) noexcept = default;
+	constexpr Flag& operator=(const Flag &other) = default;
+	constexpr Flag& operator=(Flag &&other) noexcept = default;
 
 	/**
 	 * C++ doesn't have a way to get a reference to something smaller than a byte, so this proxy class effectively fills in that functionality
 	 */
 	class reference{
-		friend class Flag<T>;
-		Flag<T> &flag;
+		friend class Flag;
+		Flag &flag;
 		T bitReferenced;
 
-		constexpr reference(Flag<T> &_flag, T bit) : flag(_flag), bitReferenced(bit){}
-		constexpr Flag<T> toBit(const bool boolean){
-			Flag<T> newFlag = static_cast<T>(boolean ? 1 : 0);
+		constexpr reference(Flag &_flag, T bit) : flag(_flag), bitReferenced(bit){}
+		constexpr Flag toBit(const bool boolean){
+			Flag newFlag = static_cast<T>(boolean ? 1 : 0);
 			newFlag <<= bitReferenced;
 			return newFlag;
 		}
 
 	public:
 		constexpr reference& operator=(bool boolean){
-			Flag<T> newFlag = toBit(boolean);
+			Flag newFlag = toBit(boolean);
 			flag &= ~newFlag; // Clear the bit's previous value
 			flag |= newFlag; // Set the bit to the input value
 			return *this;

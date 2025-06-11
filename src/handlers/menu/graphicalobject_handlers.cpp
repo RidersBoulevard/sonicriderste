@@ -8,128 +8,103 @@
 #include "handlers/ingame/customcss.hpp"
 #include "tweaks/player/archetype/character_archetype.hpp"
 #include "handlers/files/packman_handlers.hpp"
+#include "dolphin/gx.hpp"
+#include "lib/stdlib.hpp"
 
-// ASMDefined void Sys2d_DrawObject(void *graphicalObject); /*asm*/
+ASMUsed void GraphicalObjectHandler_TournamentRace(GraphicalObject &graphicalObject) {
+    /*
+     * textureSlot1: first digit of player bans
+     * textureSlot2: second digit of player bans
+     * textureSlot3: first digit of player wins
+     * textureSlot4: second digit of player wins
+     * textureSlot5: "P# Bans" text
+     * textureSlot6: "P# Wins" text
+     */
 
-ASMDefined void GraphicalObjectHandler_TournamentRace(void *graphicalObject) {
-	u8 *active = static_cast<u8 *>(graphicalObject) + 0x57;
-	u32 *activeTimer = static_cast<u32 *>(graphicalObject) + 0x48 / 4;
-	u16 *index = static_cast<u16 *>(graphicalObject) + 0x34 / 2;
-	void *info = static_cast<void *>(*(static_cast<u32 **>(graphicalObject) + 0x40 / 4));
-	void *objectInfo = static_cast<void *>(*(static_cast<u32 **>(info) + 0x18 / 4 + *index));
+    constexpr auto SLOT1_BASE_ID = 0x9B;
+    constexpr auto SLOT2_BASE_ID = 0x9C;
+    constexpr auto SLOT3_BASE_ID = 0x9D;
+    constexpr auto SLOT4_BASE_ID = 0x9E;
+    constexpr auto SLOT5_BASE_ID = 0x9F;
+    constexpr auto SLOT6_BASE_ID = 0xA0;
+    constexpr auto NUMBER_ID_START = 0x8D;
+    constexpr auto P1_BANS_ID = 0x97;
+    constexpr auto P2_BANS_ID = 0x98;
+    constexpr auto P1_WINS_ID = 0x99;
+    constexpr auto P2_WINS_ID = 0x9A;
 
-	BSS_StageBan *bss = &bss_StageBans;
-	void *objectOffsets, *textureData;
-	u32 i, playerIndex, switchCase;
-	u8 textureID;
-	bool init = FALSE;
-	if (bss->tournamentRace != 0u) {
-		init = *activeTimer == 0;
-		if (init) {
-			*active = 0xC;
-		}
+    if (bss_StageBans.tournamentRace == 0u) { return; }
 
-		if ((bss_StageBans_isBanned != 0u) || init) {
-			if (*static_cast<u32 *>(objectInfo) >= 9) { // texture count
-				objectOffsets = static_cast<u8 *>(objectInfo) + 0xC;
+    graphicalObject.active = true;
 
-				// update player win count and ban count texture
-				for (i = 0; i < 4; i++) {
-					if (i >= 2) {
-						switchCase = i - 2;
-						playerIndex = 1;
-					} else {
-						switchCase = i;
-						playerIndex = 0;
-					}
+    const u8 playerIndex = graphicalObject.idStruct.idIndex;
 
-					if (playerIndex == 0) {
-						switch (switchCase) {
-							case 0:
-								// p1 ban count
-								objectOffsets = static_cast<u32 *>(objectOffsets) + 1; // ban count never goes over 10 so skip it
+    graphicalObject.setExtraTransform(52, playerIndex);
 
-								textureData = (void *) *(u32 *) objectOffsets;
-								objectOffsets = (u32 *) objectOffsets + 1;
+    // set texture slot base IDs (defaults)
+    graphicalObject.textureIDs[1].textureSlot1 = SLOT1_BASE_ID;
+    graphicalObject.textureIDs[1].textureSlot2 = SLOT2_BASE_ID;
+    graphicalObject.textureIDs[1].textureSlot3 = SLOT3_BASE_ID;
+    graphicalObject.textureIDs[1].textureSlot4 = SLOT4_BASE_ID;
+    graphicalObject.textureIDs[1].textureSlot5 = SLOT5_BASE_ID;
+    graphicalObject.textureIDs[1].textureSlot6 = SLOT6_BASE_ID;
 
-								textureID = 0x8D + bss->player_banCount[0];
-								*((u8 *) textureData + 0xB) = textureID;
-								break;
-							case 1:
-								// p1 win count
-								textureData = (void *) *(u32 *) objectOffsets;
-								objectOffsets = (u32 *) objectOffsets + 1;
+    // update textures for the current player win count
+    if (playerIndex == 0) {
+        graphicalObject.textureIDs[0].textureSlot3 = NUMBER_ID_START + bss_StageBans.player1Score / 10;
+        graphicalObject.textureIDs[0].textureSlot4 = NUMBER_ID_START + bss_StageBans.player1Score % 10;
+    } else {
+        graphicalObject.textureIDs[0].textureSlot3 = NUMBER_ID_START + bss_StageBans.player2Score / 10;
+        graphicalObject.textureIDs[0].textureSlot4 = NUMBER_ID_START + bss_StageBans.player2Score % 10;
+    }
 
-								textureID = 0x8D + (bss->player1Score / 10);
-								*((u8 *) textureData + 0xB) = textureID;
+    // update textures for the current player ban count
+    graphicalObject.textureIDs[0].textureSlot1 = NUMBER_ID_START + bss_StageBans.player_banCount[playerIndex] / 10;
+    graphicalObject.textureIDs[0].textureSlot2 = NUMBER_ID_START + bss_StageBans.player_banCount[playerIndex] % 10;
+    graphicalObject.textureIDs[0].textureSlot5 = playerIndex == 0 ? P1_BANS_ID : P2_BANS_ID;
+    graphicalObject.textureIDs[0].textureSlot6 = playerIndex == 0 ? P1_WINS_ID : P2_WINS_ID;
 
-								textureData = (void *) *(u32 *) objectOffsets;
-								objectOffsets = (u32 *) objectOffsets + 1;
-
-								textureID = 0x8D + (bss->player1Score % 10);
-								*((u8 *) textureData + 0xB) = textureID;
-								break;
-						}
-					} else {
-						switch (switchCase) {
-							case 0:
-								// p2 ban count
-								objectOffsets = (u32 *) objectOffsets + 1; // ban count never goes over 10 so skip it
-
-								textureData = (void *) *(u32 *) objectOffsets;
-								objectOffsets = (u32 *) objectOffsets + 1;
-
-								textureID = 0x8D + bss->player_banCount[1];
-								*((u8 *) textureData + 0xB) = textureID;
-								break;
-							case 1:
-								// p2 win count
-								textureData = (void *) *(u32 *) objectOffsets;
-								objectOffsets = (u32 *) objectOffsets + 1;
-
-								textureID = 0x8D + (bss->player2Score / 10);
-								*((u8 *) textureData + 0xB) = textureID;
-
-								textureData = (void *) *(u32 *) objectOffsets;
-								objectOffsets = (u32 *) objectOffsets + 1;
-
-								textureID = 0x8D + (bss->player2Score % 10);
-								*((u8 *) textureData + 0xB) = textureID;
-								break;
-						}
-					}
-				}
-
-			}
-		}
-		Sys2d_DrawObject(static_cast<GraphicalObject*>(graphicalObject));
-	}
-
+    Sys2d_DrawObject(&graphicalObject);
 }
 
 ASMDefined void GraphicalObjectHandler_DebugMenuText(void *graphicalObject) {
     DebugMenuData *debugMenu = &DebugMenu_Data;
     void *textTexture = gpasTexList_SubFont.unk0;
 
-    Sys2d_DrawObject(static_cast<GraphicalObject*>(graphicalObject));
+    Sys2d_DrawObject(static_cast<GraphicalObject *>(graphicalObject));
 
     DebugMenu_RenderDescription();
 
-    for (u32 i = 0, y = 100; i < debugMenu->maximumItems; i++, y += 20) {
-		const RGBA32 rgba = debugMenu->selectedItemRow == i ? 0xFF0000FF : ~0U;
+    // Scissor the viewport so that upon scrolling, the rendered text gets cut off correctly.
+    constexpr auto SCISSOR_X = 20;
+    constexpr auto SCISSOR_Y = 85;
+    constexpr auto SCISSOR_W = 620;
+    constexpr auto SCISSOR_H = SCISSOR_Y + 190;
+    GX_SetScissor(SCISSOR_X, SCISSOR_Y, SCISSOR_W, SCISSOR_H);
 
-		auto options = debugMenu->page1Options[i];
+    s32 y = DebugMenuDef::TEXT_Y + debugMenu->itemYOffset;
+
+    for (u32 i = 0; i < debugMenu->maximumItems; i++, y += DebugMenuDef::TEXT_HEIGHT) {
+        // Don't waste time rendering text outside the scissored viewport.
+        if (y < (SCISSOR_Y - DebugMenuDef::TEXT_HEIGHT) || y >= SCISSOR_W) continue;
+
+        const RGBA32 rgba = debugMenu->selectedItemRow == i ? 0xFF0000FF : ~0U;
+
+        auto options = debugMenu->page1Options[i];
         auto textID = DebugMenu_FetchTextIDAllToggles(options);
 
         RenderText(20, y, rgba, 240, 0, i, DebugMenu_TextData.textData.data(), textTexture, -1.0f);
         RenderText(270, y, rgba, 240, 0, textID, DebugMenu_TextData.extraTextData.data(), textTexture, -1.0f);
     }
+
+    // Reset viewport scissor to default.
+    GX_SetScissor(0, 0, 640, 480);
 }
 
 ASMDefined void GraphicalObjectHandler_DisplayMusicTextMenu(void *graphicalObject) {
     void *textTexture = gpasTexList_SubFont.unk0;
 
-	Sys2d_DrawObject(static_cast<GraphicalObject*>(graphicalObject));
+    Sys2d_DrawObject(static_cast<GraphicalObject *>(graphicalObject));
 
     const u32 musicTextID = bss_CustomMusicID + 1;
 
@@ -197,9 +172,10 @@ constexpr std::array<std::array<u8, 20>, GameLanguage_count> ModeTitleTexts = {
 
 // function decompiled
 ASMDefined void GraphicalObjectHandler_ModeTitle(GraphicalObject *gobject) {
-    void *object1ptr = static_cast<u8*>(gp2DSys) + (gobject->cullingGroup * 8) +  0x6000;
-    void **object1addr = static_cast<void**>(object1ptr);
-    auto *object1 = static_cast<TitleSequenceObject1*>(*object1addr);
+    //void *object1ptr = static_cast<u8*>(gp2DSys) + (gobject->cullingGroup * 8) +  0x6000;
+    void *object1ptr = &gp2DSys->objectGroupPtrs[gobject->cullingGroup][0];
+    void **object1addr = static_cast<void **>(object1ptr);
+    auto *object1 = static_cast<TitleSequenceObject1 *>(*object1addr);
     gobject->active = true;
     gobject->textureIDs[0].textureSlot1 = ModeTitleTexts[geMessageLanguage][object1->currentMode];
     gobject->textureIDs[1].textureSlot1 = 0x1A;
@@ -210,12 +186,12 @@ ASMDefined void GraphicalObjectHandler_ModeTitle(GraphicalObject *gobject) {
     Sys2d_DrawObject(gobject);
 }
 
-ASMDefined void HandleSys2dAnimationObject1(GraphicalObject *object, u32 index, u8* stateptr, u32 incrementAmount);
+ASMDefined void HandleSys2dAnimationObject1(GraphicalObject *object, u32 index, u8 *stateptr, u32 incrementAmount);
 
 ASMDefined void GraphicalObjectHandler_EXLoadButtonCSS(GraphicalObject *gobject) {
-    void *object1ptr = static_cast<u8*>(gp2DSys) + (gobject->cullingGroup * 8) +  0x6000;
-    void **object1addr = static_cast<void**>(object1ptr);
-    auto *object1 = static_cast<CSSObject*>(*object1addr);
+    void *object1ptr = &gp2DSys->objectGroupPtrs[gobject->cullingGroup][0];
+    void **object1addr = static_cast<void **>(object1ptr);
+    auto *object1 = static_cast<CSSObject *>(*object1addr);
 
     const u8 playerIndex = gobject->idStruct.idIndex;
     switch (object1->state) {
@@ -233,7 +209,8 @@ ASMDefined void GraphicalObjectHandler_EXLoadButtonCSS(GraphicalObject *gobject)
                 if (object1->cssSelectionState[playerIndex] == 1) {
                     // in character select
                     gobject->active = CheckPlayerHoveringOverPossibleEXLoad(player, EXLoadHoverTypes::OnlyCharacter);
-                } else if (object1->cssSelectionState[playerIndex] == 2 || object1->cssSelectionState[playerIndex] == 3) {
+                } else if (object1->cssSelectionState[playerIndex] == 2 ||
+                           object1->cssSelectionState[playerIndex] == 3) {
                     // in gear select
                     gobject->active = CheckPlayerHoveringOverPossibleEXLoad(player, EXLoadHoverTypes::OnlyGear);
                 } else {
@@ -264,16 +241,34 @@ constexpr std::array<u16, 7> ExtraDefaultGearTextID = {
         522, // variable character, add new characters' IDs before this
 };
 
-constexpr std::array<u16, 1> NewGearTextID = {
+constexpr std::array<u16, 2> NewGearTextID = {
         767, // G.U.N. Gear
+        767, // OllieKingGear
 };
 
-// decompiled
-ASMUsed void GraphicalObjectHandler_CSSInformationText(GraphicalObject* gobject) {
-    const u8 playerIndex    = gobject->idStruct.idIndex;
-	const CSSObject* object = *(static_cast<CSSObject**>(gp2DSys) + ((gobject->cullingGroup * (8/4)) + (0x6000 / 4)));
+std::array<s16, MaxControllerCount> gCSSInformationTextYOffsets;
 
-	switch (object->state) {                        /* irregular */
+// decompiled
+ASMUsed void GraphicalObjectHandler_CSSInformationText(GraphicalObject *gobject) {
+    auto applyYScroll = [](const Player *player, const SubFont &subFont, const u32 textID, const u16 lineWidth) {
+        auto *text = GetTextStringArray(subFont, textID);
+        const auto lines = CalculateTextStringLineCount(text, subFont.textDataHeader->charWidth, lineWidth);
+        const auto overflowedLines = static_cast<s32>(lines) - 5;
+        const auto yBound = -(overflowedLines * subFont.textDataHeader->charWidth);
+
+        auto &offset = gCSSInformationTextYOffsets[player->input->port];
+        if (player->input->rightStickVertical > 80 && offset < 0) {
+            offset += 2;
+        } else if (player->input->rightStickVertical < -80 && offset > yBound) {
+            offset -= 2;
+        }
+    };
+
+    const u8 playerIndex = gobject->idStruct.idIndex;
+    //CSSObject* object = *(static_cast<CSSObject**>(gp2DSys) + ((gobject->cullingGroup * (8/4)) + (0x6000 / 4)));
+    CSSObject *object = static_cast<CSSObject *>(gp2DSys->objectGroupPtrs[gobject->cullingGroup][0]);
+
+    switch (object->state) {                        /* irregular */
         case 0:
             gobject->extraTransformObjectID = 0x23;
             gobject->unk60 = 1;
@@ -284,37 +279,46 @@ ASMUsed void GraphicalObjectHandler_CSSInformationText(GraphicalObject* gobject)
             gobject->unk60 = 3;
             gobject->extraTransformIndex = -1;
             gobject->extraTransformIndex = playerIndex;
-			return;
-		case 1:
-			return;
-        case 2:
+            return;
+        case 1:
+            return;
+        case 2: {
+            // Scissor the viewport to the opened information box.
+            const auto texX = static_cast<u32>(gobject->textureTransform.x);
+            const auto texY = static_cast<u32>(gobject->textureTransform.y);
+            GX_SetScissor(0, texY, texX + gobject->unkB4, 70);
             if (object->cssSelectionState[playerIndex] == 3) {
-				const Player* player = &players[playerIndex];
+                const Player *player = &players[playerIndex];
                 const s8 gear = static_cast<s8>(player->extremeGear);
                 gobject->active = true;
 
                 u16 text = 0;
                 if (player->character > Character::E10R && player->extremeGear == ExtremeGear::Default) {
                     // any new characters
-                    text = ExtraDefaultGearTextID[std::to_underlying(player->character) - std::to_underlying(Character::Silver)];
+                    text = ExtraDefaultGearTextID[std::to_underlying(player->character) -
+                                                  std::to_underlying(Character::Silver)];
                 } else if (player->extremeGear > ExtremeGear::Cannonball) {
                     // new gears
                     text = NewGearTextID[player->extremeGear - ExtremeGear::GunGear];
-                } else if(player->extremeGear == ExtremeGear::ChaosEmerald){
+                } else if (player->extremeGear == ExtremeGear::ChaosEmerald) {
                     text = 548; // default case
-                    switch(player->character){
+                    switch (player->character) {
                         case Character::MetalSonic:
+                            if (player->gearExload().exLoadID == EXLoad::StardustSpeeder) {
+                                text = 776;
+                                break;
+                            }
                             text = 772;
                             break;
                         case Character::Sonic:
                             text = 768;
-                            if (player->gearExload().exLoadID == EXLoad::PerfectNazo){
+                            if (player->gearExload().exLoadID == EXLoad::PerfectNazo) {
                                 text = 773;
                                 break;
-                            } else if (player->gearExload().exLoadID == EXLoad::DarkSonic){
+                            } else if (player->gearExload().exLoadID == EXLoad::DarkSonic) {
                                 text = 774;
                                 break;
-                            } else if (player->gearExload().exLoadID == EXLoad::HyperSonic){
+                            } else if (player->gearExload().exLoadID == EXLoad::HyperSonic) {
                                 text = 775;
                                 break;
                             }
@@ -331,26 +335,35 @@ ASMUsed void GraphicalObjectHandler_CSSInformationText(GraphicalObject* gobject)
                         default:
                             break;
                     }
+                } else if (DebugMenu_CheckOption(DebugMenuOptions::PTRMode) && player->extremeGear == ExtremeGear::Darkness) {
+                    text = 777;
                 } else {
-                    text = lbl_001D37F8[((static_cast<s8>(player->character) + 0x29) * static_cast<int>(gear == 0) - 1) + gear];
+                    text = lbl_001D37F8[
+                            ((static_cast<s8>(player->character) + 0x29) * static_cast<int>(gear == 0) - 1) + gear];
                 }
 
+                applyYScroll(player, gasSubFont[1], text, static_cast<u16>(gobject->unkB4));
+
                 if (object->visualTrigger[playerIndex] == 1) {
-                    const s32 temp_r3 = static_cast<const s32>(gobject->currentAnimationFrame2);
-                    gobject->currentAnimationFrame2 = static_cast<s32>(((u32) (-temp_r3 | temp_r3) >> 0xCU) & 0x80000);
+                    const s32 temp_r3 = static_cast<const s32>(gobject->extraTransformAnimationFrame);
+                    gobject->extraTransformAnimationFrame = static_cast<s32>(((u32) (-temp_r3 | temp_r3) >> 0xCU) &
+                                                                             0x80000);
+
+                    gCSSInformationTextYOffsets[playerIndex] = 0;
                 }
 
                 lbl_000F9038(gobject, 0U, 0x10000U, 2U, 0U);
 
-                if (gobject->currentAnimationFrame2 >= 0x80000U) {
+                if (gobject->extraTransformAnimationFrame >= 0x80000U) {
                     Sys2d_DrawObject(gobject);
                     RenderText(static_cast<s32>(gobject->textureTransform.x),
-                               static_cast<s32>(gobject->textureTransform.y),
+                               static_cast<s32>(gobject->textureTransform.y) +
+                               gCSSInformationTextYOffsets[player->index],
                                gobject->unkB0,
                                gobject->unkB4,
                                0U,
                                text,
-                               gasSubFont + 1,
+                               &gasSubFont[1],
                                gpasTexList_SubFont.unk4,
                                lbl_001D3938 + gobject->textureTransform.z);
                 }
@@ -358,29 +371,39 @@ ASMUsed void GraphicalObjectHandler_CSSInformationText(GraphicalObject* gobject)
                 // in character selection
                 gobject->active = true;
 
+                Player *player = &players[playerIndex];
+
                 if (object->visualTrigger[playerIndex] == 1) {
-                    const s32 temp_r3 = static_cast<const s32>(gobject->currentAnimationFrame2);
-                    gobject->currentAnimationFrame2 = static_cast<s32>(((u32) (-temp_r3 | temp_r3) >> 0xCU) & 0x80000);
+                    const s32 temp_r3 = static_cast<const s32>(gobject->extraTransformAnimationFrame);
+                    gobject->extraTransformAnimationFrame = static_cast<s32>(((u32) (-temp_r3 | temp_r3) >> 0xCU) &
+                                                                             0x80000);
+
+                    gCSSInformationTextYOffsets[playerIndex] = 0;
                 }
 
                 lbl_000F9038(gobject, 0U, 0x10000U, 2U, 0U);
 
-                Player* player = &players[playerIndex];
-                if (gobject->currentAnimationFrame2 >= 0x80000U && player->character < Character::Total) {
+                if (gobject->extraTransformAnimationFrame >= 0x80000U && player->character < Character::Total) {
                     auto exLoads = player->characterExload();
 
                     CharacterArchetype text;
-                    if (player->hasCharacterExload() && exLoads.archetype() != CharacterArchetype::NoEXLoad && CheckIfEXLoadCanBeApplied(*player, exLoads)) {
+                    if (player->hasCharacterExload() && exLoads.archetype() != CharacterArchetype::NoEXLoad &&
+                        CheckIfEXLoadCanBeApplied(*player, exLoads)) {
                         text = exLoads.archetype();
-                    	if (exLoads.exLoadID == EXLoad::Selkadoom) {text = CharacterArchetype{10};} // Special version of combat text
+                        if (exLoads.exLoadID == EXLoad::Selkadoom) {
+                            text = CharacterArchetype{3};
+                        } // Special version of combat text
                     } else if (player->character == Character::Emerl) {
                         text = CharacterArchetype{9};
-                    } else if (player->character == Character::Shadow) {
-                    	text = CharacterArchetype{10};
-                    } else {
+                    }
+                	// else if (player->character == Character::Shadow) {
+                        //    	text = CharacterArchetype{10};
+                 //    }
+                	else {
                         u32 index;
                         if (player->character == Character::E10G &&
-                            (exLoads.exLoadID == EXLoad::E10B || exLoads.exLoadID == EXLoad::E10R || exLoads.exLoadID == EXLoad::E10Y)) {
+                            (exLoads.exLoadID == EXLoad::E10B || exLoads.exLoadID == EXLoad::E10R ||
+                             exLoads.exLoadID == EXLoad::E10Y)) {
                             index = std::to_underlying(Character::E10R);
                         } else {
                             index = player->character;
@@ -388,10 +411,13 @@ ASMUsed void GraphicalObjectHandler_CSSInformationText(GraphicalObject* gobject)
                         text = AllCharacterArchetypes[index];
                     }
 
+                    applyYScroll(player, CharacterInformationFont, std::to_underlying(text), static_cast<u16>(gobject->unkB4));
+
                     Sys2d_DrawObject(gobject);
 
                     RenderText(static_cast<s32>(gobject->textureTransform.x),
-                               static_cast<s32>(gobject->textureTransform.y),
+                               static_cast<s32>(gobject->textureTransform.y) +
+                               gCSSInformationTextYOffsets[player->index],
                                gobject->unkB0,
                                gobject->unkB4,
                                0U,
@@ -402,12 +428,18 @@ ASMUsed void GraphicalObjectHandler_CSSInformationText(GraphicalObject* gobject)
                 }
             } else {
                 gobject->active = false;
+                gCSSInformationTextYOffsets[playerIndex] = 0;
                 if (object->cssSelectionState[playerIndex] < 3U) {
-                    gobject->currentAnimationFrame2 = 0;
+                    gobject->extraTransformAnimationFrame = 0;
                     gobject->unk5C = 0;
                 }
             }
+
+            // Restore default scissor.
+            GX_SetScissor(0, 0, 640, 480);
             break;
-    	default: break;
+        }
+        default:
+            break;
     }
 }

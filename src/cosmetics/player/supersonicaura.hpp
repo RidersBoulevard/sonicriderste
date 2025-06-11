@@ -1,11 +1,11 @@
 #pragma once
 
 #include "riders/player.hpp"
-#include "containers/particle_details.hpp"
+#include "containers/particleparam.hpp"
 #include "riders/object.hpp"
 
 struct SuperAuraDetail {
-    ParticleDetails* particles;
+    ParticleParam* particles;
     void** texList;
 };
 

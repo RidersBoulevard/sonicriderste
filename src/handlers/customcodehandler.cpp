@@ -15,7 +15,7 @@ void CustomCodehandlerUpdate(const u32 codetype, const u32 bssType, InjectorPtr 
 	}
 }
 
-void CustomCodehandler_Player(Player *player) {
+void CustomCodehandler_Player(Player &player) {
 	CustomCodehandler::InvokeInjectedCodes(player);
 }
 
@@ -151,13 +151,13 @@ namespace CustomCodehandler {
 		}
 	}
 
-	void InvokeInjectedCodes(Player *player) {
+	void InvokeInjectedCodes(Player &player) {
 		const std::span injectedCodeList = std::span(injectedPlayerCodes).subspan(0, injectedCodeAmount[InGameInjectedCode]);
 		for(const auto &injectedCode: injectedCodeList) {
 			reinterpret_cast<InjectorPlayerPtr>(injectedCode.function)(
 			        injectedCode.bssPointer,
 			        reinterpret_cast<void *>(&CustomCodehandler_Retrieve),
-			        player);
+			        &player);
 		}
 	}
 }// namespace CustomCodehandler

@@ -11,14 +11,15 @@
 #include "../types.hpp"
 
 /// Contains the specific IDs assigned to commonly seen stage objects.
-enum ObjectTypes {
-	ItemBox = 0x7DA, PowerObject = 0x820, FlightRing = 0x848, DashPanel = 0x83E, WhiteCaveWeb = 0x1F40, MetalCityCar = 0x13A8, NightChaseCar = 0x13A7
+enum class ObjectTypes : u16{
+	ItemBox = 0x7DA, PowerObject = 0x820, FlightRing = 0x848, DashPanel = 0x83E, WhiteCaveWeb = 0x1F40, MetalCityCar = 0x13A8, NightChaseCar = 0x13A7, StartLine = 0x7D0, GuardianBoss = 0x2b18
 };
 
 /// Contains all the item ID values for an item box object.
-enum ItemID {
+enum class ItemID : u16{
 	TenRings, TwentyRings, ThirtyRings, ThirtyAir, FiftyAir, HundredAir, SpeedShoes, Magnet,
-	Invincibility, Bomb, BallAndChain, RNG, HundredRings, MaxAir, FiveRings
+	Invincibility, Bomb, BallAndChain, RNG, HundredRings, MaxAir, FiveRings,
+	Total
 };
 
 /// Dictates where an object is allowed to be spawned.
@@ -49,7 +50,7 @@ enum class ObjectGroups : u16 {
     Object_SuperTailsRenderText = 0xF000,
     Object_EmerlTypeIcon, ///< @note This object group is used directly in assembly! When modifying this, modify it in assembly as well.
     Object_TournamentRacePopup,
-	Object_BallAndChain
+	Object_BallAndChain,
 };
 
 /// The main struct which holds data about all currently spawned in objects. See variable StartOfObjectsPointer for these objects.
@@ -62,7 +63,7 @@ struct ObjectNode {
 	void* object;
 	u8 state;
     union {
-        u16 object_type;
+        ObjectTypes object_type;
         u16 userDataU16;
         struct {
             u8 _padding;
@@ -70,15 +71,17 @@ struct ObjectNode {
         };
     };
 	u8 culling_group;
-	u16 item_id;
+	ItemID item_id;
 	u16 object_id;
 	u16 index;
 };
 static_assert(sizeof(ObjectNode) == 0x20);
 
+ASMDefined ObjectNode *gpsCurrentTask;
+
 /// Contains all required info about an object to be spawned in. These structs are contained within a specific file in every stage's files.
 struct ObjectInfo {
-	u16 objectType;
+	ObjectTypes objectType;
 	u8 maxPlayerCount; ///< maximum amount of required players in the game for object to spawn
 	u8 objectPortal;
     ObjectVisibility spawnableGamemodes;
@@ -110,6 +113,12 @@ ASMDefined const vu16 CurrentObjectAmount;
 ASMDefined const vu32 MaxObjectAmount;
 ASMDefined ObjectNode* const StartOfObjectsPointer;
 
+enum class Object1Sizes : u8 {
+	None,
+	x20,
+	x80
+};
+
 /**
  * Sets a new task.
  * Tasks are simply routines that are ran every frame and you can specify their lifetime.
@@ -119,7 +128,9 @@ ASMDefined ObjectNode* const StartOfObjectsPointer;
  * @param objectGroup The object group to associate with this task.
  * @param object1Size Sets the size of the extra data struct used at ObjectNode::object if necessary for the task. Set this to 0 for no extra data, 1 for 0x20 sized extra data and 2 for 0x80 sized extra data.
  */
-ASMDefined ObjectNode* SetTask(Task task, ObjectGroups objectGroup, u32 object1Size);
+ASMDefined ObjectNode* SetTask(Task task, ObjectGroups objectGroup, Object1Sizes object1Size);
+#define ASSERT_OBJECT1SIZE_X20(object1) static_assert(sizeof(object1) <= 0x20);
+#define ASSERT_OBJECT1SIZE_X80(object1) static_assert(sizeof(object1) <= 0x80);
 
 /// Kills the current task.
 ASMDefined void gNp_DeadTask();

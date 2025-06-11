@@ -1,3 +1,5 @@
+#include <mechanics/dash/grindraildash.hpp>
+
 #include "cosmetics/player/exloads.hpp"
 #include "lib/sound.hpp"
 #include "lib/stdlib.hpp"
@@ -8,6 +10,7 @@
 #include "riders/stage.hpp"
 #include "gears/omnipotence.hpp"
 #include "gears/blastGaugeGears.hpp"
+#include "gears/supermetal.hpp"
 #include "handlers/player/specialflagtweaks.hpp"
 
 constexpr std::array<f32, TotalStageAmount> StageBaseSpeeds = {
@@ -70,11 +73,13 @@ constexpr f32 BaseFlyHoopVerticalSpeeds[TotalStageAmount] = {
 		0.45f,// sega illusion
 };
 
-ASMUsed f32 CustomFlyHoopVerticalSpeeds(ObjectNode *object, Player *player, f32 flyHoopSpeed, f32 currentSpeed, f32 angle) {
+ASMUsed f32 CustomFlyHoopVerticalSpeeds(const ObjectNode &object, const Player &player, const f32 flyHoopSpeed, const f32 currentSpeed, const f32 angle) {
 	f32 multiplier = BaseFlyHoopVerticalSpeeds[CurrentStage];
+    f32 const baseHoopCalc = !player.specialFlags.hasAny(SpecialFlags::ringGear) ? -1.0f * (static_cast<f32>(player.level) * pSpeed(10.0f)) : pSpeed(-10.0f);
+    // (-0.0902777777777778f)
 	switch(CurrentStage) {
 		case MetalCity:
-			switch(object->object_id) {
+			switch(object.object_id) {
 				case 0x121:
 					multiplier = 0.1f;
 					break;
@@ -87,7 +92,7 @@ ASMUsed f32 CustomFlyHoopVerticalSpeeds(ObjectNode *object, Player *player, f32 
 			break;
 
 		case GreenCave:
-			switch(object->object_id) {
+			switch(object.object_id) {
 				case 0xEB:
 					multiplier = -0.1f;
 					break;
@@ -97,7 +102,7 @@ ASMUsed f32 CustomFlyHoopVerticalSpeeds(ObjectNode *object, Player *player, f32 
 			break;
 
 		case SandRuins:
-			switch(object->object_id) {
+			switch(object.object_id) {
 				case 0x136:
 					multiplier = -0.8f;
 					break;
@@ -113,7 +118,7 @@ ASMUsed f32 CustomFlyHoopVerticalSpeeds(ObjectNode *object, Player *player, f32 
 			break;
 
 		case NightChase:
-			switch(object->object_id) {
+			switch(object.object_id) {
 				case 0x26:
 					multiplier = 0.4f;
 					break;
@@ -126,7 +131,7 @@ ASMUsed f32 CustomFlyHoopVerticalSpeeds(ObjectNode *object, Player *player, f32 
 			break;
 
 		case IceFactory:
-			switch(object->object_id) {
+			switch(object.object_id) {
 				case 0x16E:
 				case 0x16F:
 					multiplier = 0.2f;
@@ -137,7 +142,7 @@ ASMUsed f32 CustomFlyHoopVerticalSpeeds(ObjectNode *object, Player *player, f32 
 			break;
 
 		case SkyRoad:
-			switch(object->object_id) {
+			switch(object.object_id) {
 				case 0xD4:
 					multiplier = -0.5f;
 					break;
@@ -153,7 +158,7 @@ ASMUsed f32 CustomFlyHoopVerticalSpeeds(ObjectNode *object, Player *player, f32 
 			break;
 
 		case SegaCarnival:
-			switch(object->object_id) {
+			switch(object.object_id) {
 				case 0x5F:
 				case 0x60:
 					multiplier = 0.4f;
@@ -166,7 +171,7 @@ ASMUsed f32 CustomFlyHoopVerticalSpeeds(ObjectNode *object, Player *player, f32 
 			}
 			break;
 		case SplashCanyon:
-			switch(object->object_id) {
+			switch(object.object_id) {
 				case 0xA0:// first hoop, last path
 					multiplier = 0.6f;
 					break;
@@ -181,7 +186,7 @@ ASMUsed f32 CustomFlyHoopVerticalSpeeds(ObjectNode *object, Player *player, f32 
 			}
 			break;
 		case DarkDesert:
-			switch(object->object_id) {
+			switch(object.object_id) {
 				case 0xF6:
 					multiplier = 0.5f;
 					break;
@@ -191,7 +196,7 @@ ASMUsed f32 CustomFlyHoopVerticalSpeeds(ObjectNode *object, Player *player, f32 
 			}
 			break;
 		// case BabylonGarden:
-		// 	if (object->object_id >= 0xE1 && object->object_id <= 0xE3) {
+		// 	if (object.object_id >= 0xE1 && object.object_id <= 0xE3) {
 		// 		multiplier = 0.45f;
 		// 	}
 		// 	break;
@@ -199,40 +204,40 @@ ASMUsed f32 CustomFlyHoopVerticalSpeeds(ObjectNode *object, Player *player, f32 
 			break;
 	}
 	return angle
-		   * (-flyHoopSpeed + ((-currentSpeed + (-player->gearStats[player->level].topSpeed * 0.1f)) * multiplier));
+		   * (-flyHoopSpeed + ((-currentSpeed + (-0.0902777777777778f + baseHoopCalc)) * multiplier));
 }
 
-inline f32 SpecificFlyHoops(ObjectNode *object, Player *player, f32 currentHoopSpeed) {
-	f32 flyHoopSpeed = SpecificFlyHoopSpeeds[CurrentStage];
-	bool toAddSpeed = FALSE;
-	u32 object_id = object->object_id;
+inline f32 SpecificFlyHoops(const ObjectNode &object, Player &player, f32 currentHoopSpeed) {
+	const f32 &flyHoopSpeed = SpecificFlyHoopSpeeds[CurrentStage];
+	bool toAddSpeed = false;
+	const u32 &object_id = object.object_id;
 
 	switch(CurrentStage) {
 		case SegaIllusion:
 			if(object_id >= 0xAA && object_id <= 0xAD) {
-				toAddSpeed = TRUE;
+				toAddSpeed = true;
 			}
 
 			break;
 		case EggFactory:
 			if(object_id >= 0x125 && object_id <= 0x126) {
-				toAddSpeed = TRUE;
+				toAddSpeed = true;
 				break;
 			}
 			if(object_id >= 0x2C5 && object_id <= 0x2C7) {
-				toAddSpeed = TRUE;
+				toAddSpeed = true;
 			}
 			break;
 		case WhiteCave:
 			if(object_id == 0x27) {
-				player->changeInAir_gain += 30000;// 30 air
+				player.changeInAir_gain += 30000;// 30 air
 			} else {
-				toAddSpeed = TRUE;
+				toAddSpeed = true;
 			}
 			break;
 		case MetalCity:
 			if(object_id >= 0x122 && object_id <= 0x124) {
-				toAddSpeed = TRUE;
+				toAddSpeed = true;
 				currentHoopSpeed *= 1.2f;
 			}
 			break;
@@ -287,9 +292,8 @@ inline f32 SpecificFlyHoops(ObjectNode *object, Player *player, f32 currentHoopS
 	return currentHoopSpeed;
 }
 
-inline f32 FlyCharacter_DualType(Player *player, f32 currentFlyHoopSpeed) {
-	const auto &characterType = player->characterptr->type;
-	if(characterType == Character::Type::Fly) {
+inline f32 FlyCharacter_DualType(const Player &player, f32 currentFlyHoopSpeed) {
+	if(player.characterptr->type == Character::Type::Fly) {
 		currentFlyHoopSpeed *= 0.975f;
 	} else {
 		currentFlyHoopSpeed *= 0.95f;
@@ -297,66 +301,71 @@ inline f32 FlyCharacter_DualType(Player *player, f32 currentFlyHoopSpeed) {
 	return currentFlyHoopSpeed;
 }
 
-inline f32 FlyCharacter_AllType(Player *player, f32 currentFlyHoopSpeed) {
-	const auto &characterType = player->characterptr->type;
-	// if (player->character == MetalSonic && player->extremeGear == ChaosEmerald) {
-	// 	currentFlyHoopSpeed *= 0.925f + (player->objectLinkCount * 0.08f);
+inline f32 FlyCharacter_AllType(const Player &player, f32 currentFlyHoopSpeed) {
+	// if (player.character == MetalSonic && player.extremeGear == ChaosEmerald) {
+	// 	currentFlyHoopSpeed *= 0.925f + (player.objectLinkCount * 0.08f);
 	// }
 	// else {
-	SpecialFlagInfo *spfInfo = &PlayerSpecialFlagInfo[player->index];
-	if(characterType == Character::Type::Fly && player->extremeGear == ExtremeGear::Omnipotence) {
+	const SpecialFlagInfo &spfInfo = PlayerSpecialFlagInfo[player.index];
+	if(player.characterptr->type == Character::Type::Fly && player.extremeGear == ExtremeGear::Omnipotence) {
 		currentFlyHoopSpeed *= 0.95f;
-	} 
-	// else if (player->gearExload().exLoadID == EXLoad::DarkSonic && spfInfo->gearChange >= 3 && player->level == 2) {
-	// 	// skip
-	// }
+	}
 	else currentFlyHoopSpeed *= 0.925f;
 	// }
 	return currentFlyHoopSpeed;
 }
 
-ASMUsed void CustomFlyHoopSpeeds(Player *player, ObjectNode *object, f32 currentFlyHoopSpeed, f32 angle) {
+ASMUsed void CustomFlyHoopSpeeds(Player &player, ObjectNode &object, const f32 currentFlyHoopSpeed, const f32 angle) {
 	const f32 flyHoopSpeed = currentFlyHoopSpeed * angle;
 	f32 newFlyHoopSpeed = flyHoopSpeed + StageBaseSpeeds[CurrentStage];
 	newFlyHoopSpeed = SpecificFlyHoops(object, player, newFlyHoopSpeed);
-	if(player->character == Character::Emerl) {
-		GizoidReplicationInfo *grInfo = &PlayerGizoidReplication[player->index];
-		if(grInfo->isEnabled && InGamePlayerCount >= 2) {
-			const auto typeCount = player->getTypeCount();
-			if(typeCount < 2) {
-				newFlyHoopSpeed *= GR_TypeShortcutSpeedMultiplier;
-			} else if(typeCount < 3) {
-				newFlyHoopSpeed *= GR_TypeShortcutSpeedMultiplierDual;
+	if(player.character == Character::Emerl) {
+		const GizoidReplicationInfo &grInfo = PlayerGizoidReplication[player.index];
+		if(grInfo.isEnabled && InGamePlayerCount >= 2) {
+			switch(player.getTypeCount()) {
+				case 2:
+					newFlyHoopSpeed *= GR_TypeShortcutSpeedMultiplier;
+					break;
+				case 3:
+					newFlyHoopSpeed *= GR_TypeShortcutSpeedMultiplierDual;
+					break;
+				default:
+					break;
 			}
 		}
 	}
 
-	switch(player->extremeGear) {
+	switch(player.extremeGear) {
 		using namespace ExtremeGear;
 		case CoverS:
-			if(player->characterptr->type != Character::Type::Fly) {
+			if(player.characterptr->type != Character::Type::Fly) {
 				newFlyHoopSpeed *= 1.115f;
 			}
 			break;
 		case Access:
-			if(player->typeAttributes == Type::Fly) {
+			if(player.typeAttributes == Type::Fly) {
 				// mono access
 				newFlyHoopSpeed *= 1.085f;
 			}
 			break;
 		case ChaosEmerald:
-			if(player->character == Character::MetalSonic) {
-				newFlyHoopSpeed += (player->objectLinkCount * 0.08f);
-			} else if(player->character == Character::Tails && player->superFormState != 0) {
-				newFlyHoopSpeed *= 1.1f;
+			if(player.character == Character::MetalSonic) {
+				if (player.gearExload().exLoadID == EXLoad::StardustSpeeder) {
+					const NeoMetalInfo &neoInfo = PlayerNeoMetalInfo[player.index];
+					if(neoInfo.formState == 2) {
+						newFlyHoopSpeed += (static_cast<f32>(player.objectLinkCount) * 0.10f); // NEO III
+					}
+				} else newFlyHoopSpeed += (static_cast<f32>(player.objectLinkCount) * 0.08f);
 			}
+		// else if(player->character == Character::Tails && player->superFormState != 0) {
+		// 		newFlyHoopSpeed *= 1.1f;
+		// 	}
 			break;
 		case Omnipotence: {
-			OmnipotenceInfo *OMNInfo = &PlayerOMNInfo[player->index];
-			if((OMNInfo->lastShortcutType != 2)) {
-				// if (player->character == E10G) {newFlyHoopSpeed *= 1.05f;}
+			if(const OmnipotenceInfo &OMNInfo = PlayerOMNInfo[player.index]; OMNInfo.lastShortcutType != 2) {
+				// if (player.character == E10G) {newFlyHoopSpeed *= 1.05f;}
 				// else 
-				if (OMNInfo->lastShortcutType != 0) {newFlyHoopSpeed *= 1.085f;}
+				if (OMNInfo.lastShortcutType != 0) {newFlyHoopSpeed *= 1.05f;}
 			}
 			break;
 		}
@@ -370,55 +379,60 @@ ASMUsed void CustomFlyHoopSpeeds(Player *player, ObjectNode *object, f32 current
 			break;
 	}
 
-	const auto typeCount = player->getTypeCount();
-	if(typeCount == 2) {
-		newFlyHoopSpeed = FlyCharacter_DualType(player, newFlyHoopSpeed);
-	} else if(typeCount == 3) {
-		newFlyHoopSpeed = FlyCharacter_AllType(player, newFlyHoopSpeed);
+	switch(player.getTypeCount()) {
+		case 2:
+			newFlyHoopSpeed = FlyCharacter_DualType(player, newFlyHoopSpeed);
+			break;
+		case 3:
+			newFlyHoopSpeed = FlyCharacter_AllType(player, newFlyHoopSpeed);
+			break;
+		default:
+			break;
 	}
 
 	// Experimental new hoop dash V2
-	PlayerFlyHoopDashProperties *properties = &playerFlyHoopDashProperties[player->index];
-	BlastGaugeInfo *bgInfo = &PlayerBlastGaugeInfo[player->index];
-	if(player->input->holdFaceButtons.hasAny(Buttons::B, Buttons::X, Buttons::L)) {
+	PlayerFlyHoopDashProperties &properties = playerFlyHoopDashProperties[player.index];
+	if(player.input->holdFaceButtons.hasAny(Buttons::B, Buttons::X, Buttons::L)) {
 		newFlyHoopSpeed *= 1.2f;
 		PlayAudioFromDAT(Sound::SFX::RailHoopDash);// dash sfx
 		Player_InitBoostParticles(player);
-		// properties->gainDelay are the amount of frames it delays the air gain.
+		// properties.gainDelay are the amount of frames it delays the air gain.
 		// change this value here to change the delay time
-		if(!player->specialFlags.hasAny(SpecialFlags::ringGear)) {
-			properties->gainDelay = 30.0f;
+		if(!player.specialFlags.hasAny(SpecialFlags::ringGear)) {
+			properties.gainDelay = 30.0f;
 		}
 
 		// don't worry about this duration here
-		// properties->duration += 1;
+		// properties.duration += 1;
 
 		// This handles the air subtraction in magneticimpulse.cpp, tells it to subtract air if true.
-		properties->hasUsed = TRUE;
+		properties.hasUsed = true;
 
-		// "player->magneticImpulse_timer - 60.0f" is the time (in frames) it takes from the MI timer
-		// change this value here to change the amount of time it takes 
+		// "player.magneticImpulse_timer - 60.0f" is the time (in frames) it takes from the MI timer
+		// change this value here to change the amount of time it takes
 		f32 newMI;
-		if(player->character == Character::SuperSonic
-			&& bgInfo->currentGauge > 0
-			&& player->gearExload().exLoadID != EXLoad::HyperSonic)
-			{newMI = player->magneticImpulse_timer;} 
-		else {newMI = player->magneticImpulse_timer - 60.0f;}
+		const auto &[currentGauge] = PlayerBlastGaugeInfo[player.index];
+		if(player.character == Character::SuperSonic
+			&& currentGauge > 0
+			&& player.gearExload().exLoadID != EXLoad::HyperSonic
+			)
+			{newMI = player.magneticImpulse_timer;}
+		else {newMI = player.magneticImpulse_timer - 60.0f;}
 
-		player->magneticImpulse_timer = clamp(newMI);
+		player.magneticImpulse_timer = clamp(newMI);
 
-	} else if(properties->gainDelay > 0.0f) {
-		properties->gainDelay = 0.0f;
+	} else if(properties.gainDelay > 0.0f) {
+		properties.gainDelay = 0.0f;
 	}
 
 	if(newFlyHoopSpeed < flyHoopSpeed && CurrentStage != DarkDesert){
 		newFlyHoopSpeed = flyHoopSpeed;
 	}
 
-	if(MI::impulseData[player->index].magneticImpulse) {
+	if(MI::impulseData[player.index].magneticImpulse) {
 		newFlyHoopSpeed += MI::calculateMultiplier(
-				player, (newFlyHoopSpeed * 0.2f) * (player->magneticImpulse_timer / MI::MaximumCap));
+				player, (newFlyHoopSpeed * 0.2f) * (player.magneticImpulse_timer / MI::MaximumCap));
 	}
 
-	player->speed = newFlyHoopSpeed;
+	player.speed = newFlyHoopSpeed;
 }

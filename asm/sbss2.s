@@ -10,6 +10,9 @@ __sbss2_rom_start__:
 .global lbl_8021CFA0
 lbl_8021CFA0:
 	.skip 0x4
+.global lwpqueue_cripostretrace
+lwpqueue_cripostretrace:
+	.skip 0x4
 
 .global __sbss2_rom_end__
 __sbss2_rom_end__:

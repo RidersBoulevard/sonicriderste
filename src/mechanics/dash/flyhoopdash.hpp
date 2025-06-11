@@ -1,6 +1,5 @@
 #pragma once
 
-#include "mechanics/dash/grindraildash.hpp"
 #include "riders/player.hpp"
 
 constexpr std::array<s32, 3> FlyHoopDashInitialCosts = {
@@ -22,12 +21,7 @@ constexpr std::array<f32, 3> FlyHoopDashAirLossMechanic = {
 
 constexpr s32 FlyHoopDashAirLossRingGear = 30;
 
-
-void Player_RingLossVisualsSFX(Player *player);
-ASMDefined void RingLoss_OnAttack(Player *player);
-ASMDefined void func_SetPlayerActionType(Player *player, u32 state);
-
-void Player_FlyHoopDashHandler(Player *player);
+void Player_FlyHoopDashHandler(Player &player);
 
 struct PlayerFlyHoopDashProperties {
 	bool canUse = false; // if player can use fly hoop dash

@@ -13,7 +13,7 @@ enum CustomCodehandlerValues {
 	CCH_CurrentlyPlayingMusicID,
 	CCH_RandFunction,
 	CCH_InGamePlayerCount,
-	CCH_RuleSettings,
+	CCH_ruleSettings,
 	CCH_CurrentStage,
 	CCH_CurrentGameMode,
 	CCH_IsGamePausedFlag,

@@ -64,11 +64,11 @@ gu32Game_PauseFlag:
 .global lbl_8021BB8C
 lbl_8021BB8C:
 	.skip 0x4
-.global lbl_8021BB90
-lbl_8021BB90:
+.global gpsTexList_Residence
+gpsTexList_Residence:
 	.skip 0x4
-.global lbl_8021BB94
-lbl_8021BB94:
+.global gvpDrawFunc_ReadAyyncManager
+gvpDrawFunc_ReadAyyncManager:
 	.skip 0x4
 .global lbl_8021BB98
 lbl_8021BB98:
@@ -1279,6 +1279,9 @@ gpsCurrentTask:
 .global gsHeapInfo
 gsHeapInfo:
 	.skip 0x18
+.global gu32HeapInitialized
+gu32HeapInitialized:
+	.skip 0x4
 
 .global __sbss_rom_end__
 __sbss_rom_end__:

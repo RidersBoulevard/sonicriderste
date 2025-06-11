@@ -42,4 +42,4 @@ struct HangOnInfo {
 
 extern std::array<HangOnInfo, MaxPlayerCount> PlayerHangOnInfo;
 
-void Player_HangOn(Player *player);
+void Player_HangOn(Player &player);

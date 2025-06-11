@@ -12,7 +12,7 @@ constexpr std::array<f32, 4> TypeAdditiveRunSpeeds = {
         pSpeed(20), // speed
         pSpeed(10), // fly
         pSpeed(0), // power
-        pSpeed(20) // no type
+        pSpeed(25) // no type
 };
 
 constexpr std::array<f32, 3> AdvantageSRunSpeeds = {
@@ -87,7 +87,9 @@ f32 Player_RunSpeed(const Player &player, const f32 runSpeed) {
 		// 	extraSpeed = pSpeed(10);
 		// 	break;
 		default:
-			extraSpeed = TypeAdditiveRunSpeeds[std::to_underlying(player.characterptr->type)];
+		    if (player.hasCharacterExload() && player.characterExload().characterType != CharacterType::DefaultTypeCharacter) {
+		        extraSpeed = TypeAdditiveRunSpeeds[std::to_underlying(player.characterExload().characterType)];
+		    } else extraSpeed = TypeAdditiveRunSpeeds[std::to_underlying(player.characterptr->type)];
 			break;
 	}
 

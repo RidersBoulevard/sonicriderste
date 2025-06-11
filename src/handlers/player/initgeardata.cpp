@@ -1,12 +1,20 @@
+// 100% match
+
 #include "initgeardata.hpp"
 
+#include <handlers/menu/debugmenu/debugmenu.hpp>
+
 #include "cosmetics/player/exloads.hpp"
+#include "gears/berserker.hpp"
+#include "gears/blastGaugeGears.hpp"
 #include "gears/supers.hpp"
 #include "handlers/files/separatemodelloading.hpp"
 #include "lib/stdlib.hpp"
+#include "mechanics/characters/gizoidreplication.hpp"
+#include "mechanics/dash/flyhoopdash.hpp"
 #include "mechanics/magneticimpulse.hpp"
+#include "riders/gamemode.hpp"
 #include "riders/stage.hpp"
-#include "gears/blastGaugeGears.hpp"
 
 inline f32 CustomBoostSpeeds(const Player &player, const f32 &boostSpeed, const u32 &level) {
 	f32 newBoostSpeed = boostSpeed;
@@ -31,10 +39,11 @@ inline f32 CustomBoostSpeeds(const Player &player, const f32 &boostSpeed, const 
 					newBoostSpeed = pSpeed(250);
 					break;
 				case Character::Shadow:
-					newBoostSpeed = pSpeed(300);
+					newBoostSpeed = pSpeed(285);
+					// newBoostSpeed = pSpeed(300);
 					break;
 				case Character::MetalSonic:
-					newBoostSpeed = pSpeed(235);
+					newBoostSpeed = pSpeed(235); // 245 NEO II
 					break;
 				default: break;
 			}
@@ -60,8 +69,9 @@ inline f32 CustomTopSpeeds(const Player &player, const f32 &topSpeed, const u32 
 		switch(player.character) {
 			case Character::Tails: return pSpeed(45);
 			case Character::Knuckles: return pSpeed(37);
-			case Character::Shadow: return pSpeed(58.5);
-			case Character::MetalSonic: return pSpeed(28);
+			case Character::Shadow: return pSpeed(18); // experiment III
+			// case Character::Shadow: return pSpeed(58.5);
+			case Character::MetalSonic: return pSpeed(28); // 43 NEO II
 			default: break;
 		}
 		return topSpeed;// Retains previous behavior. todo: Should this return actually be here?
@@ -150,6 +160,9 @@ inline Flag<SpecialFlags> CustomSpecialFlags(const Player &player, const Flag<Sp
 	Flag<SpecialFlags> newSpecialFlags = specialFlags;
 	if(player.extremeGear == ExtremeGear::ChaosEmerald) {
 		switch(player.character) {
+			case Character::SuperSonic:
+				newSpecialFlags |= SpecialFlags::ringGear;
+				break;
 			case Character::Tails:
 				newSpecialFlags |= (SpecialFlags::iceImmunity | SpecialFlags::noSpeedLossChargingJump);
 				newSpecialFlags &= ~(SpecialFlags::ringGear | SpecialFlags::noPits | SpecialFlags::thirtyPercentAir);
@@ -175,6 +188,8 @@ inline f32 CustomAcceleration(const Player &player, const f32 &acceleration) {
 			case Character::Knuckles:
 				newAcceleration = 0.00617286f;
 				break;
+			case Character::MetalSonic:
+				if (player.gearExload().exLoadID == EXLoad::StardustSpeeder) newAcceleration = 0.000617286f;
 			default: break;
 		}
 	}
@@ -309,9 +324,10 @@ ASMUsed void InitGearData(Player &player) {
 		player.typeAttributes = gear.extraTypeAttributes | Type::Power;
 	}else if(player.characterExload().exLoadID == EXLoad::E10Y) {
 		player.typeAttributes = gear.extraTypeAttributes | Type::Fly;
-	} else if(isSuperCharacter(player, Character::MetalSonic)) {
+	} else if(player.isSuperCharacter(Character::MetalSonic)) {
 		player.typeAttributes = Type::Speed | Type::Power;
-	} else if(isSuperCharacter(player, Character::Tails)) {
+		if(player.gearExload().exLoadID == EXLoad::StardustSpeeder) player.typeAttributes = Type::Speed;
+	} else if(player.isSuperCharacter(Character::Tails)) {
 		player.typeAttributes = Type::Fly;
 	}
 	 else {

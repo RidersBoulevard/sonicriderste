@@ -1,13 +1,13 @@
 /** \file */
 
 #include "exloads.hpp"
-#include "ninjanext.hpp"
+#include "nn/ninjanext.hpp"
 #include "skinsystem.hpp"
 #include "containers/graphicalobject.hpp"
 #include "lib/lib.hpp"
 #include "riders/gamemode.hpp"
-
-ASMDefined void *const gp2DSys;
+#include "handlers/ingame/customcss.hpp"
+#include "handlers/menu/debugmenu/debugmenu.hpp"
 
 /**
  * Saves currently selected EX load information for each Player.
@@ -194,35 +194,25 @@ ASMUsed void _CheckEXLoadBoostColors() {
 	return EXLoadTypes::None;
 }
 
-inline void ApplyVisual(CSSObject &object) {
-	object.visualTrigger[0] = TRUE; // object that is passed in is already aligned to the player index, no need to apply index in here
-	object.visualTriggerTime = 1;
-	lbl_0013FA84(0xA9000000);
-	lbl_0013FA84(0xA9000800);
-}
-
 /**
  * This function checks whenever the Player is pressing any of the EX load buttons outlined in CheckEXLoadControls().
  * If they are, it'll call the sound effect and visuals for when characters/gears are switched naturally on CSS.
  *
  * @param player The Player to apply the visuals to.
- * @param object Reference to the Object used for handling the CSS.
+ * @param object Reference to the Object used for handling the CSS. (This pointer is already aligned to the player index!)
+ * @returns true if controls are pressed and are applicable, otherwise false
  */
-ASMUsed void ApplyEXLoadFancyVisuals(const Player &player, CSSObject &object) {
-	const u8 controllerPort = player.input->port;
+[[nodiscard]] bool IsEXLoadControlPressed(const Player &player, const CSSObject &object) {
+    const u8 controllerPort = player.input->port;
 
-	if(Player_EXLoadData[controllerPort].delayTime == 0) {
-		if(CheckEXLoadControls(player) != EXLoadTypes::None) {
-			ApplyVisual(object);
-		}
-	}
+    // if the gear's or character's information box is pulled up, stop applying visuals
+    // using an index of 0 for cssSelectionState, because the object is already aligned to the player
+    const auto isGearInfoBoxActive = object.cssSelectionState[0] == 3;
+    const auto isCharacterInfoBoxActive = object.cssSelectionState[0] == 1 && PlayerCharacterInformationBox[controllerPort];
 
-	// For the skin system
-	// if (PlayerSkinSystemData[controllerPort].delay == 0) {
-	// 	if (CheckSkinSystemControls(player) != NoneSkinSystemType) {
-	// 		ApplyVisual(object);
-	// 	}
-	// }
+    if (isGearInfoBoxActive || isCharacterInfoBoxActive) return false;
+
+    return Player_EXLoadData[controllerPort].delayTime == 0 && CheckEXLoadControls(player) != EXLoadTypes::None;
 }
 
 /**
@@ -246,6 +236,19 @@ ASMUsed void ApplyEXLoadFancyVisuals(const Player &player, CSSObject &object) {
 	bool canApplyGear;
 	if(info.gear != Character::Invalid) {
 		canApplyGear = info.gear == player.extremeGear;
+		// disable if debug toggle is off
+		if (!DebugMenu_CheckOption(DebugMenuOptions::PTRMode)) {
+			switch(info.exLoadID) {
+				case EXLoad::StardustSpeeder:
+			    case EXLoad::TheProfessional:
+			    case EXLoad::SuperStorm:
+			    case EXLoad::HyperHangOn:
+			        canApplyGear = false;
+			        break;
+				default:
+					break;
+			}
+		}
 	} else {
 		canApplyGear = true;
 	}
@@ -279,9 +282,8 @@ ASMUsed void UpdateEXLoadData(Player &player) {
  * @param exLoadDataSlots The applicable EX load slots.
  * @param exLoadMode Which subset type the provided slots are (refer to ::EXLoadMode).
  * @param exLoadType Which scrolling behavior needs to be used. This value can be obtained from CheckEXLoadControls().
- * @return The newly rotated index that corresponds to the array parameter.
  */
-[[nodiscard]] void RotateEXLoadAndFetch(Player &player, std::span<const EXLoadInfo> exLoadDataSlots, const EXLoadMode &exLoadMode, const EXLoadTypes &exLoadType) {
+void RotateEXLoad(Player &player, std::span<const EXLoadInfo> exLoadDataSlots, const EXLoadMode &exLoadMode, const EXLoadTypes &exLoadType) {
 	// set the correct ex load type to check if it can be applied, so that it corresponds to the enum in the slot structs
 	EXLoadTypes checkType = EXLoadTypes::None;
 	if(exLoadType == EXLoadTypes::CosmeticForwards || exLoadType == EXLoadTypes::CosmeticBackwards) {
@@ -330,10 +332,10 @@ void ApplyNextEXLoad(Player &player, const EXLoadMode &exLoadMode, const EXLoadT
 	switch (exLoadMode) {
 		default: return;
 		case EXLoadMode::CharacterEXLoadMode:
-			RotateEXLoadAndFetch(player, CharacterEXLoadDataSlots, exLoadMode, exLoadType);
+            RotateEXLoad(player, CharacterEXLoadDataSlots, exLoadMode, exLoadType);
 			break;
 		case EXLoadMode::GearEXLoadMode:
-			RotateEXLoadAndFetch(player, GearEXLoadDataSlots, exLoadMode, exLoadType);
+            RotateEXLoad(player, GearEXLoadDataSlots, exLoadMode, exLoadType);
 			break;
 	}
 	player.exload().delayTime = CurrentEXLoadInfo::MaxDelayTime;
@@ -367,8 +369,17 @@ void CheckPlayerEXLoadButton(Player &player, const EXLoadMode &exLoadMode) {
 ASMUsed void Character_UpdateGraphicalEXLoad(GraphicalObject *object) {
 	if(object->active == 0) { return; }
 
-	Player &player = players[object->idStruct.idIndex];
-	CheckPlayerEXLoadButton(player, EXLoadMode::CharacterEXLoadMode);
+    const auto *cssObject = static_cast<CSSObject *>(gp2DSys->objectGroupPtrs[7][0]);
+    const auto playerIndex = object->idStruct.idIndex;
+
+    // if the gear's or character's information box is pulled up, stop polling for ex load control checks
+    const auto isGearInfoBoxActive = cssObject->cssSelectionState[playerIndex] == 3;
+    const auto isCharacterInfoBoxActive = cssObject->cssSelectionState[playerIndex] == 1 && PlayerCharacterInformationBox[playerIndex];
+
+    Player &player = players[playerIndex];
+
+    if (!(isGearInfoBoxActive || isCharacterInfoBoxActive))
+	    CheckPlayerEXLoadButton(player, EXLoadMode::CharacterEXLoadMode);
 
 	if(player.hasCharacterExload()) {
 		const EXLoadInfo &info = player.characterExload();
@@ -402,19 +413,16 @@ ASMUsed void Gear_UpdateGraphicalEXLoad(GraphicalObject *object) {
 
 	if(object->active == 0) { return; }
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "cppcoreguidelines-pro-type-reinterpret-cast"
-	//void *objectptr = reinterpret_cast<u8 *>(gp2DSys) + 0x6038;
-	//void **objectptr2 = reinterpret_cast<void **>(objectptr);
-	//auto *cssObject = reinterpret_cast<CSSObject *>(*objectptr2);
-	void **objectptr = reinterpret_cast<void **>(static_cast<u8 *>(gp2DSys) + 0x6038);
-	auto *cssObject = static_cast<CSSObject *>(*objectptr);
-#pragma clang diagnostic pop
+	const auto *cssObject = static_cast<CSSObject *>(gp2DSys->objectGroupPtrs[7][0]);
+    const auto playerIndex = object->idStruct.idIndex;
 
-	Player &player = players[object->idStruct.idIndex];
-	const u8 &controllerPort = player.input->port;
+    // if the gear's or character's information box is pulled up, stop polling for ex load control checks
+    const auto isGearInfoBoxActive = cssObject->cssSelectionState[playerIndex] == 3;
+    const auto isCharacterInfoBoxActive = cssObject->cssSelectionState[playerIndex] == 1 && PlayerCharacterInformationBox[playerIndex];
 
-	if(cssObject->cssSelectionState[controllerPort] < 4) {
+	Player &player = players[playerIndex];
+
+	if(cssObject->cssSelectionState[playerIndex] < 4 && !(isGearInfoBoxActive || isCharacterInfoBoxActive)) {
 		CheckPlayerEXLoadButton(player, EXLoadMode::GearEXLoadMode);
 	}
 
@@ -488,10 +496,10 @@ ASMUsed void Gear_UpdateGraphicalEXLoad(GraphicalObject *object) {
  * @param savePtr Where to save the attack part's matrix multiplication result.
  * @param level Which level attack is currently being performed.
  */
-ASMUsed void HatsuneMiku_BindAttackPartsToBone(Player &player, Matrix3x3F &savePtr, const u8 level) {
+ASMUsed void HatsuneMiku_BindAttackPartsToBone(Player &player, Matrix3x4F &savePtr, const u8 level) {
 	if(player.characterExload().exLoadID != EXLoad::HatsuneMiku) { return; }
 
-	Matrix3x3F *mtxList = gpsaMtxList_Player[player.index];
+	Matrix3x4F *mtxList = gpsaMtxList_Player[player.index];
 	constexpr u32 rightHandBone = 43;
 
 	if (level == 2) {
@@ -499,10 +507,10 @@ ASMUsed void HatsuneMiku_BindAttackPartsToBone(Player &player, Matrix3x3F &saveP
 		nnMultiplyMatrix(&player.unkC4, mtxList + rightHandBone, savePtr);
 	} else {
 		// level 1 microphone
-		Matrix3x3F translateMat;
+		Matrix3x4F translateMat;
 		nnMakeTranslateMatrix(&translateMat, 0.1f, 0.0f, -0.05f);
 
-		Matrix3x3F modelMatrix;
+		Matrix3x4F modelMatrix;
 		nnMultiplyMatrix(&player.unkC4, mtxList + rightHandBone, modelMatrix);
 		nnMultiplyMatrix(&modelMatrix, &translateMat, savePtr);
 	}
@@ -650,6 +658,13 @@ ASMUsed void ClearPlayerEXLoadBSS() {
 	//memset(Player_EXLoadData.data(), 0, sizeof(Player_EXLoadData));
 	//std::fill(Player_EXLoadData.begin(), Player_EXLoadData.end(), CurrentEXLoadInfo());
 	std::ranges::fill(Player_EXLoadData, CurrentEXLoadInfo{});
+}
+
+/// Clears a specific player's EX load data.
+ASMUsed void ClearSpecificEXLoadBSS(Player &player) {
+    auto &exload = player.exload();
+    exload.characterExload = {};
+    exload.gearExload = {};
 }
 
 /*

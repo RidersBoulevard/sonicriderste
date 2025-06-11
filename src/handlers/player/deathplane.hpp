@@ -2,4 +2,4 @@
 
 #include "riders/player.hpp"
 
-void Player_DeathPlane(Player *player);
+void Player_DeathPlane(Player &player);

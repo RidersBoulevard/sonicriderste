@@ -2,6 +2,8 @@
 #include "gears/turbostar.hpp"
 #include "riders/gamemode.hpp"
 #include "handlers/player/specialflagtweaks.hpp"
+#include "gears/faster.hpp"
+#include "tweaks/player/archetype/boostarchetypejcbc.hpp"
 
 constexpr m2darray<u8, std::to_underlying(CharacterArchetype::Count), 3> Archetype_BoostDuration = {{
 		{0x14, 0x14, 0x14},// all rounder
@@ -15,7 +17,7 @@ constexpr m2darray<u8, std::to_underlying(CharacterArchetype::Count), 3> Archety
 		{0x00, 0x00, 0x00},// trickster
 		{0x00, 0x00, 0x00},// none archetype
 		{0x00, 0x00, 0x00},// Windcatcher
-		{0x00, 0x00, 0x00},// Turning
+		{0x2D, 0x2D, 0x0A},// Turning (WIP new combat)
 		{0x00, 0x00, 0x00},// Mechanic
 }};
 
@@ -38,16 +40,16 @@ ASMUsed u32 CustomBoostDuration(Player *player, u32 currentBoostDuration) {
 		// if (exLoads.gearExLoadID == HyperHangOnEXLoad)
 		// {if (hhoInfo->saturnMegadriveStatus != 2) currentBoostDuration /= 2;}
 		const auto &exloadID = player->gearExload().exLoadID;
-		if(player->character == Character::SuperSonic && player->extremeGear == ExtremeGear::ChaosEmerald 
+		if(player->character == Character::SuperSonic && player->extremeGear == ExtremeGear::ChaosEmerald
 			&& exloadID != EXLoad::HyperSonic) {
 			currentBoostDuration = 150;
 		}
-		if(isSuperCharacter(*player, Character::Knuckles)){
+		if(player->isSuperCharacter(Character::Knuckles)){
 			currentBoostDuration = 210;
-		} else if(isSuperCharacter(*player, Character::Shadow)){
+		} else if(player->isSuperCharacter(Character::Shadow)){
 			currentBoostDuration = 120;
-			if (player->supershadowboostflag) currentBoostDuration = 60;
-		} else if(isSuperCharacter(*player, Character::MetalSonic)){
+			// if (player->supershadowboostflag) currentBoostDuration = 60;
+		} else if(player->isSuperCharacter(Character::MetalSonic)){
 			currentBoostDuration = 180;
 		}
 
@@ -88,10 +90,22 @@ ASMUsed u32 CustomBoostDuration(Player *player, u32 currentBoostDuration) {
 					currentBoostDuration = 5;
 				break;
 			}
-			// case Accelerator: {
-			// 	currentBoostDuration /= 1.5;
+			// case Default: {
+			// 	if(exloadID == EXLoad::SuperStorm) {
+			// 		if(player->speed >= pSpeed(310.0f)) {
+			// 			currentBoostDuration = 180;
+			// 		} else
+			// 			currentBoostDuration = 30;
+			// 	}
 			// 	break;
 			// }
+			case Accelerator: {
+				if (player->gearExload().exLoadID == EXLoad::HyperHangOn) {
+				    AcceleratorInfo &aclInfo = PlayerAcceleratorInfo[player->index];
+				    if (aclInfo.isOverheated) currentBoostDuration = 0; // Kickdash if overheated
+				}
+				break;
+			}
 			default:
 				break;
 		}

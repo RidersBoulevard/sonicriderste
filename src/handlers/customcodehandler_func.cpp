@@ -1,7 +1,8 @@
 #include "customcodehandler_func.hpp"
-#include "files/filehandler_dat.hpp"
+#include "lib/files.hpp"
 #include "lib/stdlib.hpp"
 #include "main.hpp"
+#include "files/filehandler_dat.hpp"
 #include "music/custom_music.hpp"
 #include "player/SetPlayerState.hpp"
 #include "riders/gamemode.hpp"
@@ -21,8 +22,8 @@ const void* CustomCodehandler_Retrieve(u32 input) {
             return reinterpret_cast<void *>(&lbl_RNG_Number);
         case CCH_InGamePlayerCount:
             return (const void *) &InGamePlayerCount; // Todo: Figure out what C++ cast is needed to do this
-        case CCH_RuleSettings:
-            return (const void *) &RuleSettings; // Todo: Figure out what C++ cast is needed to do this
+        case CCH_ruleSettings:
+            return &ruleSettings;
         case CCH_CurrentStage:
             return (const void *) &CurrentStage; // Todo: Figure out what C++ cast is needed to do this
         case CCH_CurrentGameMode:

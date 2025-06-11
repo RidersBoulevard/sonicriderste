@@ -2,6 +2,7 @@
 
 #include "globalDefs.hpp"
 #include "types.hpp"
+#include "lib/files.hpp"
 
 #include <memory>
 #include <string_view>
@@ -40,14 +41,6 @@ struct DATFile {
 	}
 };
 
-ASMDefined void* DumpFile(const char filename[], bool lowHeap = true);
-
-template<typename T>
-[[nodiscard]] inline std::unique_ptr<T> DumpFile(const char *filename, bool lowHeap = true){
-	T* ptr = static_cast<T*>(DumpFile(filename, lowHeap));
-	return std::unique_ptr<T>(ptr);
-}
-
 ASMUsed void LoadMainMenuDatFiles();
 ASMUsed void LoadStageDatFiles();
 
@@ -61,9 +54,3 @@ ASMDefined void FreeDATFiles(u8 indexToStartFreeing = LongStandingDatFileCount);
 ASMDefined void FreeDATFileByIndex(u8 index);
 ASMUsed void LoadDATFileDynamic(const char filename[]);
 ASMUsed void DATFileHandler();
-
-ASMDefined char* DumpPackManFile(const char* filename, bool lowHeap = false);
-ASMDefined void SetArchiveBinary(const char*, u32, u32);
-ASMDefined void GetSet_Tex(void *packmanStart, u32 *offsetFromStart, void *saveptr, u32 mallocHi);
-ASMDefined void PackMan_SetupRenderedText(void *packmanStart, u32 *offsetFromStart, void *saveptr);
-void FileHandler_LongLasting();

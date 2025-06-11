@@ -93,9 +93,6 @@ lbl_8021B940:
 FontEncode:
 	.4byte 0xffff0000
 	.4byte 0x00000000
-.global SwitchThreadCallback
-SwitchThreadCallback:
-	.4byte DefaultSwitchThreadCallback
 .global lbl_8021B954
 lbl_8021B954:
 	.4byte 0x00000000
@@ -113,9 +110,6 @@ __DVDVersion:
 .global lbl_8021B96C
 lbl_8021B96C:
 	.4byte 0x00000001
-.global lbl_8021B970
-lbl_8021B970:
-	.4byte defaultOptionalCommandChecker
 .global lbl_8021B974
 lbl_8021B974:
 	.4byte 0x6476642e
@@ -141,9 +135,6 @@ lbl_8021B994:
 	.4byte 0x76692e63
 	.4byte 0x00000000
 	.4byte 0x00000000
-.global lbl_8021B9A0
-lbl_8021B9A0:
-	.4byte lbl_8011A5AC + 0x24
 .global lbl_8021B9A4
 lbl_8021B9A4:
 	.4byte 0x00000020
@@ -156,27 +147,12 @@ lbl_8021B9AC:
 .global lbl_8021B9B0
 lbl_8021B9B0:
 	.4byte 0x00000005
-.global lbl_8021B9B4
-lbl_8021B9B4:
-	.4byte SPEC2_MakeStatus
 .global lbl_8021B9B8
 lbl_8021B9B8:
 	.4byte 0x41000000
 .global lbl_8021B9BC
 lbl_8021B9BC:
 	.4byte 0x42000000
-.global lbl_8021B9C0
-lbl_8021B9C0:
-	.4byte lbl_8011A618 + 0x10
-	.skip 0x4
-.global lbl_8021B9C8
-lbl_8021B9C8:
-	.4byte lbl_8011A618 + 0x58
-	.skip 0x4
-.global lbl_8021B9D0
-lbl_8021B9D0:
-	.4byte lbl_8011A618 + 0xA0
-	.skip 0x4
 .global lbl_8021B9D8
 lbl_8021B9D8:
 	.4byte lbl_8011A618 + 0xE8
@@ -297,10 +273,6 @@ lbl_8021BAA8:
 .global lbl_8021BAAC
 lbl_8021BAAC:
 	.4byte 0x34000000
-.global lbl_8021BAB0
-lbl_8021BAB0:
-	.4byte lbl_80121E64 + 0x44
-	.skip 0x4
 .global lbl_8021BAB8
 lbl_8021BAB8:
 	.4byte lbl_80121FB8

@@ -1,72 +1,78 @@
 #pragma once
 
+#include <optional>
 #include "riders/controller.hpp"
 #include "riders/object.hpp"
-#include <optional>
+#include "riders/player.hpp"
 
 namespace DebugMenuOptions {
-	enum Page1 {
-		DisableMusic,                        //= 1 << 0,
-		MagneticImpulse,                     //= 1 << 1,
-		Autopilot,                           //= 1 << 2,
-		ExtremeDetach,                       //= 1 << 3,
-		TornadoIgnore,                       //= 1 << 4,
-		TimerActivity_ActiveInSingleplayer,  //= 1 << 5,
-		TimerActivity_ActiveIn1v1,           //= 1 << 6,
-		TimerActivity_ActiveIn1v1Middle,     //= 1 << 7,
-		TimerActivity_ActiveIn3OrMorePlayers,//= 1 << 8,
-		DisableHUDPartial,
-		DisableHUDFull,
-		InfiniteAir,
-		InfiniteRings,
-		AlwaysMaxMI,
-		MusicPlaylist, // if this enum is toggled it's vanilla playlist
+    enum Page1 {
+        DisableMusic,                         //= 1 << 0,
+        MagneticImpulse,                      //= 1 << 1,
+        Autopilot,                            //= 1 << 2,
+        ExtremeDetach,                        //= 1 << 3,
+        TornadoIgnore,                        //= 1 << 4,
+        TimerActivity_ActiveInSingleplayer,   //= 1 << 5,
+        TimerActivity_ActiveIn1v1,            //= 1 << 6,
+        TimerActivity_ActiveIn1v1Middle,      //= 1 << 7,
+        TimerActivity_ActiveIn3OrMorePlayers, //= 1 << 8,
+        DisableHUDPartial,
+        DisableHUDFull,
+        InfiniteAir,
+        InfiniteRings,
+        AlwaysMaxMI,
+        MusicPlaylist, // if this enum is toggled it's vanilla playlist
         ClutchAsTexture,
-        ClutchAsAirGauge
-	};
-	constexpr auto PAGE1OPTIONCOUNT = 12;
-	constexpr auto DefaultPage1Options = 1 << MagneticImpulse
-	                                     | 1 << Autopilot
-	                                     | 1 << TornadoIgnore
-	                                     | 1 << TimerActivity_ActiveInSingleplayer
-	                                     | 1 << ExtremeDetach
-                                         | 1 << ClutchAsAirGauge;
-}// namespace DebugMenuOptions
+        ClutchAsAirGauge,
+        PTRMode,
+        VanillaHazardsOn,
+        VanillaHazardsSkyRoadTurb,
+        VanillaHazardsDigiHands,
+        DisableAttacks,
+        AttackInRun,
+        DisableFog
+    };
+    constexpr auto PAGE1OPTIONCOUNT = 18;
+    constexpr auto DefaultPage1Options =
+            1 << MagneticImpulse | 1 << Autopilot | 1 << TornadoIgnore | 1 << TimerActivity_ActiveInSingleplayer | 1 << ClutchAsAirGauge | 1 << AttackInRun;
+} // namespace DebugMenuOptions
+
+namespace DebugMenuDef {
+    constexpr auto TEXT_Y      = 100;
+    constexpr auto TEXT_HEIGHT = 20;
+} // namespace DebugMenuDef
 
 struct DebugMenuData {
-	std::array<std::span<u8>, DebugMenuOptions::PAGE1OPTIONCOUNT> page1Options;
+    std::array<std::span<u8>, DebugMenuOptions::PAGE1OPTIONCOUNT> page1Options;
 
-	u8 state = 0;
-	u8 selectedItemRow = 0;
-	u8 selectedItemColumn = 0;
-	u8 maximumItems = 0;
+    u8 state           = 0;
+    u8 selectedItemRow = 0;
+    u8 maximumItems    = 0;
+    u8 dirHoldTimer    = 0;
 
-	// bit field that corresponds to enum DebugMenuOptions
-	u32 toggledPageOptions = DebugMenuOptions::DefaultPage1Options;
+    // bit field that corresponds to enum DebugMenuOptions
+    u32 toggledPageOptions = DebugMenuOptions::DefaultPage1Options;
+
+    s32 itemYOffset = 0;
 };
 
 struct Text2dFileData {
-	std::array<void *, 2> textData;
-	std::array<void *, 2> extraTextData;
+    std::array<void *, 2> textData;
+    std::array<void *, 2> extraTextData;
 };
 
 struct AllPlayerInputs {
-	Flag<Buttons> holdButtons;
-	Flag<Buttons> toggleButtons;
+    Flag<Buttons> holdButtons;
+    Flag<Buttons> toggleButtons;
 };
 
 struct TitleSequenceObject1 {
-	fillerData<0xD> filler;
-	s8 currentButtonIndex;
-	s8 lastButtonIndex;
-	s8 currentMode;
-};
-
-struct Text2dFileHeader {
-	u16 width;
-	u16 height;
-	u32 unknown;
-	u32 textCount;
+    fillerData<0xD> filler;
+    s8 currentButtonIndex;
+    s8 lastButtonIndex;
+    s8 currentMode;
+    fillerData<0x2C> filler2;
+    u8 chosenGamemode;
 };
 
 extern Text2dFileData DebugMenu_TextData;

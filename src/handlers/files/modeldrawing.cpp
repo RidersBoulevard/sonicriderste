@@ -14,7 +14,7 @@ ASMDefined f32 gf32Motion_1Frame;
  * @param nnsMtxPal The matrix palette to use.
  * @param nnsNodeStat The node status to use.
  */
-ASMUsed void DrawPlayerWithMatMot(const Player &player, NNS_Object *nnsObject, NNS_MtxPal *nnsMtxPal, NNS_NodeStat *nnsNodeStat) {
+ASMUsed void DrawPlayerWithMatMot(const Player &player, NNS_Object *nnsObject, NNS_Matrix *nnsMtxPal, NNS_NodeStatus *nnsNodeStat) {
     const u32 mirrorFlag = static_cast<const u32>(((player.unkBAC & 0x100) ? 1 : 0) * 0x40);// NOLINT(readability-implicit-bool-conversion)
 
     if (gpsaMatMotObj_Player[player.index] != nullptr) {

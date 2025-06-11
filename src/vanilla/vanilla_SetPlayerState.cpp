@@ -194,7 +194,7 @@ void func_SetPlayerActionType(Player *player, u32 state) {
 					lbl_10087C40 = gu32GameCnt;
 					PlaySound(0xA901, 0x02);
 				}
-				if ((RuleSettings & 0x400000) == 0) {
+				if ((ruleSettings & 0x400000) == 0) {
 					if ((player->specialFlags & 2) != 0) {
 						switch (player->rampType) {
 							case 0:
@@ -345,7 +345,7 @@ void func_SetPlayerActionType(Player *player, u32 state) {
 			temp_r30 = gpsTexList_Particle;
 
 			temp_r10 = ((struct ParticleObject *) SetTask(&func_Particle_Task, gsParFullParam_MagicCarpet.unk6,
-														  2))->object1;
+														  Object1Sizes::x80))->object1;
 
 			temp_r10->unk72 = temp_r28;
 			temp_r10->unk0 = (s32) mcparticle->unk74;

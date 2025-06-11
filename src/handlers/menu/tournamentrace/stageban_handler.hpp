@@ -1,5 +1,6 @@
 #pragma once
 
+#include "riders/gamemode.hpp"
 #include "riders/controller.hpp"
 #include "riders/object.hpp"
 #include "riders/stage.hpp"
@@ -80,9 +81,7 @@ constexpr std::array<u32, 2> BannedStageGraphicColors = {
 constexpr auto NeutralStageAmount = 5;
 
 extern BSS_StageBan bss_StageBans;
-extern u32 bss_StageBans_isBanned;
 
-ASMDefined ObjectNode * gpsCurrentTask;
 ASMDefined void SetGenericPopup2dObjectTbl(void* object1);
 
 struct ActivePad {
@@ -108,6 +107,6 @@ static_assert(sizeof(TournamentRaceObject1) == 0x20);
 
 struct SaveData {
     char filler[0x6cc];
-    u32 ruleSettings;
+    RuleSettings ruleSettings;
 };
 extern SaveData GameData;

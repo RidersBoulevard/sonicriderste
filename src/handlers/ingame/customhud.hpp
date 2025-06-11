@@ -10,7 +10,11 @@ struct HUDIconObject1 {
 };
 static_assert(sizeof(HUDIconObject1) < 0x20);
 
-ASMDefined ObjectNode * gpsCurrentTask;
+struct GameCtrlObject1 {
+    fillerData<0x2> unknown;
+    u8 pausedPlayerIndex;
+};
+
 ASMDefined void* texList_GTSE_0;
 
 using HUDVisibleFunc = bool (*)(const Player& player);

@@ -7,20 +7,28 @@
 
 #include <bitset>
 #include <memory>
+#include <nn/ninjanext.hpp>
 #include <span>
 #include <vector>
 
 #include "character.hpp"
 #include "collision.hpp"
+#include "containers/rgba.hpp"
+#include "containers/vector3.hpp"
 #include "controller.hpp"
+#include "cosmetics/player/exloads.hpp"
+#include "gamemode.hpp"
 #include "gear.hpp"
 #include "general_flags.hpp"
+#include "lib/sound.hpp"
 #include "tricks.hpp"
 #include "types.hpp"
 #include "containers/rgba.hpp"
 #include "containers/vector3.hpp"
 #include "cosmetics/player/exloads.hpp"
 #include "lib/sound.hpp"
+#include "nn/struct/nns.hpp"
+#include "nn/struct/camera.hpp"
 
 enum class PlayerState : u8 {
 	QTE = 0x0,
@@ -92,7 +100,7 @@ struct RailQTE; // This is never defined, doesn't error only because its never d
  * Struct to contain any flags that are used regardless of character or gear
  */
 struct UniversalTEFlags {
-	fillerData<1> padding;
+	fillerData<1> _;
 };
 static_assert(sizeof(UniversalTEFlags) == sizeof(u8), "Size of Universal TE Flags too big, reduce the size of padding");
 
@@ -123,7 +131,7 @@ struct Player {
 	/* 0x7 */ u8 unused3;
     // NOTE: ignoreTurbulence is used in ASM!
 	/* 0x8 */ bool ignoreTurbulence; ///< by Z button or Y toggle
-	/* 0x9 */ u8 itemBox_cooldown;
+	/* 0x9 */ u8 unused9;
 	/* 0xA */ u8 unkA;
 	/* 0xB */ u8 unkB;
 	/* 0xC */ std::array<u16, 0x57> animationIDMap;
@@ -133,9 +141,12 @@ struct Player {
 	/* 0xBD */ bool playerType;
 	/* 0xBE */ GearType gearType;
 	/* 0xBF */ u8 attributes;
-	/* 0xC0 */ u32 unkC0;
+	/* 0xC0 */ u8 unkC0;
+	/* 0xC1 */ u8 unkC1;
+	/* 0xC2 */ u8 unkC2;
+	/* 0xC3 */ u8 unkC3;
 	/* Data beyond point is cleared on level load unless preserved. See Player::reset() */
-	/* 0xC4 */ Matrix3x3F unkC4;
+	/* 0xC4 */ Matrix3x4F unkC4;
 	/* 0xF4 */ u32 current_itemID;
 	/* 0xF8 */ u8 tornadoIgnore_invincibilityTimer;
 	/* 0xF9 */ UniversalTEFlags srteFlags;
@@ -309,12 +320,8 @@ struct Player {
 	/* 0x34C */ u32 unk34C;
 	/* 0x350 */ u32 unk350;
 	/* 0x354 */ u32 unk354;
-	/* 0x358 */ u32 unk358;
-	/* 0x35C */ u32 unk35C;
-	/* 0x360 */ u32 unk360;
-	/* 0x364 */ u32 unk364;
-	/* 0x368 */ u32 unk368;
-	/* 0x36C */ u32 unk36C;
+	/* 0x358 */ Vector3F forward;
+	/* 0x364 */ Vector3F unk364;
 	/* 0x370 */ u32 unk370;
 	/* 0x374 */ u32 unk374;
 	/* 0x378 */ u32 unk378;
@@ -472,8 +479,10 @@ struct Player {
 	/* 0x5D8 */ u32 unk5D8;
 	/* 0x5DC */ u32 unk5DC;
 	/* 0x5E0 */ u32 unk5E0;
-	/* 0x5E4 */ u32 unk5E4;
-	/* 0x5E8 */ u32 unk5E8;
+	/* 0x5E4 */ u16 unk5E4;
+	/* 0x5E6 */ u16 currPathFindingPoint;
+	/* 0x5E8 */ u16 prevPathFindingPoint;
+	/* 0x5EA */ u16 unk5EA;
 	/* 0x5EC */ u32 unk5EC;
 	/* 0x5F0 */ u32 unk5F0;
 	/* 0x5F4 */ u32 unk5F4;
@@ -649,6 +658,8 @@ struct Player {
 		/* 0x87C */ u32 superTails_transformCooldown;
 		/* 0x87C */ u32 hyperSonic_totalLinkTimer;
 		/* 0x87C */ u32 SuperMetalFrameCounter;
+		/* 0x87C */ u32 DarknessFrameCounter;
+		/* 0x87C */ u32 ATFrameCounter;
 	};
 	/* 0x880 */ u32 unk880;
 	/* 0x884 */ u32 unk884;
@@ -787,7 +798,7 @@ struct Player {
 	/* 0xB04 */ u32 unkB04;
 	/* 0xB08 */ u32 unkB08;
 	/* 0xB0C */ u32 unkB0C;
-	/* 0xB10 */ u32 unkB10;
+	/* 0xB10 */ u32 unkB10; // Used for turb and other things
 	/* 0xB14 */ u32 unkB14;
 	/* 0xB18 */ u32 unkB18;
 	/* 0xB1C */ u32 unkB1C;
@@ -1252,8 +1263,8 @@ struct Player {
 		/* 0x107E */ //bool hovercraft_alternatingRingPickup;
 	};
 
-    [[maybe_unused, deprecated("No longer used, use Player::getTypeCount()")]]
-	/* 0x107F */ u8 typeAmount;
+    // [[maybe_unused, deprecated("No longer used, use Player::getTypeCount()")]]
+	/* 0x107F */ bool canBeAttacked;
 
 	void reset();
 
@@ -1283,6 +1294,42 @@ struct Player {
         return !playerType;
     }
 
+	/**
+     * Checks if the player is a CPU or not (in CSS).
+     * @return true if not a CPU in CSS, false if is a CPU in CSS.
+     */
+	[[nodiscard]] bool isRealPlayerInCSS() const {
+		return !aiControl && isInGame();
+	}
+
+	/**
+	 * Returns the maximum amount of rings the player can hold.
+	 *
+	 * @return Maximum allowed ring count. Defaults to 100.
+	 */
+	[[nodiscard, const]] u32 max_rings() const {
+		switch (extremeGear) {
+			using namespace ExtremeGear;
+			case Gambler:
+				return 150;
+			case ChaosEmerald:
+				break;
+			// if (player->character != Character::Tails) {
+			//     break;
+			// }
+			// return 200;
+			case CoverF:
+				return 200;
+			case CoverS:
+				return 125;
+			case CoverP:
+				return 200;
+			default:
+				break;
+		}
+		return 100;
+	}
+
     /**
      * Gets the correct gear type based on the Player's current Extreme Gear.
      * Use this in cases where the Player::gearType variable may not be calculated yet.
@@ -1290,7 +1337,7 @@ struct Player {
      * @return A newly calculated gear type based on the Extreme Gear.
      */
     [[nodiscard]] GearType getGearTypeIndependent() const {
-        GearType gType = GearType::Skates;
+	    auto gType = GearType::Skates;
         if(extremeGear < ExtremeGear::ERider) {
             gType = GearType::Board;
         } else if(extremeGear < ExtremeGear::Darkness) {
@@ -1304,7 +1351,7 @@ struct Player {
 	 * @brief Getter for the player's exload info
 	 * @return A reference to the player's current exload info
 	 */
-	[[nodiscard]] inline auto& exload(){
+	[[nodiscard]] auto& exload(){
 		return Player_EXLoadData[input->port];
 	}
 
@@ -1312,7 +1359,7 @@ struct Player {
 	 * @brief Const getter for the player's exload info
 	 * @return A const reference to the player's current exload info
 	 */
-	[[nodiscard]] inline const auto& exload() const{
+	[[nodiscard]] const auto& exload() const{
 		return Player_EXLoadData[input->port];
 	}
 
@@ -1320,9 +1367,8 @@ struct Player {
 	 * @brief Getter for the player's character exload
 	 * @return A reference to either the player's current character exload, or the default character exload
 	 */
-	[[nodiscard]] inline const auto& characterExload() const{
-		const auto ret = exload().characterExload;
-		if(ret != nullptr) {
+	[[nodiscard]] const auto& characterExload() const{
+		if(const auto ret = exload().characterExload; ret != nullptr) {
 			return *ret;
 		}
 		return CharacterEXLoadDataSlots[0];
@@ -1332,9 +1378,8 @@ struct Player {
 	 * @brief Const getter for the player's gear exload
 	 * @return A reference to either the player's current gear exload, or the default gear exload
 	 */
-	[[nodiscard]] inline const auto& gearExload() const{
-		const auto ret = exload().gearExload;
-		if(ret != nullptr) {
+	[[nodiscard]] const auto& gearExload() const{
+		if(const auto ret = exload().gearExload; ret != nullptr) {
 			return *ret;
 		}
 		return GearEXLoadDataSlots[0];
@@ -1343,26 +1388,33 @@ struct Player {
 	/**
 	 * @return if the player has a character exload enabled
 	 */
-	[[nodiscard]] inline bool hasCharacterExload() const{
+	[[nodiscard]] bool hasCharacterExload() const{
 		return characterExload().exLoadID != EXLoad::None;
 	}
 
 	/**
 	 * @return if the player has a gear exload enabled
 	 */
-	[[nodiscard]] inline bool hasGearExload() const{
+	[[nodiscard]] bool hasGearExload() const{
 		return gearExload().exLoadID != EXLoad::None;
 	}
 
 	/**
 	 * @return if the player has a any exload enabled
 	 */
-	[[nodiscard]] inline bool hasExload() const{
-		return hasCharacterExload() || hasGearExload();
+	[[nodiscard]] bool hasExload() const{
+		return isRealPlayer() && (hasCharacterExload() || hasGearExload());
 	}
+
+	/**
+	* Called whenever this player starts a new lap
+	*/
+	void on_lap();
 };
 static_assert(sizeof(Player) == 0x1080); // NOLINT(readability-magic-numbers)
 ASMDefined std::array<Player, MaxPlayerCount> players;
+
+ASMDefined std::array<NNS_Object *, MaxPlayerCount> gpsaObject_Player;
 
 struct PlayerCameraStruct {
 	fillerData<0x24A> filler;
@@ -1370,15 +1422,19 @@ struct PlayerCameraStruct {
 	u8 cameraPresetProperty; // some extra property to the preset
 	fillerData<0x10> filler2;
 };
+static_assert(sizeof(PlayerCameraStruct) == 0x25C);
 
 ASMDefined std::array<PlayerCameraStruct, MaxPlayerCount> playerCameraStruct;
-ASMDefined const vu32 InGamePlayerCount;
 
-[[nodiscard]] constexpr bool isSuperCharacter(const Player &player, const bool &excludeSuperSonic = false){
+ASMDefined std::array<NNS_CameraTargetUpVector, 5> PlayerCameraPositionStruct;
+
+ASMDefined vu32 InGamePlayerCount;
+
+[[nodiscard, deprecated]] constexpr bool isSuperCharacter(const Player &player, const bool &excludeSuperSonic = false){
 	return player.isSuperCharacter(excludeSuperSonic);
 }
 
-[[nodiscard]] constexpr bool isSuperCharacter(const Player &player, const Character::Enum &character){
+[[nodiscard, deprecated]] constexpr bool isSuperCharacter(const Player &player, const Character::Enum &character){
 	return player.isSuperCharacter(character);
 }
 
@@ -1427,3 +1483,7 @@ ASMDefined const vu32 InGamePlayerCount;
 	auto underlying = 1 << std::to_underlying(type);
 	return Type{underlying};
 }
+
+ASMUsed void Player_OnLap(Player &player);
+
+ASMDefined void lbl_Player_BoostEndFunction(Player &player);

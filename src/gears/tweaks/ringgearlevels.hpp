@@ -2,4 +2,4 @@
 
 #include "riders/player.hpp"
 
-void Player_RingGearLevels(Player *player);
+void Player_RingGearLevels(Player &player);

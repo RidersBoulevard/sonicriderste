@@ -35,3 +35,4 @@ constexpr std::array<SkinSystemInfo, SkinCount> PlayerSkinSystemInfo = {{
 extern std::array<SkinSystemData, MaxPlayerCount> PlayerSkinSystemData;
 
 SkinSystemTypes CheckSkinSystemControls(const Player &player);
+[[nodiscard]] bool IsSkinSystemControlPressed(const Player &player);

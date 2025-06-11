@@ -1,4 +1,5 @@
 #include "filehandler_dat.hpp"
+#include "lib/files.hpp"
 #include "lib/sound.hpp"
 //#include <stdexcept>
 
@@ -37,11 +38,4 @@ ASMUsed void LoadMainMenuDatFiles(){
 			GameLanguage == Language::Japanese
 			? "10JCSSV.DAT"
 			: "10CSSV.DAT");
-}
-
-/**
- * This file handler will keep these files in memory for the entire runtime of the game.
- */
-void FileHandler_LongLasting() {
-	//SetArchiveBinary(DumpPackManFile("TSGM"), 0, 0);
 }

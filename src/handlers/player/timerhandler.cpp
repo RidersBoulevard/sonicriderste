@@ -7,17 +7,9 @@
 #include "gears/blastGaugeGears.hpp"
 #include "lib/stdlib.hpp"
 #include "cosmetics/player/dreamtrail.hpp"
+#include "handlers/player/specialflagtweaks.hpp"
 
 void Player_TimerHandler(Player &player) {
-    // decrement item box cooldown timer
-    if (player.flags.hasAny(PlayerFlags::ItemBoxCooldown)) {
-        if (player.itemBox_cooldown != 0) {
-            player.itemBox_cooldown -= 1;
-        } else {
-            player.flags &= ~PlayerFlags::ItemBoxCooldown;
-        }
-    }
-
     // decrement tornado invincibility timer upon ignoring a tornado with Z button
     if (player.tornadoIgnore_invincibilityTimer != 0) {
         player.tornadoIgnore_invincibilityTimer -= 1;
@@ -41,7 +33,7 @@ void Player_TimerHandler(Player &player) {
     }
 
     // decrement berserker counter attack timer
-    if (player.state != PlayerState::AttackedByPlayer && player.berserkerCooldown != 0) {
+    if ((player.state != PlayerState::AttackedByPlayer && player.state != PlayerState::AttackingPlayer) && player.berserkerCooldown != 0) {
         player.berserkerCooldown -= 1;
     }
 
@@ -54,12 +46,12 @@ void Player_TimerHandler(Player &player) {
 					PlayAudioFromDAT(Sound::SFX::GoldExp);
 				}
             }
-			player.currentAir = player.gearStats[player.level].maxAir;
+            player.currentAir = player.gearStats[player.level].maxAir;
         }
     }
 
     // decrement super tails transform cooldown
-    if (isSuperCharacter(player, Character::Tails)) {
+    if (player.isSuperCharacter(Character::Tails)) {
 	    SuperTailsInfo *stInfo = &PlayerSuperTailsInfo[player.index];
         if (player.superTails_transformCooldown > 0) {
             player.superTails_transformCooldown -= 1;
@@ -113,4 +105,12 @@ void Player_TimerHandler(Player &player) {
         // reset special recipro extend if you lose original recipro extend
         player.specialReciproExtend = false;
     }
+
+	SpecialFlagInfo *spfInfo = &PlayerSpecialFlagInfo[player.index];
+	if (spfInfo->typeRemovalTimer > 0.0f && player.state != PlayerState::Death) {
+		player.specialFlags |= SpecialFlags::lowBoost; // Should remove type shortcuts, but that doesn't work rn so this is just as funny lmao
+		spfInfo->typeRemovalTimer -= 1.0f;
+	} else if (spfInfo->typeRemovalTimer <= 0.0f && !player.gearptr->specialFlags.hasAny(SpecialFlags::lowBoost)) {
+		player.specialFlags &= ~SpecialFlags::lowBoost;
+	}
 }

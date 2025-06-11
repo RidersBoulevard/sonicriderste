@@ -1,5 +1,8 @@
+#include "cosmetics/player/exloads.hpp"
+#include "lib/files.hpp"
 #include "riders/player.hpp"
-#include "filehandler_dat.hpp"
+#include "lib/files.hpp"
+#include "cosmetics/player/exloads.hpp"
 
 ASMDefined void* tex_HotswapTextures;
 
@@ -25,5 +28,5 @@ ASMUsed void* TextureHotswapHandler(Player *player, void* gvrTexture, u32 textur
 }
 
 ASMUsed void InitializeTextureHotswap() {
-    tex_HotswapTextures = DumpFile("POT");
+    tex_HotswapTextures = DumpFile("POT", true);
 }

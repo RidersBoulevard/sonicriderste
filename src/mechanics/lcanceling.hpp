@@ -14,4 +14,4 @@ struct OffroadParticleObject1 {
 	u8 playerIndex;
 };
 
-void Player_LCancelHandler(Player *player);
+void Player_LCancelHandler(Player &player);

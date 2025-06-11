@@ -1,21 +1,28 @@
 #include "supersonicaura.hpp"
+
+#include <nn/ninjanext.hpp>
+
 #include "cosmetics/player/exloads.hpp"
 #include "lib/lib.hpp"
 #include "riders/object.hpp"
+#include "gears/supermetal.hpp"
+#include "gears/faster.hpp"
 
 ASMDefined void func_Particle_Task();
-ASMDefined ParticleDetails lbl_001EFF98;
+ASMDefined ParticleParam lbl_001EFF98;
 extern void *texList_CustomParticles;
-ASMDefined ParticleDetails PerfectNazoAuraParticles;
-ASMDefined ParticleDetails DarkSonicAuraParticles;
-ASMDefined ParticleDetails HyperSonicAuraParticles;
-ASMDefined ParticleDetails SuperKnucklesAuraParticles;
+ASMDefined ParticleParam PerfectNazoAuraParticles;
+ASMDefined ParticleParam DarkSonicAuraParticles;
+ASMDefined ParticleParam HyperSonicAuraParticles;
+ASMDefined ParticleParam SuperKnucklesAuraParticles;
+ASMDefined ParticleParam SuperShadowAuraParticles;
+ASMDefined ParticleParam NeoMetalAuraParticles;
 
 /**
  * Uses this list of matrices as the origin point for where the super aura particles are formed from.
  * See UpdateAuraMatrices() for how these matrices are formed.
  */
-std::array<Matrix3x3F, MaxPlayerCount> SuperAuraOriginPoint{};
+std::array<Matrix3x4F, MaxPlayerCount> SuperAuraOriginPoint{};
 
 /**
  * Spawns Super Sonic aura on a specified Player.
@@ -28,7 +35,7 @@ ASMUsed void SuperSonicAuraCXX(const Player &player) {
 
     const SuperAuraDetail details = GetSuperAuraDetail(player);
 
-    auto *object = static_cast<ParticleTaskObject1*>(SetTask(&func_Particle_Task, details.particles->objectGroupID, 2)->object);
+    auto *object = static_cast<ParticleTaskObject1*>(SetTask(&func_Particle_Task, details.particles->taskPriority, Object1Sizes::x80)->object);
     object->unk72 = 4;
 
     object->x = 0.0F;
@@ -61,8 +68,10 @@ ASMUsed void SuperSonicAuraCXX(const Player &player) {
 SuperAuraDetail GetSuperAuraDetail(const Player &player) {
     SuperAuraDetail detail = {&lbl_001EFF98, &texList_CustomParticles};
 
-    if (isSuperCharacter(player, Character::Knuckles)) {
+    if (player.isSuperCharacter(Character::Knuckles)) {
         detail.particles = &SuperKnucklesAuraParticles;
+    } else if (player.isSuperCharacter(Character::Shadow)) {
+	    detail.particles = &SuperShadowAuraParticles;
     } else {
         switch (player.gearExload().exLoadID) {
             case EXLoad::PerfectNazo:
@@ -74,6 +83,20 @@ SuperAuraDetail GetSuperAuraDetail(const Player &player) {
             case EXLoad::HyperSonic:
                 detail.particles = &HyperSonicAuraParticles;
                 break;
+        	case EXLoad::StardustSpeeder: {
+        		NeoMetalInfo *neoInfo = &PlayerNeoMetalInfo[player.index];
+        		if (neoInfo->formState == 1) {
+        			detail.particles = &PerfectNazoAuraParticles;
+        		} else if (neoInfo->formState == 2) {
+        			detail.particles = &NeoMetalAuraParticles;
+        		}
+        		break;
+        	}
+            case EXLoad::HyperHangOn: {
+        	    AcceleratorInfo &aclInfo = PlayerAcceleratorInfo[player.index];
+        	    if (aclInfo.isOverheated) detail.particles = &SuperShadowAuraParticles;
+        	    break;
+        	}
 			default: break;
         }
     }

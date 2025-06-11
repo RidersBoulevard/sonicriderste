@@ -15,7 +15,7 @@ namespace Sound {
 		// Most likely not needed but available as a fallback
 		//auto exloadInfo = FetchEnabledEXLoadIDs(player);
 		//ID::CharacterSoundIDs charID{};
-		//if(isSuperCharacter(player, MetalSonic)){
+		//if(player.isSuperCharacter(MetalSonic)){
 		//	charID = ID::NeoMetalSonic;
 		//}
 		//switch(exloadInfo.gearExLoadID) {

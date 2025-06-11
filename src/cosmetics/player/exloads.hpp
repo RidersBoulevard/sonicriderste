@@ -14,7 +14,7 @@
 #include "containers/rgba.hpp"
 
 constexpr auto CharacterEXLoadSlots = 12;
-constexpr auto GearEXLoadSlots = 10;
+constexpr auto GearEXLoadSlots = 7;
 
 constexpr auto NotLockedGearSelectionID = 0x1A;
 constexpr auto LockedGearSelectionID = 0x1B;
@@ -28,14 +28,14 @@ enum class EXLoad : u8 {
     E10R,
     DarkSonic,
     HyperSonic,
-    StardustSpeeder,	// SYB: Probably a good idea to start recycling these unnecessary Gear
-    HyperHangOn,		// entries after 2.4 considering the custom Gear system is in the code now
-    TheProfessional,	// (Easier than removing them considering ASM checks for Miku etc).
-    OllieKingGear,
+    StardustSpeeder, // Neo Metal II (PTR mode)
+    HyperHangOn, // Accelerator IV (PTR mode)
+    TheProfessional, // Darkness II (PTR mode)
+    NewCombatArch, // Recyclable (it is now a gear internally).
     WindmasterJet,
     NeoMetal,
     E99,
-    TheBeast,
+    TheBeast, // Recyclable (scrapped gear design, see TheCrazy.cpp).
     E10B,
     HatsuneMiku,
     MetalSonicNoScarf,
@@ -48,7 +48,7 @@ enum class EXLoad : u8 {
     MCTails,
     MCKnuckles,
     SuperStorm,
-    Pyro,
+    Gemerl,
     HangOnAT,
     Selkadoom,
     SuperSonic,
@@ -142,7 +142,7 @@ constexpr std::array<CharacterArchetype, EXLoadCount> EXLoadArchetypes = {
 	CharacterArchetype::NoEXLoad,
 	CharacterArchetype::NoEXLoad,
 	CharacterArchetype::NoEXLoad,
-	CharacterArchetype::NoEXLoad,
+	CharacterArchetype::Turning, // WIP combat
 	CharacterArchetype::NoEXLoad,
 	CharacterArchetype::NoEXLoad,
 	CharacterArchetype::NoEXLoad,
@@ -335,6 +335,28 @@ constexpr std::array<EXLoadInfo, GearEXLoadSlots> GearEXLoadDataSlots = {
                         .portraitTextureID = 0xF1,
 						.gearTextTextureID = 0x1A,
                 },
+				{
+						.exLoadType = EXLoadTypes::GameplayAltering,
+						.exLoadID = EXLoad::StardustSpeeder, // NEO II
+						.character = Character::MetalSonic,
+						.gear = ExtremeGear::ChaosEmerald,
+						.portraitTextureID = 0xF1,
+						.gearTextTextureID = 0x1A,
+				},
+				{
+					.exLoadType = EXLoadTypes::GameplayAltering,
+					.exLoadID = EXLoad::TheProfessional,
+					.gear = ExtremeGear::Darkness,
+					.portraitTextureID = 0xA0,
+					.gearTextTextureID = 0x30,
+				},
+				{
+					.exLoadType = EXLoadTypes::GameplayAltering,
+					.exLoadID = EXLoad::HyperHangOn,
+					.gear = ExtremeGear::Accelerator,
+					.portraitTextureID = 0xA0,
+					.gearTextTextureID = 0x12,
+				},
         }
 };
 
@@ -388,7 +410,7 @@ struct Player;
 
 ASMUsed [[deprecated]] void FetchEnabledEXLoadIDs(const Player *player, EnabledEXLoads &exLoads);
 ASMUsed bool IsAnyE10EXLoad(const Player &player);
-ASMUsed void ApplyEXLoadFancyVisuals(const Player &player, CSSObject &object);
+[[nodiscard]] bool IsEXLoadControlPressed(const Player &player, const CSSObject &object);
 ASMUsed void Character_UpdateGraphicalEXLoad(GraphicalObject *object);
 ASMUsed void Gear_UpdateGraphicalEXLoad(GraphicalObject *object);
 ASMUsed const char *GetEXLoadFilenameSuperForm(const Player &player, const char *filename);
@@ -405,10 +427,10 @@ bool CheckIfEXLoadCanBeApplied(const Player &player, const EXLoadInfo &info);
 
 ASMUsed void UpdateEXLoadData(Player &player);
 
-void RotateEXLoadAndFetch(Player &player,
-						std::span<const EXLoadInfo> exLoadDataSlots,
-						const EXLoadMode &exLoadMode,
-						const EXLoadTypes &exLoadType);
+void RotateEXLoad(Player &player,
+                  std::span<const EXLoadInfo> exLoadDataSlots,
+                  const EXLoadMode &exLoadMode,
+                  const EXLoadTypes &exLoadType);
 
 void ApplyNextEXLoad(Player &player, const EXLoadMode &exLoadMode, const EXLoadTypes &exLoadType);
 
@@ -418,7 +440,7 @@ std::optional<std::string> GetEXLoadCharacterModel(const Player &player, GearTyp
 std::optional<std::string> GetEXLoadSkateModelStart(const Player &player);
 bool CheckPlayerHoveringOverPossibleEXLoad(const Player &player, EXLoadHoverTypes type);
 
-ASMUsed void HatsuneMiku_BindAttackPartsToBone(Player &player, Matrix3x3F &savePtr, u8 level);
+ASMUsed void HatsuneMiku_BindAttackPartsToBone(Player &player, Matrix3x4F &savePtr, u8 level);
 
 ASMUsed [[nodiscard]] bool CheckPlayerHasCharacterEXLoadID(const Player &player, EXLoad exLoad);
 ASMUsed [[nodiscard]] bool CheckPlayerHasGearEXLoadID(const Player &player, EXLoad exLoad);

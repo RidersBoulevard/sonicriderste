@@ -13,13 +13,13 @@ std::array<SkinSystemData, MaxPlayerCount> PlayerSkinSystemData;
  * @return The type of control the player pressed. Returns ::NoneSkinSystemType if no designated button was pressed.
  */
 SkinSystemTypes CheckSkinSystemControls(const Player &player) {
-	if(player.input->toggleFaceButtons.hasAny(Buttons::Y)) {
-		return SkinSystemTypeForwards;
-	}
-	if(player.input->toggleFaceButtons.hasAny(Buttons::X)) {
-		return SkinSystemTypeBackwards;
-	}
-	return NoneSkinSystemType;
+    if (player.input->toggleFaceButtons.hasAny(Buttons::Y)) {
+        return SkinSystemTypeForwards;
+    }
+    if (player.input->toggleFaceButtons.hasAny(Buttons::X)) {
+        return SkinSystemTypeBackwards;
+    }
+    return NoneSkinSystemType;
 }
 
 /**
@@ -29,8 +29,8 @@ SkinSystemTypes CheckSkinSystemControls(const Player &player) {
  * @return true if applicable, false otherwise
  */
 bool IsSkinApplicable(const Player &player) {
-	const u8 &controllerPort = player.input->port;
-	return PlayerSkinSystemInfo[PlayerSkinSystemData[controllerPort].skinID].character == player.character;
+    const u8 &controllerPort = player.input->port;
+    return PlayerSkinSystemInfo[PlayerSkinSystemData[controllerPort].skinID].character == player.character;
 }
 
 /**
@@ -40,35 +40,35 @@ bool IsSkinApplicable(const Player &player) {
  * @param type The type to use in cycling.
  */
 void ApplyNextSkin(const Player &player, SkinSystemTypes type) {
-	const u8 &controllerPort = player.input->port;
+    const u8 &controllerPort = player.input->port;
 
-	u32 index = PlayerSkinSystemData[controllerPort].skinID;
-	while(true) {
-		// NoneSkinSystemType has already been filtered out in this function
-		if(type == SkinSystemTypeForwards) {
-			index += 1;
-			if(index >= PlayerSkinSystemInfo.size()) {
-				index = 0;
-			}
-		} else { // backwards
-			index -= 1;
-			if(static_cast<s32>(index) < 0) {
-				index = SkinCount - 1;
-			}
-		}
+    u32 index = PlayerSkinSystemData[controllerPort].skinID;
+    while (true) {
+        // NoneSkinSystemType has already been filtered out in this function
+        if (type == SkinSystemTypeForwards) {
+            index += 1;
+            if (index >= PlayerSkinSystemInfo.size()) {
+                index = 0;
+            }
+        } else { // backwards
+            index -= 1;
+            if (static_cast<s32>(index) < 0) {
+                index = SkinCount - 1;
+            }
+        }
 
-		const SkinSystemInfo &info = PlayerSkinSystemInfo[index];
+        const SkinSystemInfo &info = PlayerSkinSystemInfo[index];
 
-		if(info.character == static_cast<u16>(-1)) {
-			break;
-		}
-		if(info.character == player.character) {
-			break;
-		}
-	}
+        if (info.character == static_cast<u16>(-1)) {
+            break;
+        }
+        if (info.character == player.character) {
+            break;
+        }
+    }
 
-	PlayerSkinSystemData[controllerPort].skinID = index;
-	PlayerSkinSystemData[controllerPort].delay = 15;
+    PlayerSkinSystemData[controllerPort].skinID = index;
+    PlayerSkinSystemData[controllerPort].delay = 15;
 }
 
 /**
@@ -78,34 +78,44 @@ void ApplyNextSkin(const Player &player, SkinSystemTypes type) {
  * @param player The player to check.
  */
 void CheckSkinSystemIntent(const Player &player) {
-	const u8 &controllerPort = player.input->port;
-	u8 &delayTime = PlayerSkinSystemData[controllerPort].delay;
+    const u8 &controllerPort = player.input->port;
+    u8 &delayTime = PlayerSkinSystemData[controllerPort].delay;
 
-	if(delayTime == 0) {
-		const SkinSystemTypes type = CheckSkinSystemControls(player);
-		if(type != NoneSkinSystemType) {
-			// apply next skin
-			ApplyNextSkin(player, type);
-		}
-	} else {
-		delayTime--;
-	}
+    if (delayTime == 0) {
+        const SkinSystemTypes type = CheckSkinSystemControls(player);
+        if (type != NoneSkinSystemType) {
+            // apply next skin
+            ApplyNextSkin(player, type);
+        }
+    } else {
+        delayTime--;
+    }
 
-	//delayTime = static_cast<u8>(clamp<s8>(static_cast<s8>(delayTime), 0));
-	//PlayerSkinSystemData[controllerPort].delay = delayTime;
+    //delayTime = static_cast<u8>(clamp<s8>(static_cast<s8>(delayTime), 0));
+    //PlayerSkinSystemData[controllerPort].delay = delayTime;
+}
+
+/**
+ * Checks if any of the buttons regarding the skin system are pressed, and if they're applicable.
+ *
+ * @param player The player to check the controls from.
+ * @return true if buttons are pressed and are applicable, otherwise false
+ */
+[[nodiscard]] bool IsSkinSystemControlPressed(const Player &player) {
+    return PlayerSkinSystemData[player.input->port].delay == 0 && CheckSkinSystemControls(player) != NoneSkinSystemType;
 }
 
 /**
  * Updates the textures on the CSS to portray the correct texture of the selected skin for players, if applicable.
  */
 ASMUsed void Character_UpdateGraphicalSkins(GraphicalObject *object) {
-	if(!object->active) { return; }
+    if (!object->active) { return; }
 
-	const Player &player = players[object->idStruct.idIndex];
+    const Player &player = players[object->idStruct.idIndex];
 
-	CheckSkinSystemIntent(player);
+    CheckSkinSystemIntent(player);
 
-	if(!IsSkinApplicable(player)) { return; }
+    if (!IsSkinApplicable(player)) { return; }
 
     const u8 &controllerPort = player.input->port;
     const SkinSystemInfo *info = &PlayerSkinSystemInfo[PlayerSkinSystemData[controllerPort].skinID];
@@ -129,6 +139,8 @@ ASMUsed u32 FetchCurrentTextureArchiveIndex(const Player &player) {
  * @note Only use this function when you are certain a player has a skin applied.
  */
 ASMUsed void* FetchCurrentSkinTextures(const Player &player) {
+    // Only use this function when you are certain a player has a skin applied.
+
     const auto &controllerPort = player.input->port;
     const SkinSystemInfo *info = &PlayerSkinSystemInfo[PlayerSkinSystemData[controllerPort].skinID];
     return CharacterSkinTextures[player.character][info->textureArchiveIndex];
@@ -148,5 +160,9 @@ ASMUsed void UpdateSkinSystemData(const Player &player) {
  */
 ASMUsed void ClearSkinSystemData() {
     //memset(PlayerSkinSystemData.data(), 0, sizeof(PlayerSkinSystemData));
-	std::ranges::fill(PlayerSkinSystemData, SkinSystemData{});
+    std::ranges::fill(PlayerSkinSystemData, SkinSystemData{});
+}
+
+ASMUsed void ClearSpecificSkinSystemData(Player &player) {
+    PlayerSkinSystemData[player.input->port].skinID = 0;
 }

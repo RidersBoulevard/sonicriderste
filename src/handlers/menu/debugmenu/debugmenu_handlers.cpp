@@ -13,7 +13,7 @@ struct AudioProperties {
 
 ASMDefined AudioProperties lbl_801BBE60;
 
-inline void SetAudioVolume(u16 volume, bool isMusicDisabled) {
+inline void SetAudioVolume(const u16 volume, const bool isMusicDisabled) {
     AudioProperties *propertiesRightChannel = &lbl_801BBE60 + 0x3E;
     AudioProperties *propertiesLeftChannel = &lbl_801BBE60 + 0x3F;
 
@@ -27,7 +27,7 @@ inline void SetAudioVolume(u16 volume, bool isMusicDisabled) {
 }
 
 void DebugMenuHandler_DisableMusic() {
-    bool isMusicDisabled = DebugMenu_CheckOption(DebugMenuOptions::DisableMusic);
+    const bool isMusicDisabled = DebugMenu_CheckOption(DebugMenuOptions::DisableMusic);
     if (isMusicDisabled) {
         SetAudioVolume(MUTED_VOLUME, isMusicDisabled);
     } else {
@@ -710,7 +710,7 @@ void DrawTimerExtra(u32 minutes,
 
 ASMDefined u32 gu32ViewportNum;
 ASMUsed void
-DebugMenuHandler_TimerActivity(u32 minutes, u32 seconds, u32 milliSeconds, u32 timeTextureRGBA, u32 numberTextureRGBA) {
+DebugMenuHandler_TimerActivity(const u32 minutes, const u32 seconds, const u32 milliSeconds, const u32 timeTextureRGBA, const u32 numberTextureRGBA) {
     if (DebugMenu_CheckOption(DebugMenuOptions::TimerActivity_ActiveInSingleplayer)) {
         if (gu32ViewportNum == 1 || CurrentGameMode == BattleMode) {
             DrawTimer(minutes, seconds, milliSeconds, timeTextureRGBA, numberTextureRGBA);
@@ -754,18 +754,25 @@ ASMUsed bool DebugMenuHandler_DisableHUD() {
     return false;
 }
 
-void DebugMenuHandler_InfiniteAir(Player *player) {
-    if (DebugMenu_CheckOption(DebugMenuOptions::InfiniteAir) && !player->specialFlags.hasAny(SpecialFlags::ringGear)) {
-        player->currentAir = player->gearStats[player->level].maxAir;
+void DebugMenuHandler_InfiniteAir(Player &player) {
+    if (DebugMenu_CheckOption(DebugMenuOptions::InfiniteAir) && !player.specialFlags.hasAny(SpecialFlags::ringGear)) {
+        player.currentAir = player.gearStats[player.level].maxAir;
     }
 }
 
-void DebugMenuHandler_InfiniteRings(Player *player) {
+void DebugMenuHandler_InfiniteRings(Player &player) {
     if (DebugMenu_CheckOption(DebugMenuOptions::InfiniteRings)) {
-        if (player->specialFlags.hasAny(SpecialFlags::ringGear)) {
-            player->currentAir = player->gearStats[player->level].maxAir;
+        if (player.specialFlags.hasAny(SpecialFlags::ringGear)) {
+            player.currentAir = player.gearStats[player.level].maxAir;
         } else {
-            player->rings = 1000;// to account for more than 100 max ring gears lol
+            player.rings = player.max_rings();// to account for more than 100 max ring gears lol
         }
     }
+}
+
+ASMUsed bool DebugMenuHandler_StageHazards() {
+	if (DebugMenu_CheckOption(DebugMenuOptions::VanillaHazardsOn)) return true; // Turn all hazards on.
+	if (DebugMenu_CheckOption(DebugMenuOptions::VanillaHazardsSkyRoadTurb) && CurrentStage == SkyRoad) return true; // This assumes we know we're on sky road for this
+	if (DebugMenu_CheckOption(DebugMenuOptions::VanillaHazardsDigiHands) && CurrentStage == DigitalDimension) return true; // This assumes we know we're on digi for this
+	return false; // Do not turn on hazards if no toggles are on
 }

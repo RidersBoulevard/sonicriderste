@@ -2,7 +2,6 @@
 #include "customtext.hpp"
 #include "lib/lib.hpp"
 #include "lib/stdlib.hpp"
-#include "main.hpp"
 #include "mechanics/characters/gizoidreplication.hpp"
 #include "riders/gamemode.hpp"
 #include "gears/advantagep.hpp"
@@ -167,6 +166,40 @@ namespace {
             }
     };
 
+    constinit std::array<HUDStruct, 4> PausedPlayersHUDInfo = {{
+                                                                       {220,
+                                                                        162,
+                                                                        0,
+                                                                        0,
+                                                                        0x20,
+                                                                        0x20,
+                                                                        0.015625f},
+
+                                                                       {220,
+                                                                        162,
+                                                                        0x20,
+                                                                        0,
+                                                                        0x20,
+                                                                        0x20,
+                                                                        0.015625f},
+
+                                                                       {220,
+                                                                        162,
+                                                                        0,
+                                                                        0x20,
+                                                                        0x20,
+                                                                        0x20,
+                                                                        0.015625f},
+
+                                                                       {220,
+                                                                        162,
+                                                                        0x20,
+                                                                        0x20,
+                                                                        0x20,
+                                                                        0x20,
+                                                                        0.015625f}
+                                                               }};
+
     constexpr std::array<u32, 3> EmerlTypeColors = {
             0x0080FF00,// speed
             0xFFFF0000,// fly
@@ -304,14 +337,14 @@ namespace {
     void RenderAdvantagePTopIn(const Player &player, HUDIconObject1 *object1) {
         if (PlayerAdvantagePInfo[player.index].isInTopMode) {
             const auto &hud = GetIconHUDStruct(player, AdvantagePTopHUD_1P, AdvantagePTopHUD_2P, AdvantagePTopHUD_4P);
-            Custom_CreateHUDElement(texList_GTSE_0, 9, 0xFFFFFF00 | object1->opacity[player.index], &hud, 256 / 64);
+            Custom_CreateHUDElement(texList_GTSE_0, 10, 0xFFFFFF00 | object1->opacity[player.index], &hud, 256 / 64);
         }
     }
 
     [[nodiscard]] bool IsHUDVisibleWithTricking(const Player &player) {
         return (geGame_ModeDetail - CurrentGameMode) >= 2 &&
                gu32Game_PauseFlag == 0u &&
-               (RuleSettings & 0x80) == 0 &&
+               !ruleSettings.unk7 &&
                (!player.flags.hasAny(static_cast<PlayerFlags>(0x80000)));
     }
 
@@ -320,7 +353,7 @@ namespace {
 
         const auto isClutchOn = static_cast<u8>(player.ignoreTurbulence);
         const auto &hud = GetIconHUDStruct(player, ClutchHUD_1P, ClutchHUD_2P, ClutchHUD_4P);
-        Custom_CreateHUDElement(texList_GTSE_0, 10 + isClutchOn,
+        Custom_CreateHUDElement(texList_GTSE_0, 11 + isClutchOn,
                                 0xFFFFFF00 | object1->opacityWithTricking[player.index], &hud);
     }
 }
@@ -387,4 +420,24 @@ ASMUsed void Player_RenderHUDIcons() {
             }
             break;
     }
+}
+
+ASMUsed void RenderPausedPlayerIcon(const u8 alpha) {
+    const ObjectNode *gameCtrlObject = nullptr;
+    for (const auto &currentObject: getObjectList()) {
+        // try to find GameCtrl task
+        if (currentObject.object_group == 1) {
+            gameCtrlObject = &currentObject;
+            break;
+        }
+    }
+
+    if (gameCtrlObject == nullptr) {
+        return;
+    }
+
+    const auto *object1 = static_cast<GameCtrlObject1 *>(gameCtrlObject->object);
+
+    HUDStruct &hud = PausedPlayersHUDInfo[object1->pausedPlayerIndex];
+    Custom_CreateHUDElement(texList_GTSE_0, 9, 0xFFFFFF00 | alpha, &hud);
 }

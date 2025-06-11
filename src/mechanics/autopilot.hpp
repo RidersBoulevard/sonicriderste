@@ -2,4 +2,4 @@
 
 #include "riders/player.hpp"
 
-void Player_Autopilot(Player *player);
+void Player_Autopilot(Player &player);

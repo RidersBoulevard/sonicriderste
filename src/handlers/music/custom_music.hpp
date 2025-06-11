@@ -2,18 +2,38 @@
 
 #include "handlers/ingame/customtext.hpp"
 
+using ADXTHandle = void*;
+
 ASMDefined void PlayADX(void *gpasAdxtHandle_Bgm, const char[]);
-ASMDefined void *gpasAdxtHandle_Bgm;
+
+/// Pauses currently playing ADX file on given ADXT handle. If pause parameter is set, it pauses the ADX file, if it's false, it unpauses it.
+ASMDefined void ADXT_Pause(ADXTHandle adxtHandle, bool pause);
+
+ASMDefined void ADXT_Stop(ADXTHandle adxtHandle);
+
+ASMDefined ADXTHandle gpasAdxtHandle_Bgm;
+ASMDefined ADXTHandle lbl_8021BC0C;
+ASMDefined ADXTHandle lbl_8021BC08;
+
 ASMDefined u32 bss_CustomMusicID;
 ASMDefined std::array<const char *, 87> lbl_001E99BC;
 extern SubFont CustomMusicTextData;
 
-ASMUsed void CustomMusicRandomizer(u32 mode);
-ASMUsed bool CustomMusicPlayer(u32 mode);
+enum class MusicMode : u32 {
+    Stage,
+    Menu,
+    RaceEnd,
+    Battle
+};
+
+ASMUsed void CustomMusicRandomizer(MusicMode mode);
+ASMUsed bool CustomMusicPlayer(MusicMode mode);
 ASMUsed const char *FixInvincibilitySongReplay();
 ASMUsed void CustomMusicChanger_OnPauseMenu();
 ASMUsed void CustomMusicChanger_MainMenu();
 void PlayVanillaStageMusic();
+[[nodiscard]] MusicMode GetMusicModeInGame();
+[[nodiscard]] u32 GetMusicRandomizeCountInGame();
 
 constexpr auto STAGE_MUSIC_COUNT = 64;
 constexpr auto MENU_MUSIC_COUNT = 31;

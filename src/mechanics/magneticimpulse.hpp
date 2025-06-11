@@ -18,6 +18,7 @@ namespace MagneticImpulse {
 	constexpr f32 MaxMITime = 420.0f;
 	/// the amount of frames it caps to when MI is lost
 	constexpr f32 LossTimeCap = 900.0f;
+	// constexpr f32 LossTimeCap = 600.0f;
 	/// how many frames before MI turns off/on
 	constexpr f32 BufferTime = 60.0f;
 	// placeholder struct for storing MI data till I allocate stuff over to player data
@@ -32,10 +33,10 @@ namespace MagneticImpulse {
 		bool magneticImpulse = false;
 	};
 	extern std::array<ImpulseData, MaxPlayerCount> impulseData;
-	extern std::array<Matrix3x3F, MaxPlayerCount> PlayerPositionRotationMatrices;
+	extern std::array<Matrix3x4F, MaxPlayerCount> PlayerPositionRotationMatrices;
 
-	void createGuaranteedMaxMIParticles(Player &player);
-	f32 calculateMultiplier(Player *player, f32 value);
+	void createGuaranteedMaxMIParticles(const Player &player);
+	f32 calculateMultiplier(const Player &player, f32 value);
 
 	template<typename T>
 	T scaleUsingCurrentMI(Player &player, const T &value) {
@@ -51,3 +52,4 @@ namespace MagneticImpulse {
 namespace MI = MagneticImpulse;// Alias the namespace into something shorter
 
 void Player_MagneticImpulseTimer(Player &player);
+ASMUsed void Player_MISpeedShoes(Player &player);

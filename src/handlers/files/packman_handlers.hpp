@@ -1,8 +1,8 @@
 #pragma once
 
-#include "handlers/ingame/customtext.hpp"
 #include "riders/character.hpp"
-#include "ninjanext.hpp"
+#include "handlers/ingame/customtext.hpp"
+#include "nn/ninjanext.hpp"
 
 constexpr u32 MAX_SKIN_COUNT = 4;
 
@@ -17,8 +17,8 @@ extern void* LoadingScreenFontTexList;
 
 extern NNS_Object *AfterburnerEffect_Object;
 extern NNS_TexList *AfterburnerEffect_TexList;
-extern NNS_MtxPal *AfterburnerEffect_MtxPal;
-extern NNS_NodeStat *AfterburnerEffect_NodeStat;
+extern NNS_Matrix *AfterburnerEffect_MtxPal;
+extern NNS_NodeStatus *AfterburnerEffect_NodeStat;
 extern NNS_Motion *AfterburnerEffect_Motion;
 extern NNS_MatMotObj *AfterburnerEffect_MatMotObj;
 extern NNS_MatMotion *AfterburnerEffect_MatMotion;

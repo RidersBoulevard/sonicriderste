@@ -2,4 +2,4 @@
 
 #include "riders/player.hpp"
 
-void Player_PowerGear(Player *player);
+void Player_PowerGear(Player &player);

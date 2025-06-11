@@ -1,8 +1,8 @@
-#include "filehandler_dat.hpp"
+#include "lib/files.hpp"
 
 void* tex_HotswapTextures;
 
 ASMUsed void MainMenuFileHandler() {
-    tex_HotswapTextures = DumpFile("POT");
+    tex_HotswapTextures = DumpFile("POT", true);
     // LoadDATFileDynamic("MSFX.DAT");
 }

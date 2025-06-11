@@ -5,6 +5,8 @@
 #pragma once
 
 #include "../types.hpp"
+#include "globalDefs.hpp"
+#include "riders/object.hpp"
 
 enum Stage {
 	TestStage, MetalCity, SplashCanyon, EggFactory, GreenCave, SandRuins, BabylonGarden,
@@ -15,4 +17,15 @@ enum Stage {
 };
 
 constexpr auto TotalHeroStageCount = 8;
-ASMDefined const vu32 CurrentStage;
+ASMDefined vu32 CurrentStage;
+
+USED inline bool gStGateForce;
+USED inline ObjectNode *gStGateTask;
+
+inline void forceStartGate(bool enable) {
+    gStGateForce = enable;
+
+    if (enable) {
+        gStGateTask->state = 4;
+    }
+}

@@ -45,6 +45,7 @@ option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)
 set(DOL_SOURCES     # main
 		asm/init.S
 		asm/text.S
+		asm/libSDK.S
 		asm/lib.S
 		# src/containers/vector3.cpp
 		src/tweaks/stage/stage_changes.cpp
@@ -148,7 +149,6 @@ set(DOL_SOURCES     # main
 		src/gears/faster.cpp
 		src/cosmetics/menu/menucolors.cpp
 		src/gears/magiccarpet.cpp
-		src/cosmetics/player/jumpchargeparticlecolor.cpp
 		src/mechanics/airoutbutton.cpp
 		src/gears/turbostar.cpp
 		src/gears/powergear.cpp
@@ -175,17 +175,30 @@ set(DOL_SOURCES     # main
 		# src/lib/sound.cpp
 		src/lib/thread.cpp
 		src/handlers/player/specialflagtweaks.cpp
-        src/handlers/menu/loadingscreentips.cpp
-		src/handlers/files/load_deduplicated.cpp
-		src/riders/player.cpp
-		src/gears/omnipotence.cpp
-		src/gears/tweaks/newgearselect.cpp
-		src/tweaks/stage/ringspawntimer.cpp
-		src/gears/advantagep.cpp
-		src/tweaks/player/attackrange.cpp
-		src/cosmetics/player/afterburner_effect.cpp
-		src/cosmetics/player/dreamtrail.cpp
-		src/cosmetics/hud/airbar.cpp) # main
+        src/handlers/files/load_deduplicated.cpp
+        src/handlers/gamemode/tutorialmode.cpp
+		src/handlers/files/modeldrawing.cpp
+		src/dolphin/os.cpp
+		src/dolphin/gx.cpp
+		src/dolphin/runtime.cpp
+		src/lib/files.cpp
+		src/dolphin/card.cpp
+        src/riders/player.cpp
+        src/gears/omnipotence.cpp
+        src/gears/tweaks/newgearselect.cpp
+        src/tweaks/stage/ringspawntimer.cpp
+        src/gears/advantagep.cpp
+        src/tweaks/player/attackrange.cpp
+		src/mechanics/rearview_cam.cpp
+        src/cosmetics/player/afterburner_effect.cpp
+        src/cosmetics/player/dreamtrail.cpp
+        src/cosmetics/hud/airbar.cpp
+        src/gears/airtank.cpp
+        src/gears/darkness.cpp
+        src/handlers/player/ItemBox.cpp
+        src/mechanics/speed_shoes.cpp
+		src/handlers/player/boundingbox.cpp
+) # main
 
 set(STANDALONE_HEADERS # This is only here to make sure that headers actually include the things it needs, by "compiling" them standalone.
 		include/compare_many.hpp
@@ -205,8 +218,27 @@ set(STANDALONE_HEADERS # This is only here to make sure that headers actually in
 		include/riders/gamemode.hpp
 		include/riders/object.hpp
 		include/riders/hud.hpp
-		include/ninjanext.hpp
+        include/nn/ninjanext.hpp
 		include/endian.hpp
+        include/gvr_texture.hpp
+        include/alignment.hpp
+		include/nn/lib/node.hpp
+		include/nn/struct/nns.hpp
+		include/nn/struct/texture.hpp
+		include/nn/struct/object.hpp
+		include/nn/struct/node.hpp
+		include/nn/struct/motion.hpp
+		include/nn/lib/material.hpp
+		include/nn/lib/matrix.hpp
+		include/nn/lib/texture.hpp
+		include/nn/lib/drawobj.hpp
+		include/nn/lib/system.hpp
+		include/nn/lib/light.hpp
+		include/nn/lib/camera.hpp
+		include/nn/struct/camera.hpp
+        include/riders/heap.hpp
+		include/nn/lib/drawprim.hpp
+		include/nn/struct/material.hpp
 )
 
 set(READONLY_DATA_FILES # Contains any files meant to store constant data
@@ -257,6 +289,10 @@ endif()
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(DEVKITPRO $ENV{DEVKITPRO} CACHE PATH "Path to the main DevKitPro tools directory")
+set(CUSTOM_LIBOGC_PATH $ENV{CUSTOM_LIBOGC_PATH} CACHE PATH "Path to the custom libogc source code")
+if(CUSTOM_LIBOGC_PATH STREQUAL "")
+	message(FATAL_ERROR "variable \"CUSTOM_LIBOGC_PATH\" must contain a valid path to the custom libogc source code")
+endif()
 
 set(CMAKE_SYSTEM_NAME NintendoGameCube)
 include(${DEVKITPRO}/cmake/GameCube.cmake)
@@ -295,8 +331,9 @@ get_filename_component(DOLINCLUDE dolinclude ABSOLUTE) # For any binary files in
 get_filename_component(CINCLUDE include ABSOLUTE)
 target_compile_options(main PUBLIC -Wa,-D,-I${ASMINCLUDE},-I${CINCLUDE},-I${DOLINCLUDE}) # For inline asm
 
-target_link_directories(main PUBLIC ${DEVKITPRO}/libogc/lib/cube)
-target_include_directories(main PUBLIC ${DEVKITPRO}/libogc/include/)
+target_link_directories(main PUBLIC ${CUSTOM_LIBOGC_PATH}/lib/cuberiders)
+#target_include_directories(main PUBLIC ${CUSTOM_LIBOGC_PATH}/gc)
+set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES "${CUSTOM_LIBOGC_PATH}/gc")
 
 target_include_directories(main PUBLIC src include)
 
@@ -311,7 +348,7 @@ endif ()
 get_filename_component(STATICLCF static.lcf ABSOLUTE)
 get_filename_component(PARSEMAPPY tools/parse_map.py ABSOLUTE)
 
-target_link_options(main PRIVATE -T ${STATICLCF} -Wl,-Map=main.map,--gc-sections,-d,--wrap=malloc,--wrap=atexit,--wrap=abort)
+target_link_options(main PRIVATE -T ${STATICLCF} -Wl,-Map=main.map,--gc-sections,-d,--wrap=malloc,--wrap=atexit,--wrap=abort,--wrap=free,--wrap=calloc)
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "${debug_build_type}")
 	target_link_libraries(main PUBLIC db)

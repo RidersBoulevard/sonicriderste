@@ -1,7 +1,7 @@
 #include "load_deduplicated.hpp"
 #include "riders/stage.hpp"
 #include "riders/gamemode.hpp"
-#include "handlers/files/filehandler_dat.hpp"
+#include "lib/files.hpp"
 
 #include <format>
 

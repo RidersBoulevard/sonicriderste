@@ -8,4 +8,4 @@ struct CheatCodeInput {
     u16 delayFrames; // how many frames you have in between button presses to successfully perform cheat code
 };
 
-void Player_AirOutButton(Player *player);
+void Player_AirOutButton(Player &player);

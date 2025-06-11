@@ -1,11 +1,16 @@
 #include "stageban_handler.hpp"
+
+#include <cstring>
+#include <ogc/pad.h>
+
 #include "containers/graphicalobject.hpp"
 #include "lib/sound.hpp"
 #include "lib/stdlib.hpp"
 #include "riders/player.hpp"
+#include <ogc/pad.h>
+#include "riders/gamemode.hpp"
 
 BSS_StageBan bss_StageBans;
-u32 bss_StageBans_isBanned;
 
 constexpr std::array<NeutralStages, NeutralStageAmount> AllowedNeutralStages = {{
 		{0, 0},// metal city
@@ -15,8 +20,6 @@ constexpr std::array<NeutralStages, NeutralStageAmount> AllowedNeutralStages = {
 		{7, 1},// sega illusion
 }};
 
-ASMDefined void* const gp2DSys;
-ASMDefined void PADReset(u32);
 ASMDefined void *lbl_8021BB40;
 ASMDefined void *lbl_8021BB44;
 
@@ -83,11 +86,9 @@ void StageBanGraphicHandler(/*GraphicalObject *subMenu,*/
 }
 
 
-void TournamentRace_SetLapCountRules(s32 lapCount) {
-    s32 newSettings = RuleSettings & ~0x63; // get rid of the lap count
-    newSettings |= lapCount;
-    RuleSettings = newSettings;
-    GameData.ruleSettings = static_cast<u32>(newSettings);
+void TournamentRace_SetLapCountRules(const u8 lapCount) {
+    ruleSettings.max_lap = lapCount;
+    GameData.ruleSettings = ruleSettings;
 }
 
 ASMUsed void Player_WinTournamentRace(const Player *player) {
@@ -135,6 +136,7 @@ ASMUsed void Player_TournamentRaceEarlyExit(PauseScreenObject1 *pauseInfo) {
     if (bss.isTestLap) {
         bss.isTestLap = false;
         bss.hasTestLapOccurred = true;
+    	TournamentRace_SetLapCountRules(3); // Fixes lap count when you exit before all players finish test lap
         return;
     }
 
@@ -150,7 +152,7 @@ ASMUsed void Player_TournamentRaceEarlyExit(PauseScreenObject1 *pauseInfo) {
 	if (atStartLineCount != 2 && InGamePlayerCount == 2) {
 		// if both players aren't at start line, detect who paused, and make them lose the point
 		const auto &pausedPlayer = players[pauseInfo->pausedPlayerIndex];
-		if ((pausedPlayer.currentLap <= (RuleSettings & 0x7F)) || (pausedPlayer.placement != 0)) {
+		if ((pausedPlayer.currentLap <= ruleSettings.max_lap) || (pausedPlayer.placement != 0)) {
 			// if paused player has crossed finish line and is the winner, the winner has been already determined
 			// this code will only run if it's not a finish line quit
 			const u32 wonPlayerIndex = pauseInfo->pausedPlayerIndex ^ 1; // reverse player index to determine the winner
@@ -178,7 +180,8 @@ bool CheckForNeutralStageBan(StageSelectObject2 *stageSelectObject) {
 }
 
 ASMUsed void StageBanHandler(GraphicalObject *subMenu) {
-	void *objectptr = static_cast<u32 *>(gp2DSys) + 0x6030 / 4;
+	//void *objectptr = static_cast<u32 *>(gp2DSys) + 0x6030 / 4;
+	void *objectptr = &gp2DSys->objectGroupPtrs[6][0];
 	void **object = static_cast<void **>(objectptr);
 	auto *stageSelectObject = static_cast<StageSelectObject2 *>(*object);
 	void *graphicalData = subMenu->graphicalData;
@@ -271,7 +274,7 @@ ASMUsed void StageBanHandler(GraphicalObject *subMenu) {
 				Controller &otherInput = GameControllers[i];
 				subInput->status = 0xFF;
 				subInput2->status = 0xFF;
-				PADReset(0x80000000UL >> i);
+				PAD_Reset(0x80000000UL >> i);
 				otherInput.initStatus = false;
 				otherInput.initStatus2 = ~0U;
 
@@ -283,7 +286,7 @@ ASMUsed void StageBanHandler(GraphicalObject *subMenu) {
 		}
 
 		const Controller &playerInput = GameControllers[bss.playerControl];
-		bool isBanned = FALSE;
+		bool isBanned = false;
 		if (playerInput.toggleFaceButtons.hasAny(Buttons::X)) {
 			u8 banCount;
 			u8 banPlayerIndex;
@@ -306,7 +309,7 @@ ASMUsed void StageBanHandler(GraphicalObject *subMenu) {
 					if (canBan) {
 						bss.bannedStages[stageSelectObject->selectedStageSquare].heroesStage = true;
 						bss.bannedStages[stageSelectObject->selectedStageSquare].heroesStage_playerIndex = banPlayerIndex;
-						isBanned = TRUE;
+						isBanned = true;
 					}
 				}
 			} else {
@@ -319,7 +322,7 @@ ASMUsed void StageBanHandler(GraphicalObject *subMenu) {
 					if (canBan) {
 						bss.bannedStages[stageSelectObject->selectedStageSquare].babylonStage = true;
 						bss.bannedStages[stageSelectObject->selectedStageSquare].babylonStage_playerIndex = banPlayerIndex;
-						isBanned = TRUE;
+						isBanned = true;
 					}
 				}
 			}
@@ -391,8 +394,6 @@ ASMUsed void StageBanHandler(GraphicalObject *subMenu) {
 					} else {
 						bss.player_banCount[1] = banCount + 1;
 					}
-
-					isBanned = TRUE; // setting this to true so that HUD updates
 				}
 			} else {
 				// babylon stage
@@ -405,12 +406,9 @@ ASMUsed void StageBanHandler(GraphicalObject *subMenu) {
 					} else {
 						bss.player_banCount[1] = banCount + 1;
 					}
-
-					isBanned = TRUE; // setting this to true so that HUD updates
 				}
 			}
 		}
-		bss_StageBans_isBanned = isBanned;
 		StageBanGraphicHandler(/*subMenu,*/ stageSelectObject, heroes_button, babylon_button);
 	} else {
 		heroes_button->inactiveButtonRGBA_1 = 0x323232FF;
@@ -528,7 +526,7 @@ void TournamentRace_Task() {
 
 ASMUsed void TournamentRace_TaskSet() {
     if (bss_StageBans.tournamentRace != 0 && bss_StageBans.currentRound == 1 && !bss_StageBans.hasTestLapOccurred) {
-		SetTask(&TournamentRace_Task, ObjectGroups::Object_TournamentRacePopup, 1);
+		SetTask(&TournamentRace_Task, ObjectGroups::Object_TournamentRacePopup, Object1Sizes::x20);
 	}
 }
 

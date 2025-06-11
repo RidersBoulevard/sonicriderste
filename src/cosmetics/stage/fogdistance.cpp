@@ -1,6 +1,7 @@
 #include "globalDefs.hpp"
 #include "riders/stage.hpp"
 #include "riders/gamemode.hpp"
+#include "handlers/menu/debugmenu/debugmenu.hpp"
 
 #include <span>
 
@@ -11,6 +12,13 @@
  */
 ASMUsed bool CustomStageFogDistance(f32* const fogDistancePtr) {
 	const std::span fogDistance = {fogDistancePtr, 2};
+
+	if (DebugMenu_CheckOption(DebugMenuOptions::DisableFog)) {
+		fogDistance[0] = 0.0f;
+		fogDistance[1] = 0.0f;
+		return true;
+	}
+
 	switch(CurrentStage) {
 		case GreenCave:
 			fogDistance[0] = 10.0f;

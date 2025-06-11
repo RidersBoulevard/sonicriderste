@@ -32,5 +32,7 @@ struct BoostParticleObject1 {
 	f32 unkfloat;
 };
 
-void Player_GrindRailDashHandler(Player *player);
-void Player_InitBoostParticles(Player *player);
+ASMDefined void RingLoss_OnAttack(Player &player);
+void Player_RingLossVisualsSFX(Player &player);
+void Player_GrindRailDashHandler(Player &player);
+void Player_InitBoostParticles(Player &player);

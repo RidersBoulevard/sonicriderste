@@ -33,7 +33,11 @@ ASMUsed void Player_GrindRailFastFall(Player *player) {
             {
                 extraGravity += 0.05f;
             }
-        } else if (stage == DarkDesert && player->railID == 0x1) extraGravity += 0.05f;
+        } else if (stage == DarkDesert && player->railID == 0x1) {
+            extraGravity += 0.05f;
+        } else if (stage == WhiteCave && (player->railID == 0x1 || player->railID == 0x2)) {
+            extraGravity += 0.05f;
+        }
 
         player->gravity += extraGravity;
     }

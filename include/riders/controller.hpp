@@ -47,7 +47,7 @@ struct Controller {
 	bool unk29; ///< always 1?
 	fillerData<0x6> filler4;
 
-	[[nodiscard]] inline auto getFaceButtons() const{
+	[[nodiscard]] auto getFaceButtons() const{
 		return holdFaceButtons | toggleFaceButtons;
 	}
 };

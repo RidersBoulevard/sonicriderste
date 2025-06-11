@@ -14,6 +14,6 @@ struct OmnipotenceInfo {
     bool firstPowerObj;
 };
 
-extern OmnipotenceInfo PlayerOMNInfo[8];
+extern std::array<OmnipotenceInfo, MaxPlayerCount> PlayerOMNInfo;
 
-void Player_Omnipotence(Player *player);
+void Player_Omnipotence(Player &player);

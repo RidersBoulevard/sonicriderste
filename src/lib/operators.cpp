@@ -1,5 +1,6 @@
 #include "stdlib.hpp"
 #include "types.hpp"
+#include <ogc/machine/processor.h>
 
 // new operator overload
 void *operator new(size_t size){
@@ -62,5 +63,5 @@ ASMUsed int __wrap_atexit(void __attribute__((unused)) (*function)(void)){ //NOL
  * Now we can do custom logic in case of an error. Here we just spin the CPU so we can easily see in the callstack where the issue happened
  */
 ASMUsed [[noreturn]] void __wrap_abort(){ //NOLINT
-	ErrorTrap();
+	ppchalt();
 }

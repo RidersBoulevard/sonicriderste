@@ -19,7 +19,7 @@ namespace ExtremeGear{
 		Gambler, PowerGear, OpaOpa, TheCrazy, Berserker, ERider, AirTank, HeavyBike, Destroyer, Omnipotence, CoverS, CoverF,
 		CoverP, HangOn, SuperHangOn, Darkness, Grinder, AdvantageS, AdvantageF, AdvantageP, Cannonball,
 
-		GunGear,
+		GunGear, OllieKingGear,
 
 		TotalGearAmount,
 		Invalid = 0xFF
@@ -70,7 +70,8 @@ enum class SpecialFlags : u32{
 	noBoostChain 				= 1<<22,
 	noSpeedLossTurning 			= 1<<23,
 	ignoreOffroad    			= 1<<24, // This special flag is used in assembly. If you change this special flag value, make sure to switch it around in text.s
-	moneyCrisis					= 1<<25
+	moneyCrisis					= 1<<25,
+	noBoostSpeedBoostChain		= 1<<26
 };
 ENUM_FLAG_OPERATORS(SpecialFlags) // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, readability-identifier-length, *-type-traits)
 

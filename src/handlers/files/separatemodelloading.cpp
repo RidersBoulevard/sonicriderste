@@ -5,17 +5,18 @@
 #include "packman_handlers.hpp"
 #include "riders/gamemode.hpp"
 #include "filehandler_dat.hpp"
-#include "ninjanext.hpp"
+#include "nn/ninjanext.hpp"
+#include "lib/files.hpp"
 
 #include <format>
 
 ASMDefined void func_8004EBCC(void *, void *, void *);
 ASMDefined void lbl_8004F4BC(u32, void *);// the u32 is actually a pointer but i can't use it as void*
 ASMDefined NNS_Object *bss_BoardOnlyModelData[];
-ASMDefined void *bss_BoardOnlyTextures[];
+ASMDefined NNS_TexList *bss_BoardOnlyTextures[];
 ASMDefined void *gpsaUnitMtxPal_Player[];
 ASMDefined u32 lbl_0014CD08(const char*, u32, u32, u32, void *, void *, u32, u32, u32);
-ASMDefined void nnScaleModelBoneCustom(Matrix3x3F *, u32, f32 *);
+ASMDefined void nnScaleModelBoneCustom(Matrix3x4F *, u32, f32 *);
 
 std::array<CSSModel, MaxPlayerCount> cssModel;
 std::array<CSSModel, MaxPlayerCount> cssSkinArchive;
@@ -27,9 +28,10 @@ std::bitset<MaxPlayerCount> IsSeparateBoardModelActive;
  * Gets the board model's file name for a specific player.
  *
  * @param player The player whose board model file name to get.
+ * @param isCSS true if CSS function calls this, false if otherwise (i.e. in-game or on load)
  * @return The file name of the board model.
  */
-[[nodiscard]] std::string GetBoardFilename(const Player &player) {
+[[nodiscard]] std::string GetBoardFilename(const Player &player, const bool isCSS) {
     std::string filename;// NOLINT(readability-magic-numbers,cppcoreguidelines-pro-type-member-init)
 
     if(player.extremeGear == ExtremeGear::Default) { // for default boards
@@ -39,7 +41,7 @@ std::bitset<MaxPlayerCount> IsSeparateBoardModelActive;
 		filename = std::format("P{}00", static_cast<char>(character.model));
         //sprintf(filename.data(), "P%c00", character.model);
 
-        if (player.isRealPlayer()) {
+        if (isCSS || player.isRealPlayer()) {
             switch (player.characterExload().exLoadID) {
                 case EXLoad::E10R:
 					filename = std::format("P{}000", static_cast<char>(character.model));
@@ -165,7 +167,7 @@ std::bitset<MaxPlayerCount> IsSeparateBoardModelActive;
     if (gearID > ExtremeGear::ERider) {
         gearID -= ExtremeGear::BIKE_COUNT; // subtract all bikes
     }
-
+    if (gearID > 30) gearID = 30; // REPLACE WHEN NEW GEARS HAVE PROPER EGGMEISTER SUPPORT
     return gearID;
 }
 
@@ -198,7 +200,7 @@ std::bitset<MaxPlayerCount> IsSeparateBoardModelActive;
  * @return The correct Eggmeister texture archive filename.
  */
 [[nodiscard]] std::string GetEggmeisterTextureArchiveFilename(const Player &player) {
-    if (player.extremeGear == ExtremeGear::GunGear) {
+    if (player.extremeGear >= ExtremeGear::GunGear) {
         return "PETX";
     }
 
@@ -218,6 +220,7 @@ std::bitset<MaxPlayerCount> IsSeparateBoardModelActive;
 [[nodiscard]] inline GearType GetGearTypeCSSExceptions(const Player &player, GearType gearType) {
     switch(player.extremeGear) {
         case ExtremeGear::GunGear:
+        case ExtremeGear::OllieKingGear:
             gearType = GearType::Board;
             break;
         default:
@@ -252,7 +255,7 @@ ASMUsed void DumpBoardModel(Player &player, const u32 index) {
 	IsSeparateBoardModelActive[player.index] = hasSeparateBoardModel;
 
     if (hasSeparateBoardModel) {
-        const auto filename = GetBoardFilename(player);
+        const auto filename = GetBoardFilename(player, false);
         const auto *file = DumpPackManFile(filename.c_str());
         SetArchiveBinary(file, index, 0);
     }
@@ -280,7 +283,7 @@ ASMUsed void DumpBoardModelCSS(const Player &player, const u32 index) {
     if (!hasSeparateBoardModel) { return; }
 	static std::array<std::string, MaxControllerCount> BoardModelFilenames;// Used to be ASMDefined, Should this be static?
 
-	BoardModelFilenames[index] = GetBoardFilename(player);
+	BoardModelFilenames[index] = GetBoardFilename(player, true);
     //auto filename = GetBoardFilename(player);
     //std::copy(filename.begin(), filename.end(), BoardModelFilenames[index].data());
 
@@ -423,8 +426,7 @@ ASMUsed void SetupCharacterModelCSS(const Player &player, char out[bufferSize]) 
  */
 ASMUsed void ReloadEggmeisterTextures(const bool forceSkip) {
     // check for restart
-    if (RaceExitMethod != ExitMethod::Retry || forceSkip) { return; }
-
+    if (gu32EndOfGameFlag != std::to_underlying(ExitMethod::Retry) || forceSkip) { return; }
     for (auto &player : getCurrentPlayerList()) {
         // just dump the texture file again if necessary, packman handler will take care of the rest
         if (PlayerIsEggmeister(player)) {
@@ -491,7 +493,7 @@ ASMUsed void FreeCSSAssets(const u32 index) {
  * @param objectDataInfo Matrix list for every bone. This should be derived from the player's matrix list, to ensure the board is animated properly.
  * @param boneVisibilityStatus The animated NodeHide keyframe data.
  */
-void RenderBoardMesh(const Player &player, void *objectDataInfo, void *boneVisibilityStatus) {
+void RenderBoardMesh(const Player &player, NNS_Matrix *objectDataInfo, NNS_NodeStatus *boneVisibilityStatus) {
 	const u32 mirrorFlag = static_cast<const u32>(((player.unkBAC & 0x100) ? 1 : 0) * 0x40);// NOLINT(readability-implicit-bool-conversion)
 	nnSetTextureList(bss_BoardOnlyTextures[player.index]);
 
@@ -511,7 +513,7 @@ void RenderBoardMesh(const Player &player, void *objectDataInfo, void *boneVisib
  * @param objectDataInfo Matrix list for every bone. This should be derived from the player's matrix list, to ensure the board is animated properly.
  * @param boneVisibilityStatus The animated NodeHide keyframe data.
  */
-void RenderBoardMeshTimeTrial(const Player &player, void *objectDataInfo, void *boneVisibilityStatus) {
+void RenderBoardMeshTimeTrial(const Player &player, NNS_Matrix *objectDataInfo, NNS_NodeStatus *boneVisibilityStatus) {
 	nnSetTextureList(bss_BoardOnlyTextures[player.index]);
 
 	nnDrawObjectExt(bss_BoardOnlyModelData[player.index], objectDataInfo, boneVisibilityStatus, 0x80000000,
@@ -519,7 +521,7 @@ void RenderBoardMeshTimeTrial(const Player &player, void *objectDataInfo, void *
 }
 
 ASMUsed void
-RenderBoardModelTimeTrial(const Player &player, void *objectDataInfo, void *boneVisibilityStatus, void *weightVertPtr,
+RenderBoardModelTimeTrial(const Player &player, NNS_Matrix *objectDataInfo, NNS_NodeStatus *boneVisibilityStatus, void *weightVertPtr,
 						  void *otherBoneData) {
 	if(IsSeparateBoardModelActive[player.index]) {
 		func_8004EBCC(weightVertPtr, bss_BoardOnlyModelData[player.index], gpsaUnitMtxPal_Player[player.index]);
@@ -529,7 +531,7 @@ RenderBoardModelTimeTrial(const Player &player, void *objectDataInfo, void *bone
 	}
 }
 
-ASMUsed void RenderBoardModel(const Player &player, void *objectDataInfo, void *boneVisibilityStatus, u32 *weightVertPtr,
+ASMUsed void RenderBoardModel(const Player &player, NNS_Matrix *objectDataInfo, NNS_NodeStatus *boneVisibilityStatus, u32 *weightVertPtr,
 							  void *otherBoneData) {
 	if(IsSeparateBoardModelActive[player.index]) {
 		func_8004EBCC(weightVertPtr, bss_BoardOnlyModelData[player.index], gpsaUnitMtxPal_Player[player.index]);
@@ -540,7 +542,7 @@ ASMUsed void RenderBoardModel(const Player &player, void *objectDataInfo, void *
 }
 
 ASMUsed void
-RenderBoardModelMultiplayer(const Player &player, void *objectDataInfo, void *boneVisibilityStatus, u32 *weightVertPtr,
+RenderBoardModelMultiplayer(const Player &player, NNS_Matrix *objectDataInfo, NNS_NodeStatus *boneVisibilityStatus, u32 *weightVertPtr,
 							void *otherBoneData, u32 *someData) {
 	if(IsSeparateBoardModelActive[player.index]) {
 		func_8004EBCC(weightVertPtr, bss_BoardOnlyModelData[player.index], gpsaUnitMtxPal_Player[player.index]);
@@ -551,7 +553,7 @@ RenderBoardModelMultiplayer(const Player &player, void *objectDataInfo, void *bo
 	}
 }
 
-ASMUsed void ScaleBoardModel(const Player &player, Matrix3x3F *boneMatrices) {
+ASMUsed void ScaleBoardModel(const Player &player, Matrix3x4F *boneMatrices) {
 	// scales certain characters boards appropriately to their model size
 	// index 2 is the extreme gear bone in the matrices
 	//u32 gearType;

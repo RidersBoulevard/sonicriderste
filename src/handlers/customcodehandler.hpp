@@ -29,7 +29,7 @@ namespace CustomCodehandler {
 
 	void InvokeInjectedCodes();
 
-	void InvokeInjectedCodes(Player *player);
+	void InvokeInjectedCodes(Player &player);
 }
 
-void CustomCodehandler_Player(Player *player);
+void CustomCodehandler_Player(Player &player);

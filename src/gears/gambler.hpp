@@ -11,6 +11,6 @@ namespace Gambler{
 	};
 }
 
-//ASMUsed void Gambler_GainTypeOnLevelup(Player *player);
-//ASMUsed void Gambler_LoseTypeOnLeveldown(Player *player);
-void Player_GamblerBoost(Player *player);
+//ASMUsed void Gambler_GainTypeOnLevelup(Player &player);
+//ASMUsed void Gambler_LoseTypeOnLeveldown(Player &player);
+void Player_GamblerBoost(Player &player);

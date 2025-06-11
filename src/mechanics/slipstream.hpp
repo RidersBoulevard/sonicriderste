@@ -11,4 +11,4 @@ struct PlayerWindParticles {
 
 ASMDefined PlayerWindParticles playerWindParticles[];
 
-void lbl_Slipstream(Player *player);
+void lbl_Slipstream(Player &player);

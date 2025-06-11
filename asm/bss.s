@@ -595,7 +595,7 @@ lbl_801F9718:
 	.skip 0x4
 .global lbl_801F971C
 lbl_801F971C:
-	.skip 0xFA4
+	.skip 0x10E4
 .global lbl_801FA6C0
 lbl_801FA6C0:
 	.skip 0x100
@@ -622,7 +622,7 @@ lbl_801FA8DC:
 	.skip 0x10C0
 .global lbl_801FB99C
 lbl_801FB99C:
-	.skip 0xE84
+	.skip 0x1104 // 0xE84
 .global lbl_801FC820
 lbl_801FC820:
 	.skip 0x14

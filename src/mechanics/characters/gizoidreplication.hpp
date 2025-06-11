@@ -22,8 +22,8 @@ extern std::array<GizoidReplicationInfo, MaxPlayerCount> PlayerGizoidReplication
 extern const f32 GR_TypeShortcutSpeedMultiplier;
 extern const f32 GR_TypeShortcutSpeedMultiplierDual;
 
-void Player_GRHandler(Player *player);
+void Player_GRHandler(Player &player);
 
-ASMUsed void Player_GRPlayerBump(Player *player, Player *grPlayer);
-ASMUsed void Player_GRAttacking(Player *player, Player *grPlayer);
+ASMUsed void Player_GRPlayerBump(Player &player, Player &grPlayer);
+ASMUsed void Player_GRAttacking(Player &player, Player &grPlayer);
 ASMUsed void ClearData_GizoidReplication();

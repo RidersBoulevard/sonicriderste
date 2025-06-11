@@ -5,6 +5,9 @@
 
 #include "types.hpp"
 #include "globalDefs.hpp"
+#include <cstddef>
+
+ASMDefined void gNp_InitHeap(void* arenaLo, void* arenaHi);
 
 ASMDefined void* gNp_MallocHi(u32 alignment, u32 size);
 ASMDefined void free_Hi(void*);
@@ -13,16 +16,11 @@ ASMDefined void free_Hi(void*);
 ASMDefined void* aligned_malloc(u32 alignment, u32 size);
 ASMDefined void nnFree(void*);
 ASMDefined void free_all(void*);
-//ASMDefined char* strcpy(char* destination, const char* source);
-//ASMDefined void* memcpy(void *dest, const void * src, u32 n);
-//ASMDefined void *memset(void *str, u32 value, u32 size);
 
 /**
  * Returns a random value between 0 and max (exclusive)
  */
 ASMDefined u32 lbl_RNG_Number(u32 max);
-
-ASMDefined [[noreturn]] void ErrorTrap();
 
 template<typename T>
 [[nodiscard]]

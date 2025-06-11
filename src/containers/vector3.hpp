@@ -22,7 +22,7 @@ struct Matrix4x4 {
 };
 
 template<typename T> requires arithmetic<T>
-struct Matrix3x3 {
+struct Matrix3x4 {
 	std::array<T, 12> field;
 };
 
@@ -257,5 +257,5 @@ constexpr Vector3<T> &Vector3<T>::operator/=(const Vector3 &right) {
 
 using Vector3F = Vector3<f32>;
 using Euler = Vector3<s32>;
-using Matrix3x3F = Matrix3x3<f32>;
-//using Matrix4x4F = Matrix4x4<f32>;
+using Matrix3x4F = Matrix3x4<f32>;
+using Matrix4x4F = Matrix4x4<f32>;

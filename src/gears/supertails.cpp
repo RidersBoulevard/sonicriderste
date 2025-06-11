@@ -27,7 +27,7 @@ constexpr GearLevelStats SuperTails_NonSuperStats = {
 };
 
 ASMUsed void SuperTails_SpawnMagnetAtStart(Player *player){
-	if(isSuperCharacter(*player, Character::Tails)){
+	if(player->isSuperCharacter(Character::Tails)){
 		SuperTailsInfo *stInfo = &PlayerSuperTailsInfo[player->index];
 		lbl_0008CC74(player->index); // spawn magnet
 		stInfo->playerMagnet = true; // Use this for magnet handler
@@ -37,17 +37,15 @@ ASMUsed void SuperTails_SpawnMagnetAtStart(Player *player){
 }
 
 ASMUsed void SuperTails_SpawnMagnetAfterDeath(Player *player){
-	if(isSuperCharacter(*player, Character::Tails) && player->superFormState == 0){
-		SuperTailsInfo *stInfo = &PlayerSuperTailsInfo[player->index];
-		lbl_0008CC74(player->index); // spawn magnet
-		stInfo->playerMagnet = true; // Use this for magnet handler
-	}
-	if(player->extremeGear == ExtremeGear::CoverP){ // temporary, move to different function later
-		player->level = 1;
-		player->currentAir = player->gearStats[player->level].maxAir;
-	}
+	// if(player->isSuperCharacter(Character::Tails) && player->superFormState == 0){
+	// 	SuperTailsInfo *stInfo = &PlayerSuperTailsInfo[player->index];
+	// 	lbl_0008CC74(player->index); // spawn magnet
+	// 	stInfo->playerMagnet = true; // Use this for magnet handler
+	// }
+
 	if(player->extremeGear == ExtremeGear::CoverF
 	   || player->extremeGear == ExtremeGear::CoverS
+	   || player->extremeGear == ExtremeGear::CoverP
 	   || player->extremeGear == ExtremeGear::GunGear){ // temporary, move to different function later
 		player->level = 1;
 		player->currentAir = player->gearStats[player->level].maxAir;
@@ -55,10 +53,6 @@ ASMUsed void SuperTails_SpawnMagnetAfterDeath(Player *player){
 
 	player->reciproExtendTimer = 0; // grant recipro extend
 
-	if(player->extremeGear == ExtremeGear::CoverF){
-		player->level = 1;
-		player->currentAir = player->gearStats[player->level].maxAir;
-	}
 }
 
 inline void SuperTails_UpdatePlayerStats(Player &player, const GearLevelStats *stats, f32 topSpeed){
@@ -71,12 +65,12 @@ inline void SuperTails_UpdatePlayerStats(Player &player, const GearLevelStats *s
 
 void Player_SuperTailsTransformation(Player &player){
 	if(player.playerType) { return; }
-	if(!isSuperCharacter(player, Character::Tails)) { return; }
+	if(!player.isSuperCharacter(Character::Tails)) { return; }
 	SuperTailsInfo *stInfo = &PlayerSuperTailsInfo[player.index];
 	BlastGaugeInfo *bgInfo = &PlayerBlastGaugeInfo[player.index];
 	if(player.flags.hasAny(PlayerFlags::InAPit)) { return; }
 	const auto transformationCost = 5;
-	const f32 tailwindSpeed = pSpeed(245.0f);
+	const f32 tailwindSpeed = pSpeed(240.0f);
 	const u32 transformTime = 1;
 
 	// Handle timer in super state with gauge
@@ -89,8 +83,9 @@ void Player_SuperTailsTransformation(Player &player){
 			bgInfo->currentGauge = 200000;
 		}
 		if (player.input->toggleFaceButtons.hasAny(Buttons::B)
-		&& !player.movementFlags.hasAny(MovementFlags::boosting) &&
-		player.unkB90 <= 0 && player.currentAir >= SuperTails_SuperStats.boostCost) {
+		&& !player.movementFlags.hasAny(MovementFlags::boosting)
+		&& player.unkB90 <= 0 && player.currentAir >= SuperTails_SuperStats.boostCost
+		&& player.unkB08 & 0x2400) {
 			// Take away timer if he boosts
 			s32 newGauge = bgInfo->currentGauge - SuperTails_SuperStats.boostCost * 1.2;
 			bgInfo->currentGauge = clamp(newGauge);
@@ -106,7 +101,7 @@ void Player_SuperTailsTransformation(Player &player){
 			if(newSpeed < tailwindSpeed) { player.speed = newSpeed; }
 			player.speedCap = tailwindSpeed;
 			player.specialFlags |= SpecialFlags::berserkerEffect; 
-			player.gearStats[player.level].boostSpeed = pSpeed(250.0f);
+			player.gearStats[player.level].boostSpeed = pSpeed(245.0f);
 		} else {
 			stInfo->tailwindTimer = 0;
 			player.fastest_superCruise = false;
@@ -131,7 +126,9 @@ void Player_SuperTailsTransformation(Player &player){
 			stInfo->tailwindTimer = 0;
 			player.fastest_superCruise = false;
 			if (player.specialFlags.hasAny(SpecialFlags::berserkerEffect) 
-			&& !player.movementFlags.hasAny(MovementFlags::boosting) && player.state != PlayerState::AttackingPlayer) 
+			&& !player.movementFlags.hasAny(MovementFlags::boosting)
+			&& player.state != PlayerState::AttackingPlayer
+			&& player.state != PlayerState::AttackedByPlayer)
 			{player.attackProperties = nullptr;}
 			player.specialFlags &= ~SpecialFlags::berserkerEffect; 
 			player.gearStats[player.level].boostSpeed = pSpeed(200.0f);
@@ -175,7 +172,7 @@ void Player_SuperTailsTransformation(Player &player){
 				PlayAudioFromDAT(Sound::SFX::SuperTransformation); // super transformation sfx
 
 				player.typeAttributes |= Type::Speed;
-				if(player.movementFlags.hasAny(MovementFlags::boosting)) { lbl_Player_BoostEndFunction(&player); }
+				if(player.movementFlags.hasAny(MovementFlags::boosting)) { lbl_Player_BoostEndFunction(player); }
 
 			}else if (player.superFormState >= 1){
 				// untransform

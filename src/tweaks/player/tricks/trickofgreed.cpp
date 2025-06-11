@@ -12,13 +12,14 @@ ASMUsed void Player_TrickOfGreed(Player *player) {
 
             player->currentAir = clamp(newAir);
 
-            // if(isSuperCharacter(*player, Character::Shadow)) {
+            // if(player->isSuperCharacter(Character::Shadow)) {
             //     SuperShadowInfo *sshInfo = &PlayerSuperShadowInfo[player->index];
             //     if (sshInfo->inhibitorRingsOff) return;
 	        //     BlastGaugeInfo *bgInfo = &PlayerBlastGaugeInfo[player->index];
             //     bgInfo->currentGauge += 30000;
             // }
-        } else if (player->extremeGear == ExtremeGear::SuperHangOn) {
+        } else
+        if (player->extremeGear == ExtremeGear::SuperHangOn) {
             player->currentAir -= 10000;
         } 
         else if (player->extremeGear == ExtremeGear::Gambler) {

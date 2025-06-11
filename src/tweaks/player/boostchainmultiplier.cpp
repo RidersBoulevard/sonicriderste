@@ -2,6 +2,8 @@
 #include "riders/player.hpp"
 #include "gears/turbostar.hpp"
 #include "riders/gear.hpp"
+#include "gears/hypersonic.hpp"
+#include "tweaks/player/archetype/boostarchetypejcbc.hpp"
 
 
 ASMUsed void Player_BoostChainMultiplier(Player *player) {
@@ -15,7 +17,8 @@ ASMUsed void Player_BoostChainMultiplier(Player *player) {
     
     // add 0.1% bcm per 1 boost speed above average boost speeds
 	f32 additiveBcm = (currentBoostSpeed - BCM_GeneralBoostSpeeds[player->level]) * (0.001f / pSpeed(1));
-    if (player->specialFlags.hasAny(SpecialFlags::ringGear)) { additiveBcm *= (1.0f/3.0f); }
+    if (player->specialFlags.hasAny(SpecialFlags::ringGear) || player->gearExload().exLoadID == EXLoad::HyperSonic
+    	|| (isSuperCharacter(*player, Character::MetalSonic) && player->gearExload().exLoadID == EXLoad::StardustSpeeder)) { additiveBcm *= (1.0f/3.0f); }
 	f32 bcm = lbl_001C7400;
     if (additiveBcm > 0) { bcm += additiveBcm; }
 
@@ -55,23 +58,22 @@ ASMUsed void Player_BoostChainMultiplier(Player *player) {
 			}
             break;
 
-        case ExtremeGear::TurboStar: {
-                switch (player->level) {
-                    case 0:
-                    bcm += 0.10f;
-                    break;
+    	case AirTank:
+    		// More air, more bcm
+    		bcm += 0.03f * (static_cast<f32>(player->currentAir) / static_cast<f32>(player->gearStats[player->level].maxAir));
+    		break;
 
-                    case 1:
-                    bcm += 0.05f;
-                    break;
+    	case Accelerator:
+			if (player->currentLap == 2) {
+				bcm += 0.11f;
+			} else if (player->currentLap >= 3) bcm += 0.06f;
+    		break;
 
-                    case 2:
-                    if (player->gearSpecificFlags[TurboStar::Level4] == 0)
-                    {bcm += 0.025f;} else bcm += 0.0f;
-                    break;
-                }
-            break;
-        }
+    	case Darkness:
+    		if (player->level == 2 && player->rings >= 60) {
+    			f32 jcbcCheck = (player->input->holdFaceButtons.hasAny(Buttons::A) && player->state == PlayerState::Cruise) ? 0.10f : 0.05f;
+    			bcm += jcbcCheck * (static_cast<f32>(player->rings - 60) / 40.0f);
+    		}
         
 		default:
 			break;

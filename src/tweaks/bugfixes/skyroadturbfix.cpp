@@ -6,7 +6,7 @@ void Player_SkyRoadTurbFix(Player *player)
     playerCount = InGamePlayerCount;
     if (CurrentStage == SkyRoad)
     {
-        turbulenceBool = (player->state == TurbulenceRide) ? TRUE : FALSE;
+        turbulenceBool = (player->state == TurbulenceRide) ? true : false;
         if (turbulenceBool)
         {
             // compare turbulence index to player count to figure out if player is riding on big turb

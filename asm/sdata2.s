@@ -1802,9 +1802,6 @@ lbl_8021CF88:
 .global lbl_8021CF90
 lbl_8021CF90:
 	.4byte 0x3f800000
-.global rel_start_prediction
-rel_start_prediction:
-	.4byte rel_start_prediction + 0x1DED6C
 
 .global __sdata2_rom_end__
 __sdata2_rom_end__:

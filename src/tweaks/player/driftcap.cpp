@@ -1,4 +1,5 @@
 #include "gears/turbostar.hpp"
+#include "gears/blastGaugeGears.hpp"
 #include "lib/stdlib.hpp"
 
 constexpr std::array<f32, 3> EmerlDriftCapBonus = {
@@ -76,7 +77,25 @@ ASMUsed void *Player_DriftCap(Player *player, f32 return_array[2], f32 currentDr
 					break;
 				
 				case ChaosEmerald:
+				    currentDriftCap += pSpeed(10);
 					if (player->character == Character::SuperSonic) {currentDriftCap += pSpeed(15);}
+					if (player->isSuperCharacter(Character::Shadow)) {
+						BlastGaugeInfo *bgInfo = &PlayerBlastGaugeInfo[player->index];
+						const f32 meterPercent = static_cast<f32>(bgInfo->currentGauge) / 200000.0f;
+						currentDriftCap += pSpeed(10) * meterPercent; // up to +10 drift cap, depending on meter
+					}
+			        break;
+
+				case AirTank:
+					// Less air, more drift cap
+					currentDriftCap += pSpeed(10.0f) * (1.0f - (static_cast<f32>(player->currentAir) / static_cast<f32>(player->gearStats[player->level].maxAir)));
+					break;
+
+			    case Accelerator:
+                    if (player->gearExload().exLoadID == EXLoad::HyperHangOn) {
+                        currentDriftCap += pSpeed(20.0f);
+                    }
+			        break;
 
 				default:
 					if(player->specialFlags.hasAny(SpecialFlags::ringGear)) {
@@ -84,7 +103,7 @@ ASMUsed void *Player_DriftCap(Player *player, f32 return_array[2], f32 currentDr
 					}
 					break;
 				
-				case ExtremeGear::TheCrazy:
+				case TheCrazy:
 					currentDriftCap += pSpeed(10);
 					s32 driftTips = ((player->driftDashFrames - 50) * player->gearStats[player->level].maxAir) / 1000;
 					driftTips = clamp(driftTips, (player->gearStats[player->level].maxAir / 100), (player->gearStats[player->level].maxAir * 10 / 100));
@@ -108,8 +127,8 @@ ASMUsed void Player_DriftCapOvercharge(Player* player, f32 currentDriftCap) {
 		player->speed = currentDriftCap;
 		return;
 	}
-	f32 newDriftCap = (player->speed - currentDriftCap) * 0.5;
-	newDriftCap *= (player->extremeGear == ExtremeGear::SlideBooster) ? 0.15 : 1;
+	f32 isSlideBooster = (player->extremeGear == ExtremeGear::SlideBooster) ? 0.2 : 1;
+	f32 newDriftCap = (player->speed - currentDriftCap) * (0.5 * isSlideBooster);
 	// Else if current speed is greater than drift cap, add drift cap to it
 	player->speed += (player->characterArchetype == CharacterArchetype::Drift) ? newDriftCap * 2: newDriftCap; 
 }

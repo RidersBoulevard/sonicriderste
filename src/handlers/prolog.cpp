@@ -5,8 +5,10 @@
 #include "customcodehandler.hpp"
 #include "menu/debugmenu/debugmenu.hpp"
 #include "menu/debugmenu/debugmenu_handlers.hpp"
-#include "ninjanext.hpp"
+#include "nn/ninjanext.hpp"
 #include "files/filehandler_dat.hpp"
+#include <ogc/gx.h>
+#include <ogc/card.h>
 
 #define DEBUG_TESTING false && DEBUG
 
@@ -23,7 +25,7 @@ ASMUsed [[noreturn]] void _prolog() {
 	const u32 tick = OSGetTick();
 	srand(tick);
 	lbl_0004D1A4(tick);
-	lbl_00175C7C();
+	CARD_Init("GXSR", "TE");
 
 	InitCamPalette(0);
 
@@ -65,12 +67,12 @@ ASMUsed [[noreturn]] void _prolog() {
 	nnSetClipScreenCoordinates(struct3.data());
 
 	lbl_000B7BFC();
+    CreateJapaneseVoiceThread();
 	lbl_001514A8();
 	lbl_800645A8(&lbl_100066C0, lbl_001D78C8.f1, lbl_001D78C8.f2, lbl_001D78C8.f3, lbl_001D78C8.f1,
 				 lbl_001D78C8.f5, lbl_001D78C8.f6);
 	lbl_80006778();
-    //FileHandler_LongLasting();
-	SetTask(&TitleSequence_Task, ObjectGroups::TitleSequence, 2);
+	SetTask(&TitleSequence_Task, ObjectGroups::TitleSequence, Object1Sizes::x80);
 
 #if DEBUG_TESTING
 	__exception_init();
@@ -86,7 +88,7 @@ ASMUsed [[noreturn]] void _prolog() {
 		if (!lbl_8021BB84) {
 			lbl_0014C080();
 		}
-		GXSetDrawSync(boob);
+		GX_SetDrawSync(boob);
 		gNp_VWaitTrans();
 		lbl_000B766C();
 		lbl_000375B4();

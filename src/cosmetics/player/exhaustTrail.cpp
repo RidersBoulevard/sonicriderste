@@ -15,6 +15,7 @@
 #include "gears/turbostar.hpp"
 #include "handlers/player/specialflagtweaks.hpp"
 #include "gears/advantagep.hpp"
+#include "gears/supermetal.hpp"
 
 ASMDefined std::array<char, 4> bss_C24D91DC; /*asm*/
 
@@ -76,17 +77,17 @@ constexpr std::array<GearExhaustTrail, 2> EggmanExhaustTrailData = {
 	}
 };
 
-void lbl_RainbowTrail(Player *Player) {
+void lbl_RainbowTrail(Player &Player) {
 	const std::span bss = bss_C24D91DC;
-	if(!Player->playerType) {
-		const u8 &index = Player->index;
-		if(!Player->rainbowTrailState) {
-			Player->exhaustTrailColor = 0xFF0000FF;
-			Player->rainbowTrailState = true;
+	if(!Player.playerType) {
+		const u8 &index = Player.index;
+		if(!Player.rainbowTrailState) {
+			Player.exhaustTrailColor = 0xFF0000FF;
+			Player.rainbowTrailState = true;
 			bss[index]                = 1;
 		}
 
-		auto &[r, g, b, a] = Player->exhaustTrailColor;
+		auto &[r, g, b, a] = Player.exhaustTrailColor;
 		//u8 r = (color & 0xFF000000UL) >> 24;
 		//u8 g = (color & 0x00FF0000UL) >> 16;
 		//u8 b = (color & 0x0000FF00UL) >> 8;
@@ -132,39 +133,40 @@ void lbl_RainbowTrail(Player *Player) {
 		}
 
 		//color = static_cast<u32>((r << 24) | (g << 16) | (b << 8) | 0xFF);
-		//Player->exhaustTrailColor = color;
+		//Player.exhaustTrailColor = color;
 	}
 }
 
-ASMUsed u32 Player_ExhaustTrailColors(Player *Player) {
+ASMUsed u32 Player_ExhaustTrailColors(Player &Player) {
 	u32 color          = 0; // will stay 0 if color wasn't changed from default
-	bool trailOverride = FALSE;
-	//u8 controllerPort = Player->input->port;
+	SpecialFlagInfo *spfInfo = &PlayerSpecialFlagInfo[Player.index];
+	//u8 controllerPort = Player.input.port;
 
-	if(Player->playerType == 0 && (CurrentGameMode == 0x2BC || CurrentGameMode == 0x320 || CurrentGameMode == 0x258 || CurrentGameMode == 0x12C ||
+	if(Player.playerType == 0 && (CurrentGameMode == 0x2BC || CurrentGameMode == 0x320 || CurrentGameMode == 0x258 || CurrentGameMode == 0x12C ||
 								   CurrentGameMode == 0x64)) {
-		// if(Player->movementFlags.hasAny(drifting)) {
-		// 	if(Player->driftDashFrames >= Player->requiredDriftDashFrames) {
+		bool trailOverride = false;
+		// if(Player.movementFlags.hasAny(drifting)) {
+		// 	if(Player.driftDashFrames >= Player.requiredDriftDashFrames) {
 		// 		color = 0x20DEDEFF;
 		// 	}
 		// }
 
-		const auto &gear = Player->extremeGear;
+		const auto &gear = Player.extremeGear;
 
-		if(Player->specialFlags.hasAny(SpecialFlags::ringGear) && isSuperCharacter(*Player, true) == FALSE) {
+		if(Player.specialFlags.hasAny(SpecialFlags::ringGear) && !Player.isSuperCharacter(true)) {
 			color = 0xD5BD56FF;
 		}
 
-		if(Player->character == Character::Emerl || gear == ExtremeGear::CoverS) {
-			if(Player->typeAttributes == Type::Speed) {
+		if(Player.character == Character::Emerl || gear == ExtremeGear::CoverS) {
+			if(Player.typeAttributes == Type::Speed) {
 				color = 0x034EFDFF;
-			} else if(Player->typeAttributes == Type::Fly) {
+			} else if(Player.typeAttributes == Type::Fly) {
 				color = 0xEBD63DFF;
-			} else if(Player->typeAttributes == Type::Power) {
+			} else if(Player.typeAttributes == Type::Power) {
 				color = 0xFF0000FF;
-			} else if(Player->typeAttributes == Type::All) {
+			} else if(Player.typeAttributes == Type::All) {
 				lbl_RainbowTrail(Player);
-				color = Player->exhaustTrailColor;
+				color = Player.exhaustTrailColor;
 			}
 		}
 
@@ -172,14 +174,14 @@ ASMUsed u32 Player_ExhaustTrailColors(Player *Player) {
 			using namespace ExtremeGear;
 			case ExtremeGear::TurboStar:
 				if(color == 0) {
-					if(Player->rings >= 90) {
+					if(Player.rings >= 90) {
 						color = 0xC8C8C8E8;
 					}
 				}
 				break;
 
 			case CoverF: {
-				const u8 &coverfstate = Player->coverF_archetype;
+				const u8 &coverfstate = Player.coverF_archetype;
 				if(coverfstate == 0) {
 					break;
 				}
@@ -188,21 +190,21 @@ ASMUsed u32 Player_ExhaustTrailColors(Player *Player) {
 			}
 
 			case CoverP: {
-				f32 changedWeight = CharacterWeights[Player->character] + 0.4f;
+				f32 changedWeight = CharacterWeights[Player.character] + 0.4f;
 				// TODO: change below to when we fix exload unloading
 
-				if(Player->characterExload().exLoadID != EXLoad::None && Player->characterExload().weight() != -1.0f) {
-					changedWeight = Player->characterExload().weight() + 0.4f;
+				if(Player.characterExload().exLoadID != EXLoad::None && Player.characterExload().weight() != -1.0f) {
+					changedWeight = Player.characterExload().weight() + 0.4f;
 				}
-				if(Player->weight == changedWeight) {
+				if(Player.weight == changedWeight) {
 					// color = 0xFFFFFFFF;
 					break;
 				}
-				if(Player->weight < changedWeight) {
+				if(Player.weight < changedWeight) {
 					color = 0x0040FFFF;
 					break;
 				}
-				if(Player->weight > changedWeight) {
+				if(Player.weight > changedWeight) {
 					color = 0xFF0000FF;
 					break;
 				}
@@ -210,116 +212,134 @@ ASMUsed u32 Player_ExhaustTrailColors(Player *Player) {
 			}
 
 			case TheCrazy: {
-				const u32 playerTopSpeed = u32(Player->gearStats[Player->level].topSpeed * SPEED_DIVISOR);
-				if(Player->unkABC >= playerTopSpeed - 1) {
+				const u32 playerTopSpeed = static_cast<u32>(Player.gearStats[Player.level].topSpeed * SPEED_DIVISOR);
+				if(Player.unkABC >= playerTopSpeed - 1) {
 					break;
 				}
-				if((Player->unkABC < (playerTopSpeed - 1) && Player->unkABC >= (playerTopSpeed - 35)) && Player->rings >= 15) {
+				if((Player.unkABC < (playerTopSpeed - 1) && Player.unkABC >= (playerTopSpeed - 35)) && Player.rings >= 15) {
 					color         = Beginner_ExhaustTrailColors[0];
-					trailOverride = TRUE;
+					trailOverride = true;
 					break;
 				}
-				if((Player->unkABC < (playerTopSpeed - 35) && Player->unkABC >= (playerTopSpeed - 85)) && Player->rings >= 20) {
+				if((Player.unkABC < (playerTopSpeed - 35) && Player.unkABC >= (playerTopSpeed - 85)) && Player.rings >= 20) {
 					color         = 0xFF0000FF;
-					trailOverride = TRUE;
+					trailOverride = true;
 					break;
 				}
-				if((Player->unkABC < (playerTopSpeed - 85)) && Player->rings >= 30) {
+				if((Player.unkABC < (playerTopSpeed - 85)) && Player.rings >= 30) {
 					color         = 0xFFFFFFFF;
-					trailOverride = TRUE;
+					trailOverride = true;
 					break;
 				}
 				break;
 			}
 
 			case GunGear: {
-				if(Player->rings >= 25) {
+				if(Player.rings >= 25) {
 					color = 0xFF0000FF;
 				}
 				break;
 			}
 
 			case ExtremeGear::HangOn: {
-				HangOnInfo *hoInfo = &PlayerHangOnInfo[Player->index];
-				if(hoInfo->lockoutFrameCounter > 0 && Player->movementFlags.hasAny(MovementFlags::boosting)) {
+				HangOnInfo &hoInfo = PlayerHangOnInfo[Player.index];
+				if(hoInfo.lockoutFrameCounter > 0 && Player.movementFlags.hasAny(MovementFlags::boosting)) {
 					color         = 0xFF0000FF;
-					trailOverride = TRUE;
+					trailOverride = true;
 				}
 				break;
 			}
-			// case SuperHangOn:
-			// 	struct HHOInfo *hhoInfo = &PlayerHHOInfo[Player->index];
-			// 	if (exLoads.gearExLoadID == EXLoad::HyperHangOn)
-			// 	{
-			// 		if (hhoInfo->extraType & SpeedType) {
-			// 			color = 0x034EFDFF;
-			// 		}
-			// 		if (hhoInfo->extraType & FlyType) {
-			// 			color = 0xEBD63DFF;
-			// 		}
-			// 		if (hhoInfo->extraType & PowerType) {
-			// 			color = 0xFF0000FF;
-			// 		}
-			// 	}
-			// 	break;
+			case ExtremeGear::SuperHangOn:
+				if(color == 0) {
+					if(Player.rings >= 90) {
+						color = 0xC8C8C8E8;
+					}
+				}
+				// struct HHOInfo *hhoInfo = &PlayerHHOInfo[Player.index];
+				// if (exLoads.gearExLoadID == EXLoad::HyperHangOn)
+				// {
+				// 	if (hhoInfo.extraType & SpeedType) {
+				// 		color = 0x034EFDFF;
+				// 	}
+				// 	if (hhoInfo.extraType & FlyType) {
+				// 		color = 0xEBD63DFF;
+				// 	}
+				// 	if (hhoInfo.extraType & PowerType) {
+				// 		color = 0xFF0000FF;
+				// 	}
+				// }
+				break;
 
 			case Omnipotence: {
-				struct OmnipotenceInfo *OMNInfo = &PlayerOMNInfo[Player->index];
-				if (OMNInfo->lastShortcutType == 1) color = 0x034EFDFF; // Last path SPEED, BLUE
-				if (OMNInfo->lastShortcutType == 2) color = 0xEBD63DFF; // Last path FLY, YELLOW
-				if (OMNInfo->lastShortcutType == 3) color = 0xFF0000FF; // Last path POWER, RED
+				OmnipotenceInfo &OMNInfo = PlayerOMNInfo[Player.index];
+				if (OMNInfo.lastShortcutType == 1) color = 0x034EFDFF; // Last path SPEED, BLUE
+				if (OMNInfo.lastShortcutType == 2) color = 0xEBD63DFF; // Last path FLY, YELLOW
+				if (OMNInfo.lastShortcutType == 3) color = 0xFF0000FF; // Last path POWER, RED
 				break;
 			}
 
 			case ExtremeGear::Gambler: {
-				if(Player->character == Character::E10G && !Player->gearSpecificFlags[Gambler::Level4]) {
-					if(Player->typeAttributes.hasAny(Type::Speed)) {
-						color = 0x034EFDFF;
+				// if(Player.character == Character::E10G && !Player.gearSpecificFlags[Gambler::Level4]) {
+				// 	if(Player.typeAttributes.hasAny(Type::Speed)) {
+				// 		color = 0x034EFDFF;
+				// 	}
+				// 	if(Player.typeAttributes.hasAny(Type::Fly)) {
+				// 		color = 0xEBD63DFF;
+				// 	}
+				// 	if(Player.typeAttributes.hasAny(Type::Power)) {
+				// 		color = 0xFF0000FF;
+				// 	}
+				// }
+				// if(Player.typeAttributes == Type::All) {
+				// 	lbl_RainbowTrail(Player);
+				// 	color = Player.exhaustTrailColor;
+				// }
+				if(color == 0) {
+					if(Player.rings >= 90) {
+						color = 0xC8C8C8E8;
 					}
-					if(Player->typeAttributes.hasAny(Type::Fly)) {
-						color = 0xEBD63DFF;
-					}
-					if(Player->typeAttributes.hasAny(Type::Power)) {
-						color = 0xFF0000FF;
-					}
-				}
-				if(Player->typeAttributes == Type::All) {
-					lbl_RainbowTrail(Player);
-					color = Player->exhaustTrailColor;
 				}
 				break;
 			}
 
-			case ChaosEmerald: if(color != 0) {
+		    case ChaosEmerald: if(color != 0) {
 					break;
 				}
-				if(Player->character == Character::Tails) {
-					if(Player->superFormState != 0) {
+				if(Player.character == Character::Tails) {
+					if(Player.superFormState != 0) {
 						lbl_RainbowTrail(Player);
-						color = Player->exhaustTrailColor;
+						color = Player.exhaustTrailColor;
 					}
+				} else if (Player.character == Character::MetalSonic && Player.gearExload().exLoadID == EXLoad::StardustSpeeder) {
+                    const NeoMetalInfo *neoInfo = &PlayerNeoMetalInfo[Player.index];
+				    // if in burn state, show alternate type given
+				    if (neoInfo->formState == 1) {
+				        if (Player.typeAttributes.hasAny(Type::Speed)) color = 0x034EFDFF;
+				        if (Player.typeAttributes.hasAny(Type::Fly)) color = 0xEBD63DFF;
+				        if (Player.typeAttributes.hasAny(Type::Power)) color = 0xFF0000FF;
+				    } else if (neoInfo->formState == 2) {
+				        lbl_RainbowTrail(Player);
+				        color = Player.exhaustTrailColor;
+				    }
 				} else {
 					lbl_RainbowTrail(Player);
-					color = Player->exhaustTrailColor;
+					color = Player.exhaustTrailColor;
 				}
 				break;
 
 			case Beginner: {
 				for(u32 i = 0; i < 3; i++) {
-					Player->gearStats[i].driftDashSpeed = Beginner_BaseDriftSpeeds[i];
+					Player.gearStats[i].driftDashSpeed = Beginner_BaseDriftSpeeds[i];
 				}
 
-				if(Player->driftDashFrames <= 0) {
+				if(Player.driftDashFrames <= 0) {
 					break;
 				}
 
-				if(Player->driftDashFrames <= 0) {
-					break;
+				if(Player.movementFlags.hasAny(MovementFlags::drifting)) {
+					trailOverride = true;
 				}
-				if(Player->movementFlags.hasAny(MovementFlags::drifting)) {
-					trailOverride = TRUE;
-				}
-				u32 beginnerDriftLevel = static_cast<u32>(Player->driftDashFrames / 30);
+				u32 beginnerDriftLevel = static_cast<u32>(Player.driftDashFrames / 30);
 				if(beginnerDriftLevel == 0) {
 					color = 0xFF0000FF;
 					break;
@@ -331,27 +351,34 @@ ASMUsed u32 Player_ExhaustTrailColors(Player *Player) {
 				color = Beginner_ExhaustTrailColors[beginnerDriftLevel - 1];
 
 				for(u32 i = 0; i < 3; i++) {
-					Player->gearStats[i].driftDashSpeed += Beginner_DriftLevelSpeeds[beginnerDriftLevel - 1];
+					Player.gearStats[i].driftDashSpeed += Beginner_DriftLevelSpeeds[beginnerDriftLevel - 1];
 				}
 				break;
 			}
 
 			case AdvantageP: {
-    			AdvantagePInfo *advpInfo = &PlayerAdvantagePInfo[Player->index];
-				if (advpInfo->isInTopMode)
+    			const AdvantagePInfo &advpInfo = PlayerAdvantagePInfo[Player.index];
+				if (advpInfo.isInTopMode)
 				{color = 0xFF0000FF;}
 				break;
 			}
 
-			default: break;
+			default:
+				break;
 		}
 
-        if(!trailOverride && Player->ignoreTurbulence) {
+        if(!trailOverride && Player.ignoreTurbulence) {
             color = 0xBE1DEEFF;
         }
 
-		if(Player->movementFlags.hasAny(MovementFlags::drifting) && Player->extremeGear != ExtremeGear::Beginner) {
-			if(Player->driftDashFrames >= Player->requiredDriftDashFrames) {
+		if (spfInfo->typeRemovalTimer > 0.0f) {
+			color = 0xC8C8C8E8;
+		}
+
+		if(Player.movementFlags.hasAny(MovementFlags::drifting) && Player.extremeGear != ExtremeGear::Beginner) {
+			if(Player.driftDashFrames >= 150 && Player.extremeGear == ExtremeGear::TheCrazy) {
+				color = 0x00FF00FF;
+			} else if(Player.driftDashFrames >= Player.requiredDriftDashFrames) {
 				color = 0x20DEDEFF;
 			}
 		}

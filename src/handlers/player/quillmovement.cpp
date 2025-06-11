@@ -3,19 +3,9 @@
 #include "cosmetics/player/exloads.hpp"
 #include "riders/player.hpp"
 #include "lib/stdlib.hpp"
-
-// acronym "Trs" in this case stands for translation, rotation, scale
-struct NodeTrs {
-    Vector3F translation;
-    Quaternion rotation;
-    Vector3F scale;
-};
-static_assert(sizeof(NodeTrs) == 0x28);
+#include "nn/ninjanext.hpp"
 
 ASMDefined s8 lbl_10087CF4;
-
-ASMDefined void nnMultiplyQuaternion(void *, void *, void *);
-ASMDefined void nnMakeRotateZXYQuaternion(void *, s32, s32, s32);
 
 // for rigs that aren't eggman
 constexpr auto QUILL_ROOT = 11;
@@ -29,7 +19,7 @@ constexpr auto HAIR_R_ROOT = 17;
 constexpr auto HAIR_R_MIDDLE = 18;
 constexpr auto HAIR_R_END = 19;
 
-ASMUsed void Silver_QuillMovement(Player *player, std::array<NodeTrs, 71> &nodeTrsList) {
+ASMUsed void Silver_QuillMovement(Player *player, std::array<NNS_TRS, 71> &nodeTrsList) {
 	f32 boneWeight;
 	f64 unkn;
 	u32 gameCnt = gu32GameCnt;
@@ -64,7 +54,7 @@ ASMUsed void Silver_QuillMovement(Player *player, std::array<NodeTrs, 71> &nodeT
 	nnMultiplyQuaternion(&nodeTrsList[QUILL_END].rotation, &nodeTrsList[QUILL_END].rotation, &test);
 }
 
-ASMUsed void Blaze_QuillMovement(Player *player, std::array<NodeTrs, 71> &nodeTrsList) {
+ASMUsed void Blaze_QuillMovement(Player *player, std::array<NNS_TRS, 71> &nodeTrsList) {
 	f32 boneWeight;
 	f64 unkn;
 	u32 gameCnt = gu32GameCnt;
@@ -99,7 +89,7 @@ ASMUsed void Blaze_QuillMovement(Player *player, std::array<NodeTrs, 71> &nodeTr
 	nnMultiplyQuaternion(&nodeTrsList[QUILL_END].rotation, &nodeTrsList[QUILL_END].rotation, &test);
 }
 
-ASMUsed void MikuCharacterFeatures(Player *player, std::array<NodeTrs, 71> &nodeTrsList) {
+ASMUsed void MikuCharacterFeatures(Player *player, std::array<NNS_TRS, 71> &nodeTrsList) {
 	if(player->characterExload().exLoadID == EXLoad::HatsuneMiku) { Blaze_QuillMovement(player, nodeTrsList); }
 }
 
@@ -108,7 +98,7 @@ constexpr T degreesToBams(f32 deg) {
     return static_cast<T>(deg * (65536.0F / 360.0F));
 }
 
-ASMUsed void ScarfPhysics(const Player &player, std::array<NodeTrs, 71> &nodeTrsList) {
+ASMUsed void ScarfPhysics(const Player &player, std::array<NNS_TRS, 71> &nodeTrsList) {
     s32 rootRotation;
     Quaternion quat{};
 
@@ -139,7 +129,7 @@ ASMUsed void ScarfPhysics(const Player &player, std::array<NodeTrs, 71> &nodeTrs
     nnMultiplyQuaternion(&nodeTrsList[QUILL_END].rotation, &nodeTrsList[QUILL_END].rotation, &quat);
 }
 
-ASMUsed void MikuHairPhysics(const Player &player, std::array<NodeTrs, 71> &nodeTrsList) {
+ASMUsed void MikuHairPhysics(const Player &player, std::array<NNS_TRS, 71> &nodeTrsList) {
     // Behavior properties
     constexpr f32 SIN_AMPLITUDE = 0.4f; // Controls the sine wave's amplitude.
     constexpr f32 FREQUENCY_FAST = 2300.04f;

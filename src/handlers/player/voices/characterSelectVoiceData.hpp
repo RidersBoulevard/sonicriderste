@@ -8,12 +8,17 @@ constexpr CharacterSelectVoiceFunc defaultCharacterSelectVoice = [](const Player
 	return player.character;
 };
 
+constexpr CharacterSelectVoiceFunc extraCharacterSelectVoice = [](
+        [[maybe_unused]] const Player &player) -> u8 {
+    return Character::Shadow;
+};
+
 template<u8 voiceID>
 constexpr CharacterSelectVoiceFunc exloadCharacterSelectVoice = [](const Player &) -> u8 {
 	return voiceID;
 };
 
-constexpr std::array<CharacterSelectVoiceFunc, Character::Total> characterSelectLines{
+constexpr std::array<CharacterSelectVoiceFunc, Character::Total + 1> characterSelectLines{
 		defaultCharacterSelectVoice,	// Sonic
 		defaultCharacterSelectVoice,	// Tails
 		defaultCharacterSelectVoice,	// Knuckles
@@ -37,6 +42,7 @@ constexpr std::array<CharacterSelectVoiceFunc, Character::Total> characterSelect
 		defaultCharacterSelectVoice,	// Blaze
 		defaultCharacterSelectVoice,	// Chaos
 		defaultCharacterSelectVoice,	// Tikal
+        extraCharacterSelectVoice,      // Extra Variable Character
 };
 
 constexpr std::array<CharacterSelectVoiceFunc, EXLoadCount> exLoadCharacterSelectLines{

@@ -3,6 +3,7 @@
 #include "handlers/player/initgeardata.hpp"
 #include "cosmetics/player/exloads.hpp"
 #include "lib/sound.hpp"
+#include "handlers/menu/debugmenu/debugmenu.hpp"
 #include <cmath>
 #include "riders/object.hpp"
 #include "lib/stdlib.hpp"
@@ -14,31 +15,30 @@ struct SpecialFlagInfo {
     m2darray<f32, 3, 3> tierAccel;
     u32 gearChange;
     u32 totalBoostTime;
+	f32 typeRemovalTimer;
 };
 
 extern std::array<SpecialFlagInfo, MaxPlayerCount> PlayerSpecialFlagInfo;
 
-ASMDefined void lbl_Player_BoostEndFunction(Player*);
+void Player_lightBoardEffect(Player &player);
 
-void Player_lightBoardEffect(Player* player);
+void Player_moneyCrisis(Player &player);
 
-void Player_moneyCrisis(Player* player);
-
-void Player_storeFlagInfo(Player* player);
+void Player_storeFlagInfo(const Player &player);
 
 ASMDefined const f32 data_C24748F0;
 
-ASMUsed f32 Player_DecelModifier(Player* player);
+ASMUsed f32 Player_DecelModifier(Player &player);
 
-ASMUsed u32 Player_MagnetTimer(Player* player, u32 currTime);
+ASMUsed u32 Player_MagnetTimer(Player &player, u32 currTime);
 
-ASMUsed void Player_CustomRingPickup(Player* player);
+ASMUsed void Player_CustomRingPickup(Player &player);
 
-ASMUsed void Player_ArchetypeTierAccelBuffs(Player* player);
+ASMUsed void Player_ArchetypeTierAccelBuffs(Player &player);
 
-ASMUsed void Player_ApplyBoostSpeed(Player* player);
+ASMUsed void Player_ApplyBoostSpeed(Player &player);
 
-ASMUsed void Player_TornadoBoostApplications(Player* player);
+ASMUsed void Player_TornadoBoostApplications(Player &player);
 
 ASMUsed u32 CustomBoostDuration(Player *player, u32 currentBoostDuration);
 
@@ -50,6 +50,10 @@ ASMDefined void lbl_0008CB1C(u32); // ball and chain model
 
 ASMUsed bool Player_ZIgnoreTornado(Player *player);
 
-ASMUsed void Player_AirGainOnAttack(Player *player);
+ASMUsed void Player_AirGainOnAttack(Player &player);
+
+ASMUsed void Player_CanBeAttacked(Player *player);
+
+ASMUsed bool Player_CanAttack(Player *player);
 
 ASMDefined ObjectNode * gpsCurrentTask;

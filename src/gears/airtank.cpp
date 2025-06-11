@@ -18,8 +18,8 @@ void BallAndChain_Task() {
     switch (object->state) {
         case 2:
             // lbl_000AC470
-			if ((ballPlayer->state >= Cruise && ballPlayer->state <= Fall)
-                || (ballPlayer->extremeGear == ExtremeGear::AdvantageS && ballPlayer->state == Run)) {
+			if ((ballPlayer->state >= PlayerState::Cruise && ballPlayer->state <= PlayerState::Fall)
+                || (ballPlayer->extremeGear == ExtremeGear::AdvantageS && ballPlayer->state == PlayerState::Run)) {
 				if (ballPlayer->speed > pSpeed(150.0f)) {
 					if(ballPlayer->speed < ballPlayer->gearStats[ballPlayer->level].baseTopSpeed) {
 						ballPlayer->speed -= ((ballPlayer->gearStats[ballPlayer->level].tier1Accel * SPEED_DIVISOR) * pSpeed(5.0f));
@@ -45,16 +45,16 @@ void BallAndChain_Task() {
     }
 }
 
-void Player_AirTank(Player *player) {
+void Player_TrapGear(Player *player) {
     if (player->extremeGear != ExtremeGear::TrapGear) return;
 
-    if (player->input->toggleFaceButtons.hasAny(BButton) && player->rings >= 10 && player->state == Cruise) {
+    if (player->input->toggleFaceButtons.hasAny(Buttons::B) && player->rings >= 10 && player->state == PlayerState::Cruise) {
 			// bomb
 			lbl_0008CBD4();
             player->rings -= 10;
 		}
-		if (player->input->toggleFaceButtons.hasAny(XButton) && player->rings >= 30) {
-            auto * objectNode = SetTask(&BallAndChain_Task, ObjectGroups::Object_BallAndChain, 1);
+		if (player->input->toggleFaceButtons.hasAny(Buttons::X) && player->rings >= 30) {
+            auto * objectNode = SetTask(&BallAndChain_Task, ObjectGroups::Object_BallAndChain, Object1Sizes::x20);
 			auto* ballInfo = static_cast<ballAndChainInfo *>(objectNode->object);
 			// ball and chain
             player->rings -= 30;
@@ -76,7 +76,7 @@ void Player_AirTank(Player *player) {
 			ballInfo->player->unkBCC = 0; // we need it fr
 			lbl_0008CB1C(ballInfo->player->index); // makes the model ahaha
 		}
-     
+
     // if (player->extremeGear != AirTank) return;
 
     // AirTankInfo *ATInfo = &PlayerAirTankInfo[player->index];
@@ -103,4 +103,18 @@ void Player_AirTank(Player *player) {
     //         } 
     //     }
     // }
+}
+
+void Player_AirTank(Player &player) {
+	if (player.extremeGear != ExtremeGear::AirTank) return;
+	if (player.state == PlayerState::StartLine) return;
+	SpecialFlagInfo *spfInfo = &PlayerSpecialFlagInfo[player.index];
+	const f32 currAirPercent = static_cast<f32>(player.currentAir) / static_cast<f32>(player.gearStats[player.level].maxAir);
+	const s32 driftChargeReduction = static_cast<s32>(15.0f * currAirPercent);
+	player.requiredDriftDashFrames = 60 - driftChargeReduction;
+
+	f32 topSpeedIncrease = pSpeed(30.0f) *  (1.0f - currAirPercent);
+	player.gearStats[player.level].topSpeed = spfInfo->lvlTopSpeed[player.level] + topSpeedIncrease;
+	// if (!player.movementFlags.hasAny(MovementFlags::boosting) && player.state == PlayerState::Cruise) player.speedCap = player.gearStats[player.level].topSpeed;
+
 }

@@ -23,12 +23,10 @@ struct JumpChargeObject {
 	u16 index;
 };
 
-ASMDefined JumpChargeObject *gpsCurrentTask;
-
 ASMDefined void Player_JumpChargeParticlesTask();
 
 ASMUsed void Player_JumpChargeParticlesVisibility() {
-	auto &obj = *gpsCurrentTask;
+	auto &obj = reinterpret_cast<JumpChargeObject&>(*gpsCurrentTask);
 	const Player &player = players[obj.player_index];
 	if (player.extremeGear != ExtremeGear::AdvantageS && player.state == PlayerState::Run) {
 		return;

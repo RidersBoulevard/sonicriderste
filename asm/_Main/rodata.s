@@ -1420,12 +1420,21 @@ lbl_001C24CC:
     .4byte 0x00000000
     .4byte 0xBC23D70A
     .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x3F000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0xBF800000
-    .4byte 0x00000000
+
+    // bounding box details for player collision searching
+    // origin point is from the player's feet and it extends
+    // both upwards and downwards
+
+    // upwards cutoff plane
+    .single 0
+    .single 0.5 // vanilla value: 0.5
+    .single 0
+
+    // downwards cutoff plane
+    .single 0
+    .single -1.5 // vanilla value: -1.0
+    .single 0
+
     .4byte 0xA9020500
     .4byte 0xA9030500
     .4byte 0xA9040500
@@ -6119,62 +6128,62 @@ lbl_001C670C:
     .4byte 0x3F800000
     .4byte 0x00000003
     .4byte 0x41A00000
-    .4byte 0x3ED55555 # trick rank speeds
-    .4byte 0x3EED097B
-    .4byte 0x3F31C71C
-    .4byte 0x3F31C71C
-    .4byte 0x3FB1C71C
-    .4byte 0x3F6D097B # 0x3F555555
-    .4byte 0x3F8E38E4 # 0x3F6D097B
-    .4byte 0x3ED55555
-    .4byte 0x3EED097B
-    .4byte 0x3F31C71C
-    .4byte 0x3F31C71C
-    .4byte 0x3FB1C71C
-    .4byte 0x3F6D097B # 0x3F555555
-    .4byte 0x3F825EDD # 0x3F6D097B
-    .4byte 0x3E6D097B
-    .4byte 0x3F31C71C
-    .4byte 0x3F3DA12F
-    .4byte 0x3F3DA12F
-    .4byte 0x3F555555
-    .4byte 0x3F555555
-    .4byte 0x3F6D097B
-    .4byte 0x3E8E38E4
-    .4byte 0x3F1A12F7
-    .4byte 0x3F31C71C
-    .4byte 0x3F31C71C
-    .4byte 0x3FB1C71C
-    .4byte 0x3F6D097B # 0x3F555555
-    .4byte 0x3F825EDD # 0x3F555555
-    .4byte 0x3D3DA12F
-    .4byte 0x3DBDA12F
-    .4byte 0x3E0E38E4
-    .4byte 0x3E0E38E4
-    .4byte 0x3EF86A2B
-    .4byte 0x3E3DA12F
-    .4byte 0x3E6D097B
-    .4byte 0x3F6D097B
-    .4byte 0x3F884BDA
-    .4byte 0x3F9425ED
-    .4byte 0x3F9425ED
-    .4byte 0x3FA5ED09
-    .4byte 0x3FA5ED09
-    .4byte 0x3FB1C71C
-    .4byte 0x3F6D097B
-    .4byte 0x3F884BDA
-    .4byte 0x3F9425ED
-    .4byte 0x3F9425ED
-    .4byte 0x3FA5ED09
-    .4byte 0x3FA5ED09
-    .4byte 0x3FB1C71C
-    .4byte 0x00004E20
-    .4byte 0x00007530
-    .4byte 0x00009C40
-    .4byte 0x0000AFC8
-    .4byte 0x00009C50 # 0x0000C350
-    .4byte 0x0000EA60
-    .4byte 0x000186A0
+    .4byte 0x3ED55555 # trick rank speeds (C rank on this line, 90 speed, front flip ramps)
+    .4byte 0x3EED097B # B rank (100 speed)
+    .4byte 0x3F31C71C # A rank (150 speed)
+    .4byte 0x3F6D097B # A+ rank (was 150 speed, 200 now) 0x3F31C71C
+    .4byte 0x3FB1C71C # S rank (300 speed, 270 PTR) 0x3FB1C71C, 0x3F884BDA, 0x3FA00000
+    .4byte 0x3F6D097B # S+ rank (200 speed, 230 PTR) 0x3F555555, 0x3F6D097B, 0x3F9425ED, 0x3F884BDA
+    .4byte 0x3F8E38E4 # X rank (240 speed) 0x3F8E38E4, 0x3F6D097B
+    .4byte 0x3ED55555 # trick rank speeds (C rank, backflip ramps, same logic)
+    .4byte 0x3EED097B # B rank (100 speed)
+    .4byte 0x3F31C71C # A rank (150 speed)
+    .4byte 0x3F6D097B # A+ rank (was 150 speed, 200 now) 0x3F31C71C
+    .4byte 0x3FB1C71C # S rank (300 speed, 270 PTR) 0x3FB1C71C, 0x3F884BDA, 0x3FA00000
+    .4byte 0x3F6D097B # S+ rank (200 speed, 230 PTR) 0x3F555555, 0x3F6D097B, 0x3F9425ED, 0x3F884BDA
+    .4byte 0x3F8E38E4 # X rank (240 speed) 0x3F8E38E4, 0x3F6D097B
+    .4byte 0x3E6D097B # trick rank speeds (C rank, unknown trick)
+    .4byte 0x3F31C71C # B rank
+    .4byte 0x3F3DA12F # A rank
+    .4byte 0x3F3DA12F # A+ rank
+    .4byte 0x3F555555 # S rank
+    .4byte 0x3F555555 # S+ rank
+    .4byte 0x3F6D097B # X rank
+    .4byte 0x3E8E38E4 # trick rank speeds (C rank, halfpipe trick)
+    .4byte 0x3F1A12F7 # B rank
+    .4byte 0x3F31C71C # A rank
+    .4byte 0x3F31C71C # A+ rank
+    .4byte 0x3FB1C71C # S rank
+    .4byte 0x3F6D097B # 0x3F555555, S+ rank
+    .4byte 0x3F825EDD # 0x3F555555, X rank
+    .4byte 0x3D3DA12F # trick rank speeds (C rank, manual ramp trick)
+    .4byte 0x3DBDA12F # B rank
+    .4byte 0x3E0E38E4 # A rank
+    .4byte 0x3E0E38E4 # A+ rank
+    .4byte 0x3EF86A2B # S rank
+    .4byte 0x3E3DA12F # S+ rank
+    .4byte 0x3E6D097B # X rank
+    .4byte 0x3F6D097B # trick rank speeds (C rank, turbulence trick)
+    .4byte 0x3F884BDA # B rank
+    .4byte 0x3F9425ED # A rank
+    .4byte 0x3F9425ED # A+ rank
+    .4byte 0x3FA5ED09 # S rank
+    .4byte 0x3FA5ED09 # S+ rank
+    .4byte 0x3FB1C71C # X rank
+    .4byte 0x3F6D097B # trick rank speeds (C rank, turbulence trick 2)
+    .4byte 0x3F884BDA # B rank
+    .4byte 0x3F9425ED # A rank
+    .4byte 0x3F9425ED # A+ rank
+    .4byte 0x3FA5ED09 # S rank
+    .4byte 0x3FA5ED09 # S+ rank
+    .4byte 0x3FB1C71C # X rank
+    .4byte 0x00004E20 # C rank air gain (for all ramps...?)
+    .4byte 0x00007530 # B rank air gain
+    .4byte 0x00009C40 # A rank air gain
+    .4byte 0x0000AFC8 # A+ rank air gain
+    .4byte 0x000088B8 # S rank air gain (old 40, now 35) 0x0000C350, 0x00009C50
+    .4byte 0x0000EA60 # S+ rank air gain (old 60, now 60) 0x0000EA60
+    .4byte 0x000186A0 # X rank air gain (100, 80 PTR) 0x000186A0, 0x00009C50, 0x00013880
     .4byte 0x00000000
     .4byte 0xBF800000
     .4byte 0x00000000
@@ -19697,7 +19706,7 @@ lbl_001D27F4:
 MainMenu_GraphicalObjectAmount:
     # 0x1D2804
     # .4byte 0x0F0E0A01
-    .4byte 0x100E0A01 # offset 0x0 is normal race button (byte)
+    .4byte 0x100E0B01 # offset 0x0 is normal race button (byte)
     .4byte 0x0E030300 # second to last byte in this array is object amount for debug menu button (tasDebugMenu)
 .global lbl_001D280C
 lbl_001D280C:
@@ -21236,8 +21245,8 @@ lbl_001D3AE8:
     .4byte 0x00000000
     .4byte 0x43300000
     .4byte 0x00000000
-.global lbl_001D3B50
-lbl_001D3B50:
+.global tcou8WorldGP
+tcou8WorldGP:
     # 0x1D3B50
     .4byte 0x01020304
     .4byte 0x05090A0B
@@ -26075,7 +26084,7 @@ data_C2453220:
     .single 8.5 # speed balancer wall bonk multiplier
     .4byte 0x00000000
     .single 10
-    .single 0.20 # 15 percent for speed balancer
+    .single 0.22 # 15 percent for speed balancer
 
 .global data_C24A7E70
 data_C24A7E70:
@@ -26853,6 +26862,7 @@ CSS_GearPortraitID:
     .8byte 0x00B400B500B600B7
     .8byte 0x00B800B900BA00BB
     .2byte 0x00F5 # GunGear
+    .2byte 0x00A0 # OllieKingGear
     .8byte 0x0086008700880089 # from here starts different default gear portraits
     .8byte 0x008A008B008C0108 # eggman is 108
     .8byte 0x008E008D00CE0086 # SS is 0086 to mimic blue star
@@ -26874,6 +26884,7 @@ CSS_GearTextTextureID:
     .8byte 0x002E002F00300031
     .8byte 0x0032003300340035
     .2byte 0x00F6 # GunGear
+    .2byte 0x00F6 # OllieKingGear
     .8byte 0x0000000100020003 # from here starts different default gear texts
     .8byte 0x0004000500060109 # eggman is 0109
     .8byte 0x0008000700FB0000 # SS is 00 to mimic blue star
@@ -26911,18 +26922,18 @@ CSS_CharacterHeightOnBoard:
 
 .global SuperShadowAttackStruct
 SuperShadowAttackStruct:
-    .long 0x3F8CCCCD
+    .long 0x3FB33333
     .long 0x0
-    .long 0x3F000000
+    .long 0x3F19999A
+    .long 0x3E19999A
     .long 0x0
-    .long 0x0
-    .long 0x0
-    .long 0x43480000
+    .long 0xBE4CCCCD
+    .long 0x0 # flashing stun timer
     .long 0x40400000
-    .long 0x00007FFF
-    .long 0x01011100
-    .long 0xFF001111
-    .long 0x290100FF
+    .long 0x00003FFF
+    .long 0x00021405
+    .long 0x01001415
+    .long 0x0C300501
     .long 0x0
 
 .global data_C2470DA8
@@ -27020,8 +27031,8 @@ data_C246C090:
 data_C24CD8FC: 
     .single 0.9
 
-.global RuleSettings_ButtonPositions
-RuleSettings_ButtonPositions:
+.global ruleSettings_ButtonPositions
+ruleSettings_ButtonPositions:
     .byte 0x16
     .byte 0x00
     .byte 0x03
@@ -27031,8 +27042,8 @@ RuleSettings_ButtonPositions:
     .byte 0x13
     .balign 4
 
-.global RuleSettings_OnOffSwitchPositions
-RuleSettings_OnOffSwitchPositions:
+.global ruleSettings_OnOffSwitchPositions
+ruleSettings_OnOffSwitchPositions:
     .byte 0x17
     .byte 0x09
     .byte 0x0F
@@ -27042,8 +27053,8 @@ RuleSettings_OnOffSwitchPositions:
     .byte 0x15
     .balign 4
 
-.global RuleSettings_ArrowPositions
-RuleSettings_ArrowPositions:
+.global ruleSettings_ArrowPositions
+ruleSettings_ArrowPositions:
     .byte 0x18
     .byte 0x0A
     .byte 0x0B
@@ -27440,6 +27451,98 @@ SuperKnucklesAuraParticles:
     .4byte 0x43600000
     .4byte 0x437D0000
     .4byte 0x00000000
+    .4byte 0x3CA3D70A
+    .4byte 0x3CA3D70A
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x461C4000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x80000000
+    .4byte 0x3E4CCCCD
+    .4byte 0x00000000
+    .4byte 0x3ECCCCCD
+    .4byte 0x3DCCCCCD
+    .4byte 0x3DCCCCCD
+    .4byte 0x00000000
+    .4byte 0x3F800000
+    .4byte 0x00000000
+    .4byte 0x000F0000
+
+.global SuperShadowAuraParticles
+SuperShadowAuraParticles:
+    # 0x1EFF98
+    .4byte 0x07030033
+    .4byte 0x0001B3B0
+    .4byte 0x3F19999A
+    .4byte 0x3F800000
+    .4byte 0x00000000
+    .4byte 0x00060005
+    .4byte 0x00000000
+    .4byte 0x3CCCCCCD
+    .4byte 0x3D4CCCCD
+    .4byte 0x398D8EC9
+    .4byte 0x000F0003
+    .4byte 0x437C0000 # Color 1 R
+    .4byte 0x40C00000 # Color 1 G
+    .4byte 0x40800000 # Color 1 B
+    .4byte 0x41A00000 # Color 1 A
+    .4byte 0x437C0000 # Color 2 R
+    .4byte 0x43240000 # Color 2 G
+    .4byte 0x00000000 # Color 2 B
+    .4byte 0x41700000 # Color 2 A
+    .4byte 0x3CA3D70A
+    .4byte 0x3CA3D70A
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x461C4000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x80000000
+    .4byte 0x3E4CCCCD
+    .4byte 0x00000000
+    .4byte 0x3ECCCCCD
+    .4byte 0x3DCCCCCD
+    .4byte 0x3DCCCCCD
+    .4byte 0x00000000
+    .4byte 0x3F800000
+    .4byte 0x00000000
+    .4byte 0x000F0000
+
+.global NeoMetalAuraParticles
+NeoMetalAuraParticles:
+    # 0x1EFF98
+    .4byte 0x07030033
+    .4byte 0x0001B3B0
+    .4byte 0x3F19999A
+    .4byte 0x3F800000
+    .4byte 0x00000000
+    .4byte 0x00060005
+    .4byte 0x00000000
+    .4byte 0x3CCCCCCD
+    .4byte 0x3D4CCCCD
+    .4byte 0x398D8EC9
+    .4byte 0x000F0003
+    .4byte 0x431E0000 # Color 1 R
+    .4byte 0x43760000 # Color 1 G
+    .4byte 0x428A0000 # Color 1 B
+    .4byte 0x40E00000 # Color 1 A
+    .4byte 0x43120000 # Color 2 R
+    .4byte 0x43730000 # Color 2 G
+    .4byte 0x42AC0000 # Color 2 B
+    .4byte 0x40E00000 # Color 2 A
     .4byte 0x3CA3D70A
     .4byte 0x3CA3D70A
     .4byte 0x00000000

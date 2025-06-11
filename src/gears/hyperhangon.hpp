@@ -15,6 +15,4 @@ extern const f32 HHO_BoostSpeeds[4];
 extern const f32 HHOBoostControlSpeeds[4];
 extern const f32 HHOBoostControlSpeedsBoostArchetype[4];
 
-ASMDefined void lbl_Player_BoostEndFunction(Player *);
-
-void Player_HyperHangOn(Player *player);
+void Player_HyperHangOn(Player &player);

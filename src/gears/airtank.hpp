@@ -15,6 +15,7 @@ struct AirTankInfo {
 
 extern std::array<AirTankInfo, MaxPlayerCount> PlayerAirTankInfo;
 
-ASMUsed u32 AntiItemCampHandler(Player *player, u32 item);
+ASMUsed void Player_TrapGear(Player *player);
 
-ASMUsed void Player_AirTank(Player *player);
+void Player_AirTank(Player &player);
+

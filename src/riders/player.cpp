@@ -12,29 +12,53 @@
 #include "handlers/player/zbutton.hpp"
 #include "gears/supertails.hpp"
 #include "gears/blastGaugeGears.hpp"
+#include "gears/hypersonic.hpp"
+#include "gears/supermetal.hpp"
+#include "mechanics/speed_shoes.hpp"
+#include "tweaks/player/archetype/boostarchetypejcbc.hpp"
 
 void Player::reset() {
-	// Preserve fields we want to keep
-	const auto voiceID = this->characterVoiceID;
+    // Preserve fields we want to keep
+    const auto voiceID = this->characterVoiceID;
 
-	// Copy the index since it gets cleared in the memset
-	const auto index = this->index;
+    // Copy the index since it gets cleared in the memset
+    const auto index = this->index;
 
-	// Clears the player struct for everything not below unkC4
-	memset(&this->unkC4, 0, sizeof(Player) - offsetof(Player, unkC4));
-	// Re-Init our extra player data using the default constructors
-	MI::impulseData[index] = {};
-	PlayerGizoidReplication[index] = {};
-	playerFlyHoopDashProperties[index] = {};
-	Player_BerserkerStatIncreaseMultipliers[index] = {};
-	PlayerAdvantagePInfo[index] = {};
-	PlayerZButtonHeldTimers[index] = {};
-	PlayerSuperTailsInfo[index] = {};
+    // Clears the player struct for everything not below unkC4
+    memset(&this->unkC4, 0, sizeof(Player) - offsetof(Player, unkC4));
+    // Re-Init our extra player data using the default constructors
+    MI::impulseData[index] = {};
+    PlayerGizoidReplication[index] = {};
+    playerFlyHoopDashProperties[index] = {};
+    Player_BerserkerStatIncreaseMultipliers[index] = {};
+    PlayerAdvantagePInfo[index] = {};
+    PlayerZButtonHeldTimers[index] = {};
+    PlayerSuperTailsInfo[index] = {};
+    PlayerHyperSonicInfo[index] = {};
     PlayerBlastGaugeInfo[index] = {};
-	if(RaceExitMethod != ExitMethod::Retry) {// on retry, don't clear data
-		IsSeparateBoardModelActive[index] = false;
-	}
+    PlayerNeoMetalInfo[index] = {};
+    player_speed_shoes[index] = {};
 
-	// Copy our preserved fields back
-	this->characterVoiceID = voiceID;
+    // don't clear data if player retried or game files were loaded outside of InitGame()
+    if (gu32EndOfGameFlag != std::to_underlying(ExitMethod::Retry)) {
+        IsSeparateBoardModelActive[index] = false;
+    }
+
+    // Copy our preserved fields back
+    this->characterVoiceID = voiceID;
+}
+
+void Player::on_lap() {
+    if (get_speed_shoes_data(*this).has_speed_shoes) {
+        Player_TriggerSpeedShoes(*this);
+    }
+}
+
+/**
+* A place to toss member functions that also need to be called from asm
+*/
+namespace asm_stuff {
+    ASMUsed void Player_OnLap(Player &player) {
+        player.on_lap();
+    }
 }

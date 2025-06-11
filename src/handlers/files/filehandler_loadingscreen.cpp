@@ -1,8 +1,10 @@
-#include "filehandler_dat.hpp"
+#include "lib/files.hpp"
 #include "main.hpp"
 #include "riders/gamemode.hpp"
 
 #include <span>
+
+#include "filehandler_dat.hpp"
 
 std::array<void*, 2> CustomTextArchiveFile;
 
@@ -13,13 +15,13 @@ ASMDefined {
 }
 
 void init_text_table(std::span<u32> table) {
-	u32 *textptr = &table[3];
-    u32 *startptr = table.data();
+	u32 *textPtr = &table[3];
+    u32 *startPtr = table.data();
 
 	const u32 &textAmount = table[2];
 	for(u32 i = 0; i < textAmount; i++){
-		*textptr = reinterpret_cast<u32>(startptr) + *textptr;
-		textptr++;
+		*textPtr = reinterpret_cast<u32>(startPtr) + *textPtr;
+		textPtr++;
 	}
 }
 
@@ -28,9 +30,9 @@ ASMUsed void LoadingScreenFileHandler() {
 
     SetArchiveBinary(DumpPackManFile("TSGC"), 0, 0); // Custom Archive File
 
-    GetSet_Tex(DumpFile("PTT"), &offset, &texList_NormalSuperTails, 0); // Super Tails Textures
+    GetSet_Tex(DumpFile("PTT", true), &offset, &texList_NormalSuperTails, 0); // Super Tails Textures
 
-    GetSet_Tex(DumpFile("P4T"), &offset, &texList_NormalSuperNeoMetal, 0); // Neo Metal Textures
+    GetSet_Tex(DumpFile("P4T", true), &offset, &texList_NormalSuperNeoMetal, 0); // Neo Metal Textures
 
     if (CurrentGameMode == FreeRace || CurrentGameMode == WorldGrandPrix){
         SetArchiveBinary(DumpPackManFile("SVB"), 0, 0);

@@ -1,18 +1,19 @@
 #include "globalDefs.hpp"
 #include "riders/object.hpp"
 #include "handlers/files/packman_handlers.hpp"
-#include "ninjanext.hpp"
+#include "nn/ninjanext.hpp"
 #include "lib/lib.hpp"
 #include "lib/stdlib.hpp"
 #include "containers/particle_details.hpp"
 #include "mechanics/magneticimpulse.hpp"
+#include "tweaks/player/archetype/boostarchetypejcbc.hpp"
 
 constexpr auto MAX_MTXSTACK_COUNT = 2;
 
 ASMDefined ObjectNode *gpsCurrentTask;
 ASMDefined f32 gf32Motion_1Frame;
 ASMDefined void *gsNnMtxStack;
-ASMDefined Matrix3x3F gaNnViewMtx;
+ASMDefined Matrix3x4F gaNnViewMtx;
 ASMDefined ParticleDetails tsAirCharge_Par_DefData;
 ASMDefined void func_Particle_Task();
 ASMDefined NNS_TexList *gpsTexList_EffectAirChargeParticle;
@@ -20,7 +21,7 @@ ASMDefined u32 *gpsaNodeStat_Player[];
 
 struct AfterburnerEffectObject1 {
     f32 motionFrame;
-    Matrix3x3F *matrixStack;
+    Matrix3x4F *matrixStack;
 };
 static_assert(sizeof(AfterburnerEffectObject1) < 0x20);
 
@@ -141,7 +142,7 @@ namespace {
     };
 
     inline ParticleTaskObject1 *MakeParticleTask() {
-        return static_cast<ParticleTaskObject1 *>(SetTask(func_Particle_Task, ObjectGroups::Particle, 2)->object);
+        return static_cast<ParticleTaskObject1 *>(SetTask(func_Particle_Task, ObjectGroups::Particle, Object1Sizes::x80)->object);
     }
 
     /**
@@ -154,14 +155,14 @@ namespace {
      */
     inline void UpdateParticleMatrix(AfterburnerEffectObject1 *obj1, Player &player, const AirChargeDef &airChargeDef, const u32 mtxIdx) {
         auto *plyMtxList = gpsaMtxList_Player[player.index];
-        Matrix3x3F rotationMat;
+        Matrix3x4F rotationMat;
         nnMakeRotateXYZMatrix(&rotationMat, airChargeDef.rot_x, airChargeDef.rot_y, airChargeDef.rot_z);
 
-        Matrix3x3F boneMat;
+        Matrix3x4F boneMat;
         nnTranslateMatrix(&boneMat, plyMtxList + airChargeDef.bone, airChargeDef.trans_x, airChargeDef.trans_y,
                           airChargeDef.trans_z);
 
-        Matrix3x3F rotBoneMat;
+        Matrix3x4F rotBoneMat;
         nnMultiplyMatrix(&boneMat, &rotationMat, rotBoneMat);
 
         nnMultiplyMatrix(&player.unkC4, &rotBoneMat, obj1->matrixStack[mtxIdx]);
@@ -211,7 +212,7 @@ namespace {
         nnSetTextureList(AfterburnerEffect_TexList);
         nnSetUpNodeStatusList(nodeStat, obj->nNode, 0);
 
-        Matrix3x3F finalMat;
+        Matrix3x4F finalMat;
         nnMultiplyMatrix(&gaNnViewMtx, &obj1->matrixStack[mtxIdx], finalMat);
 
         nnCalcMatrixPaletteMotion(mtxPal, nodeStat, obj, AfterburnerEffect_Motion, motionFrame, &finalMat,
@@ -258,7 +259,7 @@ namespace {
             particles->unk74 = 0;
         }
 
-        nnRotateXMatrix(&obj1->matrixStack[mtxIdx], &obj1->matrixStack[mtxIdx], nn::FloatToBAM(-90.0f));
+        nnRotateXMatrix(&obj1->matrixStack[mtxIdx], &obj1->matrixStack[mtxIdx], nn::DegToA32(-90.0f));
     }
 
     /**
@@ -302,7 +303,7 @@ ASMUsed void Player_AfterburnerEffectTask() {
     switch (taskObj->state) {
         case 2: {
             // make space for 4 matrices, max 2 matrices for particles + 2 copies
-            obj1->matrixStack = static_cast<Matrix3x3F *>(gNp_MallocHi(4, sizeof(Matrix3x3F) * (MAX_MTXSTACK_COUNT * 2)));
+            obj1->matrixStack = static_cast<Matrix3x4F *>(gNp_MallocHi(4, sizeof(Matrix3x4F) * (MAX_MTXSTACK_COUNT * 2)));
             taskObj->state++;
             [[fallthrough]];
         }
@@ -316,7 +317,13 @@ ASMUsed void Player_AfterburnerEffectTask() {
 
             UpdateParticleMatrixAll(obj1, player);
 
-            if (MI::impulseData[playerIndex].afterburnerTimer == 0) break;
+            if (player.characterArchetype != CharacterArchetype::Trickster) break;
+
+            if (player.characterArchetype == CharacterArchetype::Trickster && MI::impulseData[playerIndex].afterburnerTimer == 0) break;
+            if (player.characterArchetype == CharacterArchetype::Turning) {
+                NewCombatInfo &combatInfo = PlayerCombatInfo[player.index];
+                if (combatInfo.attackBonusTimer <= 0.0f) break;
+            }
 
             u32 particleNum = 1;
             if (player.gearType == GearType::Skates) particleNum++;

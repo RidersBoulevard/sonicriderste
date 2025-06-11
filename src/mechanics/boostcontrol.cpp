@@ -19,7 +19,8 @@ ASMUsed void Player_BoostControl(Player *player) {
 	if(player->boostDuration == 1) {
 		// see if player is initiating boost control
 		if(player->input->holdFaceButtons.hasAny(Buttons::B, Buttons::X)) {
-			if(isSuperCharacter(*player, Character::Shadow) && sshInfo->inhibitorRingsOff && sshInfo->chaosBoostControl == 1
+			if(player->isSuperCharacter(Character::Shadow)
+			&& sshInfo->inhibitorRingsOff && sshInfo->chaosBoostControl == 1
 			// && player->input->holdFaceButtons.hasAny(Buttons::X)
 			) {
 				BlastGaugeInfo *bgInfo = &PlayerBlastGaugeInfo[player->index];
@@ -54,6 +55,14 @@ ASMUsed void Player_BoostControl(Player *player) {
 
 					case AdvantageS:
 						newAir = player->currentAir - (BoostControl_AdvantageSAir[player->level] * 80) / 100;
+						newAir = clamp(newAir);
+						player->currentAir = newAir;
+
+						isBoostControlActive = newAir != 0;
+						break;
+
+					case OpaOpa:
+						newAir = player->currentAir - BoostControl_FasterAir[player->level];
 						newAir = clamp(newAir);
 						player->currentAir = newAir;
 

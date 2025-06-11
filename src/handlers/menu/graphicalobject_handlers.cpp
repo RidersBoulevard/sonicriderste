@@ -335,7 +335,7 @@ ASMUsed void GraphicalObjectHandler_CSSInformationText(GraphicalObject *gobject)
                         default:
                             break;
                     }
-                } else if (DebugMenu_CheckOption(DebugMenuOptions::PTRMode) && player->extremeGear == ExtremeGear::Darkness) {
+                } else if (DebugMenu_CheckOption(DebugMenuOptions::PTRMode) && player->extremeGear == ExtremeGear::Darkness && player->gearExload().exLoadID == EXLoad::TheProfessional) {
                     text = 777;
                 } else {
                     text = lbl_001D37F8[

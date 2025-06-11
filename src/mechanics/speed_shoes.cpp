@@ -1,4 +1,7 @@
 #include "speed_shoes.hpp"
+
+#include <gears/hangon.hpp>
+
 #include "globalDefs.hpp"
 #include "handlers/player/ItemBox.hpp"
 #include "mechanics/magneticimpulse.hpp"
@@ -57,7 +60,7 @@ void Player_TriggerSpeedShoes(Player &player) {
 	ItemBox_SpeedShoes_PlayADX();
 	speed_shoes.double_tap_timer = 0;
 	speed_shoes.has_speed_shoes = false;
-    speed_shoes.cannot_use_speed_shoes = true; // disables using speed shoes until a new, shoeless box is picked
+    if (!(player.extremeGear == ExtremeGear::SuperHangOn && player.gearSpecificFlags[SuperHangOn::Level4])) speed_shoes.cannot_use_speed_shoes = true; // disables using speed shoes until a new, shoeless box is picked
 
 	if constexpr(enable_speed_shoes_recolor) {
 		for(auto &material : gpsaObject_Player[player.index]->materials()) {

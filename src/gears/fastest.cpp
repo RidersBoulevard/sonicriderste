@@ -14,6 +14,7 @@ void Player_Fastest(Player &player) {
 		const bool isLateBooster = player.characterArchetype == CharacterArchetype::LateBooster;
 		const bool isCombat = player.characterArchetype == CharacterArchetype::Combat;
 		if(player.input->toggleFaceButtons.hasAny(Buttons::B, Buttons::X)) {
+		    player.specialFlags |= SpecialFlags::berserkerEffect;
 			if(isCombat) {
 				player.currentAir -= 4000;// 20% reduction
 			} else if(isLateBooster) {
@@ -43,7 +44,7 @@ void Player_Fastest(Player &player) {
 			player.currentAir -= 400;
 		}
 
-		if(isBerserker) { player.specialFlags |= SpecialFlags::berserkerEffect; }
+		// if(isBerserker) { player.specialFlags |= SpecialFlags::berserkerEffect; }
 	} else {
 		player.fastest_superCruise = false;
 		player.fastest_timer = 0;

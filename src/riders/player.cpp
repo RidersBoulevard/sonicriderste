@@ -2,19 +2,22 @@
 
 #include <cstring>
 
-#include "gears/berserker.hpp"
-#include "handlers/files/separatemodelloading.hpp"
-#include "mechanics/characters/gizoidreplication.hpp"
-#include "mechanics/dash/flyhoopdash.hpp"
-#include "riders/gamemode.hpp"
-#include "mechanics/magneticimpulse.hpp"
 #include "gears/advantagep.hpp"
-#include "handlers/player/zbutton.hpp"
-#include "gears/supertails.hpp"
+#include "gears/berserker.hpp"
 #include "gears/blastGaugeGears.hpp"
+#include "gears/faster.hpp"
 #include "gears/hypersonic.hpp"
 #include "gears/supermetal.hpp"
+#include "gears/supertails.hpp"
+#include "gears/hangon.hpp"
+#include "gears/airtank.hpp"
+#include "handlers/files/separatemodelloading.hpp"
+#include "handlers/player/zbutton.hpp"
+#include "mechanics/characters/gizoidreplication.hpp"
+#include "mechanics/dash/flyhoopdash.hpp"
+#include "mechanics/magneticimpulse.hpp"
 #include "mechanics/speed_shoes.hpp"
+#include "riders/gamemode.hpp"
 #include "tweaks/player/archetype/boostarchetypejcbc.hpp"
 
 void Player::reset() {
@@ -38,6 +41,9 @@ void Player::reset() {
     PlayerBlastGaugeInfo[index] = {};
     PlayerNeoMetalInfo[index] = {};
     player_speed_shoes[index] = {};
+    PlayerHangOnInfo[index] = {};
+    PlayerAcceleratorInfo[index] = {};
+    PlayerAirTankInfo[index] = {};
 
     // don't clear data if player retried or game files were loaded outside of InitGame()
     if (gu32EndOfGameFlag != std::to_underlying(ExitMethod::Retry)) {
@@ -49,9 +55,6 @@ void Player::reset() {
 }
 
 void Player::on_lap() {
-    if (get_speed_shoes_data(*this).has_speed_shoes) {
-        Player_TriggerSpeedShoes(*this);
-    }
 }
 
 /**

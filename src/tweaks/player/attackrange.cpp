@@ -29,9 +29,9 @@
     }
 
     if (player.extremeGear == ExtremeGear::Berserker) {
-        if (currentRange > DEFAULT_RANGE || player.state != PlayerState::RailGrind && player.attackProperties->isAOE) {
+        if (currentRange > DEFAULT_RANGE || (player.state == PlayerState::Cruise && player.attackProperties->isAOE)) {
             currentRange += 0.5f;
-        } else if (player.state != PlayerState::RailGrind) {
+        } else if (player.state == PlayerState::Cruise) {
             currentRange += 1.0f;
         }
     }

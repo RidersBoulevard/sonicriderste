@@ -371,7 +371,8 @@ ASMUsed void Player_TornadoBoostApplications(Player* player) {
 }
 
 ASMUsed void Player_AirGainOnAttack(Player *player) {
-	// Note: Ring gears do not use this at all
+	// Note: Ring gears should not use this at all
+	if (player->specialFlags.hasAny(SpecialFlags::ringGear)) return;
 	switch (player->extremeGear) {
 		using namespace ExtremeGear;
 		case HighBooster: 

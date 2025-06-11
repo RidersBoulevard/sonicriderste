@@ -46,48 +46,48 @@ constexpr std::array<f32, 2> SuperTailsRunSpeeds = {
  * @return New run speed.
  */
 f32 Player_RunSpeed(const Player &player, const f32 runSpeed) {
-    if (player.state != Run) {
+    if (player.state != PlayerState::Run) {
 		return runSpeed;
 	}
 
 	if(player.extremeGear == ExtremeGear::ChaosEmerald){
 		switch(player.character){
-			case MetalSonic:
+			case Character::MetalSonic:
 				return SuperNeoMetalRunSpeeds[player.superFormState];
-			case SuperSonic:
-				if (FetchEnabledEXLoadIDs(player).gearExLoadID == HyperSonicEXLoad){
+			case Character::SuperSonic:
+				if (player.gearExload().exLoadID == EXLoad::HyperSonic){
 					return pSpeed(215.0f);
 				} // else
 				return pSpeed(205.0f);
-			case Knuckles:
+			case Character::Knuckles:
 				return pSpeed(190.0f);
-			case Shadow:
+			case Character::Shadow:
 				return pSpeed(215.0f);
-			case Tails:
+			case Character::Tails:
 				return SuperTailsRunSpeeds[player.superFormState != 0 ? 1 : 0];
 			default:
 				break;
 		}
 	}
 	if (player.extremeGear == ExtremeGear::AdvantageS) {
-        return AdvantageSRunSpeeds[player.level] + AdvantageSTypeAdditiveRunSpeeds[player.characterptr->type];
+        return AdvantageSRunSpeeds[player.level] + AdvantageSTypeAdditiveRunSpeeds[std::to_underlying(player.characterptr->type)];
     }
 
 	const f32 &newRunSpeed = BaseRunSpeeds[player.level];
 	f32 extraSpeed{};
 	switch (player.character) {
-		case Sonic:
+		case Character::Sonic:
 			if (player.level == 2) {
 				extraSpeed = pSpeed(30);
 			} else {
-				extraSpeed = TypeAdditiveRunSpeeds[player.characterptr->type];
+				extraSpeed = TypeAdditiveRunSpeeds[std::to_underlying(player.characterptr->type)];
 			}
 			break;
-		// case E10G:
+		// case Character::E10G:
 		// 	extraSpeed = pSpeed(10);
 		// 	break;
 		default:
-			extraSpeed = TypeAdditiveRunSpeeds[player.characterptr->type];
+			extraSpeed = TypeAdditiveRunSpeeds[std::to_underlying(player.characterptr->type)];
 			break;
 	}
 

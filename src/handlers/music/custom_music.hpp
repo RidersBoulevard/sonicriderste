@@ -13,6 +13,7 @@ ASMUsed bool CustomMusicPlayer(u32 mode);
 ASMUsed const char *FixInvincibilitySongReplay();
 ASMUsed void CustomMusicChanger_OnPauseMenu();
 ASMUsed void CustomMusicChanger_MainMenu();
+void PlayVanillaStageMusic();
 
 constexpr auto STAGE_MUSIC_COUNT = 64;
 constexpr auto MENU_MUSIC_COUNT = 31;

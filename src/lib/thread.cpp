@@ -12,5 +12,5 @@ void Thread::Stop() {
 	//throw std::runtime_error("Attempting to stop incorrect thread");
 }
 Thread &Thread::GetCurrentThread() {
-	return *static_cast<Thread *>(_OSGetCurrentContext());
+	return *static_cast<Thread *>(OSGetCurrentThread());
 }

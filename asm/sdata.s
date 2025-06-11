@@ -25,8 +25,8 @@ lbl_8021B8D0:
 .global gu32Game_UnPauseFlag
 gu32Game_UnPauseFlag:
 	.4byte 0x00000001
-.global lbl_8021B8D8
-lbl_8021B8D8:
+.global gf32MapMotionEndFrame
+gf32MapMotionEndFrame:
 	.4byte 0x42700000
 .global lbl_8021B8DC
 lbl_8021B8DC:
@@ -61,8 +61,8 @@ lbl_8021B908:
 	.4byte 0x6e2e7265
 	.4byte 0x6c000000
 	.4byte 0x00000000
-.global lbl_8021B918
-lbl_8021B918:
+.global __OSVersion
+__OSVersion:
 	.4byte lbl_80117C98
 .global lbl_8021B91C
 lbl_8021B91C:
@@ -71,16 +71,16 @@ lbl_8021B91C:
 .global lbl_8021B924
 lbl_8021B924:
 	.4byte 0x25730a00
-.global lbl_8021B928
-lbl_8021B928:
+.global __OSCurrHeap
+__OSCurrHeap:
 	.4byte 0xffffffff
 	.4byte 0x00000000
-.global lbl_8021B930
-lbl_8021B930:
+.global __OSArenaLo
+__OSArenaLo:
 	.4byte 0xffffffff
 	.4byte 0x00000000
-.global lbl_8021B938
-lbl_8021B938:
+.global __OSFpscrEnableBits
+__OSFpscrEnableBits:
 	.4byte 0x000000f8
 .global lbl_8021B93C
 lbl_8021B93C:
@@ -89,33 +89,33 @@ lbl_8021B93C:
 lbl_8021B940:
 	.4byte 0x25640000
 	.4byte 0x00000000
-.global lbl_8021B948
-lbl_8021B948:
+.global FontEncode
+FontEncode:
 	.4byte 0xffff0000
 	.4byte 0x00000000
-.global lbl_8021B950
-lbl_8021B950:
-	.4byte lbl_8000FF7C
+.global SwitchThreadCallback
+SwitchThreadCallback:
+	.4byte DefaultSwitchThreadCallback
 .global lbl_8021B954
 lbl_8021B954:
 	.4byte 0x00000000
-.global lbl_8021B958
-lbl_8021B958:
+.global DVD_FirstRead
+DVD_FirstRead:
 	.4byte 0x00000001
 	.4byte 0x00000000
 .global lbl_8021B960
 lbl_8021B960:
 	.4byte 0x64766466
 	.4byte 0x732e6300
-.global lbl_8021B968
-lbl_8021B968:
+.global __DVDVersion
+__DVDVersion:
 	.4byte lbl_80119F74 + 0x34
 .global lbl_8021B96C
 lbl_8021B96C:
 	.4byte 0x00000001
 .global lbl_8021B970
 lbl_8021B970:
-	.4byte lbl_800137A4
+	.4byte defaultOptionalCommandChecker
 .global lbl_8021B974
 lbl_8021B974:
 	.4byte 0x6476642e
@@ -158,7 +158,7 @@ lbl_8021B9B0:
 	.4byte 0x00000005
 .global lbl_8021B9B4
 lbl_8021B9B4:
-	.4byte lbl_80019870
+	.4byte SPEC2_MakeStatus
 .global lbl_8021B9B8
 lbl_8021B9B8:
 	.4byte 0x41000000
@@ -187,10 +187,10 @@ lbl_8021B9E0:
 	.4byte 0x00000000
 .global lbl_8021B9E8
 lbl_8021B9E8:
-	.4byte lbl_80022108
+	.4byte __AXFXAllocFunction
 .global lbl_8021B9EC
 lbl_8021B9EC:
-	.4byte lbl_80022130
+	.4byte __AXFXFreeFunction
 .global lbl_8021B9F0
 lbl_8021B9F0:
 	.4byte lbl_801208D0

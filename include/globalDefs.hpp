@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include "shared-definitions.h"
 #include "types.hpp"
-
 constexpr f32 SPEED_DIVISOR = 216.0F; // value used as a divisor to calculate player speed in game
 
 constexpr auto MaxPlayerCount = 8;

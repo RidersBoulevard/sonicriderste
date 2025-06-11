@@ -32,14 +32,14 @@ ASMDefined void InitCamera(u32);
 ASMDefined void nnInitLight();
 ASMDefined void InitLight(u32);
 ASMDefined void nnSetClipScreenCoordinates(u32 []);
-ASMDefined void lbl_000B7BFC();
+ASMDefined void lbl_000B7BFC(); // Creates the loading screen thread?
 ASMDefined void lbl_001514A8();
 ASMDefined void lbl_800645A8(void *, f32, f32, f32, f32, f32, f32);
 ASMDefined void lbl_80006778();
 ASMDefined void lbl_0004F404();
 ASMDefined void gNp_TaskDone();
 ASMDefined void lbl_0014C080();
-ASMDefined void func_800303B0(u32);
+ASMDefined void GXSetDrawSync(u32);
 ASMDefined void gNp_VWaitTrans();
 ASMDefined void lbl_000B766C();
 ASMDefined void lbl_000375B4();

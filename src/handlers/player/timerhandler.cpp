@@ -3,16 +3,18 @@
 #include "gears/hyperhangon.hpp"
 #include "lib/sound.hpp"
 #include "mechanics/magneticimpulse.hpp"
+#include "gears/supertails.hpp"
+#include "gears/blastGaugeGears.hpp"
+#include "lib/stdlib.hpp"
+#include "cosmetics/player/dreamtrail.hpp"
 
 void Player_TimerHandler(Player &player) {
-    EnabledEXLoads exLoads;
-	FetchEnabledEXLoadIDs(&player, exLoads);
     // decrement item box cooldown timer
-    if (player.flags.hasAny(ItemBoxCooldownFlag)) {
+    if (player.flags.hasAny(PlayerFlags::ItemBoxCooldown)) {
         if (player.itemBox_cooldown != 0) {
             player.itemBox_cooldown -= 1;
         } else {
-            player.flags &= ~ItemBoxCooldownFlag;
+            player.flags &= ~PlayerFlags::ItemBoxCooldown;
         }
     }
 
@@ -24,9 +26,9 @@ void Player_TimerHandler(Player &player) {
     // decrement tornado invuln timer
     if (player.tornadoInvulnerabilityTimer != 0) {
         if (player.tornadoInvulnerabilityTimer == 1) {
-            player.statusEffectFlags &= ~InvincibilityStatus;
-        } else if (!player.statusEffectFlags.hasAny(InvincibilityStatus)) {
-            player.statusEffectFlags |= InvincibilityStatus;
+            player.statusEffectFlags &= ~PlayerStatus::InvincibilityStatus;
+        } else if (!player.statusEffectFlags.hasAny(PlayerStatus::InvincibilityStatus)) {
+            player.statusEffectFlags |= PlayerStatus::InvincibilityStatus;
         }
         
         player.tornadoInvulnerabilityTimer -= 1;
@@ -35,46 +37,58 @@ void Player_TimerHandler(Player &player) {
     // decrement and apply dream trail timer
     if (player.dreamTrail_timer != 0) {
         player.dreamTrail_timer -= 1;
-        Player_DreamTrailParticles(&player);
+        Player_DreamTrailParticles(player);
     }
 
     // decrement berserker counter attack timer
-    if (player.state != AttackedByPlayer && player.berserkerCooldown != 0) {
+    if (player.state != PlayerState::AttackedByPlayer && player.berserkerCooldown != 0) {
         player.berserkerCooldown -= 1;
     }
 
     // decrement hang on max rings timer and set max rings
     if (player.extremeGear == ExtremeGear::HangOn) {
         if (player.hangOn_infiniteRingTimer > 0) { //  && player->state != AttackingPlayer
-            if (player.state != AttackingPlayer) {
+            if (player.state != PlayerState::AttackingPlayer) {
                 player.hangOn_infiniteRingTimer -= 1;
                 if(player.hangOn_infiniteRingTimer >= 179) {
 					PlayAudioFromDAT(Sound::SFX::GoldExp);
 				}
             }
-            if (exLoads.gearExLoadID == HangOnATEXLoad) {
-                player.rings = 100;
-                player.currentAir += 750;
-            } else {
-				player.currentAir = player.gearStats[player.level].maxAir;
-			}
+			player.currentAir = player.gearStats[player.level].maxAir;
         }
     }
 
     // decrement super tails transform cooldown
-    if (isSuperCharacter(player, Tails)) {
+    if (isSuperCharacter(player, Character::Tails)) {
+	    SuperTailsInfo *stInfo = &PlayerSuperTailsInfo[player.index];
         if (player.superTails_transformCooldown > 0) {
             player.superTails_transformCooldown -= 1;
+        } else if (player.superFormState == 1 && stInfo->transformCheck == 1) {
+            // changes super state to 2 when cooldown is done and you're in 1
+            stInfo->transformCheck = 0;
+            player.superFormState = 2;
         }
     }
 
+    // decrement SS meter
+    // if (player.character == Character::SuperSonic && player.extremeGear == ExtremeGear::ChaosEmerald
+    //     && player.gearExload().exLoadID != EXLoad::HyperSonic && player.gearExload().exLoadID != EXLoad::DarkSonic) {
+    //     BlastGaugeInfo *bgInfo = &PlayerBlastGaugeInfo[player.index];
+    //     if (player.state == PlayerState::Cruise && !(player.movementFlags.hasAny(MovementFlags::boosting) && player.unkD90 > 0)) {
+    //         s32 newGauge = (player.movementFlags.hasAny(MovementFlags::boosting))
+    //         ? bgInfo->currentGauge - 45
+    //         : bgInfo->currentGauge - 62.475;
+    //         bgInfo->currentGauge = clamp(newGauge);
+    //     }
+    // }
+
 	// EnabledEXLoads exLoads;
 	// FetchEnabledEXLoadIDs(&player, exLoads);
-    if (exLoads.gearExLoadID == HyperSonicEXLoad) {
-        if (player.hyperSonic_totalLinkTimer > 0 && ((player.state == Cruise) || (player.state == Run)) && !player.movementFlags.hasAny(boosting)) { // && !(player->movementFlags & boosting)
+    if (player.gearExload().exLoadID == EXLoad::HyperSonic) {
+        if (player.hyperSonic_totalLinkTimer > 0 && (player.state == PlayerState::Cruise || player.state == PlayerState::Run) && !player.movementFlags.hasAny(MovementFlags::boosting)) { // && !(player->movementFlags & boosting)
             player.hyperSonic_totalLinkTimer -= 1;
         }
-        if (player.hyperSonic_totalLinkTimer == 1 && ((player.state != Cruise && player.state != Run) || player.movementFlags.hasAny(boosting))) {
+        if (player.hyperSonic_totalLinkTimer == 1 && ((player.state != PlayerState::Cruise && player.state != PlayerState::Run) || player.movementFlags.hasAny(MovementFlags::boosting))) {
             player.hyperSonic_totalLinkTimer = 0;
         }
     }
@@ -84,7 +98,7 @@ void Player_TimerHandler(Player &player) {
 	}
 
 	//HHOInfo *hhoInfo = &PlayerHHOInfo[player.index];
-    // if (exLoads.gearExLoadID == HyperHangOnEXLoad) {
+    // if (exLoads.gearExLoadID == HyperHangOn) {
     //     if (hhoInfo->saturnMegadriveStatus == 2) // active state
     //     {
     //         if(hhoInfo->HHOTimer > 0 && ((player->state == Cruise) || (player->state >= FrontflipRamp && player->state <= TurbulenceTrick2))) hhoInfo->HHOTimer -= 1;

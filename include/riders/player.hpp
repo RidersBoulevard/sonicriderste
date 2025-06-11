@@ -3,22 +3,26 @@
  */
 
 #pragma once
+#undef vector // No idea why this macro is predefined to be itself
 
-#include "../../src/containers/rgba.hpp"
-#include "../../src/containers/vector3.hpp"
-#include "../../src/lib/sound.hpp"
-#include "../types.hpp"
+#include <bitset>
+#include <memory>
+#include <span>
+#include <vector>
+
 #include "character.hpp"
 #include "collision.hpp"
 #include "controller.hpp"
 #include "gear.hpp"
 #include "general_flags.hpp"
 #include "tricks.hpp"
-#include <bitset>
-#include <span>
-#include <stdexcept>
+#include "types.hpp"
+#include "containers/rgba.hpp"
+#include "containers/vector3.hpp"
+#include "cosmetics/player/exloads.hpp"
+#include "lib/sound.hpp"
 
-enum PlayerState : u8 {
+enum class PlayerState : u8 {
 	QTE = 0x0,
 	StartLine = 0x1,
 	Unknown = 0x2,
@@ -43,7 +47,7 @@ enum PlayerState : u8 {
 	AttackedByPlayer = 0x16,
 	Stun = 0x17,
 	Run = 0x19,
-
+	StartLineShock = 0x1A,
 	Unknown2 = 0x1B,
 };
 
@@ -65,7 +69,7 @@ struct PlayerGearStats {
 	/* 0x30 */ f32 driftDashSpeed;
 	/* 0x34 */ f32 boostSpeed;
 
-	inline void updateGearLevelStats(const GearLevelStats &stats){
+	void updateGearLevelStats(const GearLevelStats &stats){
 		maxAir = stats.maxAir;
 		airDrain = stats.passiveAirDrain;
 		driftCost = stats.driftingAirCost;
@@ -94,6 +98,18 @@ static_assert(sizeof(UniversalTEFlags) == sizeof(u8), "Size of Universal TE Flag
 
 using GearSpecificFlags = std::bitset<32>;
 
+struct AttackProperties {
+    fillerData<0x1C> padding;
+    f32 hitboxSize;
+    fillerData<0x4> padding2;
+    bool isAOE;
+    u8 attackPreset; ///< which level this attack is used at (0, 1, 2)
+    fillerData<0x7> padding3;
+    u8 attackFrameDelay; ///< should be 1 for AOE/instant
+    fillerData<0x6> padding4;
+};
+static_assert(sizeof(AttackProperties) == 0x34);
+
 
 /**
  * Main struct that contains data of every player in the game.
@@ -105,18 +121,20 @@ struct Player {
 	/* 0x5 */ u8 unused1;
 	/* 0x6 */ u8 unused2;
 	/* 0x7 */ u8 unused3;
+    // NOTE: ignoreTurbulence is used in ASM!
 	/* 0x8 */ bool ignoreTurbulence; ///< by Z button or Y toggle
 	/* 0x9 */ u8 itemBox_cooldown;
 	/* 0xA */ u8 unkA;
 	/* 0xB */ u8 unkB;
 	/* 0xC */ std::array<u16, 0x57> animationIDMap;
-	/* 0xBA */ CharacterEnums character;
+	/* 0xBA */ Character::Enum character;
 	/* 0xBB */ ExtremeGear::Enum extremeGear;
 	/* 0xBC */ bool aiControl;
 	/* 0xBD */ bool playerType;
 	/* 0xBE */ GearType gearType;
 	/* 0xBF */ u8 attributes;
 	/* 0xC0 */ u32 unkC0;
+	/* Data beyond point is cleared on level load unless preserved. See Player::reset() */
 	/* 0xC4 */ Matrix3x3F unkC4;
 	/* 0xF4 */ u32 current_itemID;
 	/* 0xF8 */ u8 tornadoIgnore_invincibilityTimer;
@@ -135,7 +153,7 @@ struct Player {
 	/* 0x111 */ bool last_level4; ///< if player has been level 4 before
 	/* 0x112 */ bool rainbowTrailState; ///< almost always 1, used for init
 	/* 0x113 */ u8 dreamTrail_timer;
-	/* 0x114 */ RGBA exhaustTrailColor;
+	/* 0x114 */ RGBA32 exhaustTrailColor;
 	/* 0x118 */ u8 berserkerCooldown;
 	/* 0x119 */ fillerData<0x1> empty; // Super hangOn related?
 	union {
@@ -1040,7 +1058,7 @@ struct Player {
 	/* 0xF34 */ u32 unkF34;
 	/* 0xF38 */ Player *attackedPlayer; ///< has pointer to the player who you're being attacked by
 	/* 0xF3C */ Player *attackingPlayer; ///< has pointer to the player you're attacking
-	/* 0xF40 */ u32 unkF40;
+	/* 0xF40 */ AttackProperties* attackProperties;
 	/* 0xF44 */ u32 unkF44;
 	/* 0xF48 */ u32 unkF48;
 	/* 0xF4C */ u32 unkF4C;
@@ -1153,8 +1171,8 @@ struct Player {
 	/* 0x1040 */ u8 unk1040;
 	/* 0x1041 */ u8 unk1041;
 	/* 0x1042 */ u8 turbulenceTrickType;
-	/* 0x1043 */ u8 qteState;
-	/* 0x1044 */ u8 unk1044;
+	/* 0x1043 */ PlayerState qteState;
+	/* 0x1044 */ PlayerState unk1044;
 	/* 0x1045 */ u8 unk1045;
 	/* 0x1046 */ u8 unk1046;
 	/* 0x1047 */ u8 unk1047;
@@ -1225,16 +1243,19 @@ struct Player {
 	/* 0x1079 */ u8 magneticImpulse_soundStatus;
 	/* 0x107A */ u8 unk107A;
 	/* 0x107B */ u8 unk107B;
-	/* 0x107C */ CharacterArchetypes characterArchetype;
+	/* 0x107C */ CharacterArchetype characterArchetype;
 	/* 0x107D */ bool isBlastGaugeGear;
 	union {
 		/* 0x107E */ bool fastest_superCruise;
 		/* 0x107E */ bool stardustspeederII_1frameboost;
+		/* 0x107E */ bool supershadowboostflag;
 		/* 0x107E */ //bool hovercraft_alternatingRingPickup;
 	};
 
-    [[gnu::unused]] [[deprecated("No longer used, use Player::getTypeCount()")]]
+    [[maybe_unused, deprecated("No longer used, use Player::getTypeCount()")]]
 	/* 0x107F */ u8 typeAmount;
+
+	void reset();
 
 	[[nodiscard]] u8 getTypeCount() const{
 		auto typeCount = 0;
@@ -1243,6 +1264,15 @@ struct Player {
 		if(typeAttributes.hasAny(Type::Power)) { typeCount++; }
 
 		return typeCount;
+	}
+
+	[[nodiscard]] constexpr bool isSuperCharacter(const bool &excludeSuperSonic = false) const {
+		const bool &usingChaosEmerald = extremeGear == ExtremeGear::ChaosEmerald;
+		return usingChaosEmerald || (!excludeSuperSonic && character == Character::SuperSonic);
+	}
+
+	[[nodiscard]] constexpr bool isSuperCharacter(const Character::Enum &character) const {
+		return this->character == character && isSuperCharacter();
 	}
 
     /**
@@ -1260,15 +1290,76 @@ struct Player {
      * @return A newly calculated gear type based on the Extreme Gear.
      */
     [[nodiscard]] GearType getGearTypeIndependent() const {
-        GearType gType = Skates;
+        GearType gType = GearType::Skates;
         if(extremeGear < ExtremeGear::ERider) {
-            gType = Board;
+            gType = GearType::Board;
         } else if(extremeGear < ExtremeGear::Darkness) {
-            gType = Bike;
+            gType = GearType::Bike;
         }
 
         return gType;
-    }
+	}
+
+	/**
+	 * @brief Getter for the player's exload info
+	 * @return A reference to the player's current exload info
+	 */
+	[[nodiscard]] inline auto& exload(){
+		return Player_EXLoadData[input->port];
+	}
+
+	/**
+	 * @brief Const getter for the player's exload info
+	 * @return A const reference to the player's current exload info
+	 */
+	[[nodiscard]] inline const auto& exload() const{
+		return Player_EXLoadData[input->port];
+	}
+
+	/**
+	 * @brief Getter for the player's character exload
+	 * @return A reference to either the player's current character exload, or the default character exload
+	 */
+	[[nodiscard]] inline const auto& characterExload() const{
+		const auto ret = exload().characterExload;
+		if(ret != nullptr) {
+			return *ret;
+		}
+		return CharacterEXLoadDataSlots[0];
+	}
+
+	/**
+	 * @brief Const getter for the player's gear exload
+	 * @return A reference to either the player's current gear exload, or the default gear exload
+	 */
+	[[nodiscard]] inline const auto& gearExload() const{
+		const auto ret = exload().gearExload;
+		if(ret != nullptr) {
+			return *ret;
+		}
+		return GearEXLoadDataSlots[0];
+	}
+
+	/**
+	 * @return if the player has a character exload enabled
+	 */
+	[[nodiscard]] inline bool hasCharacterExload() const{
+		return characterExload().exLoadID != EXLoad::None;
+	}
+
+	/**
+	 * @return if the player has a gear exload enabled
+	 */
+	[[nodiscard]] inline bool hasGearExload() const{
+		return gearExload().exLoadID != EXLoad::None;
+	}
+
+	/**
+	 * @return if the player has a any exload enabled
+	 */
+	[[nodiscard]] inline bool hasExload() const{
+		return hasCharacterExload() || hasGearExload();
+	}
 };
 static_assert(sizeof(Player) == 0x1080); // NOLINT(readability-magic-numbers)
 ASMDefined std::array<Player, MaxPlayerCount> players;
@@ -1283,30 +1374,56 @@ struct PlayerCameraStruct {
 ASMDefined std::array<PlayerCameraStruct, MaxPlayerCount> playerCameraStruct;
 ASMDefined const vu32 InGamePlayerCount;
 
-constexpr bool isSuperCharacter(const Player &player, const bool &excludeSuperSonic = false){
-	const bool &usingChaosEmerald = player.extremeGear == ExtremeGear::ChaosEmerald;
-	if(excludeSuperSonic) { return usingChaosEmerald; }
-	return usingChaosEmerald || player.character == SuperSonic;
+[[nodiscard]] constexpr bool isSuperCharacter(const Player &player, const bool &excludeSuperSonic = false){
+	return player.isSuperCharacter(excludeSuperSonic);
 }
 
-constexpr bool isSuperCharacter(const Player &player, const CharacterEnums &character){
-	return player.character == character && isSuperCharacter(player);
+[[nodiscard]] constexpr bool isSuperCharacter(const Player &player, const Character::Enum &character){
+	return player.isSuperCharacter(character);
 }
 
 /**
  * An easy way to get an iterable list of the current players without needing to manually loop and check InGamePlayerCount
  * @return a std::span containing only the players that will be in-game
  */
-[[nodiscard]] inline std::span<Player> getCurrentPlayerList() {
+[[nodiscard]] constexpr std::span<Player> getCurrentPlayerList() {
 	return std::span(players).subspan(0, InGamePlayerCount);
 }
 
+/**
+ * Simple function to get all of the possible human players. So the first 4 of 8 players
+ * @return a std::span containing the first 4 players
+ */
+[[nodiscard]] constexpr auto getHumanPlayers(){
+	return std::span(players).subspan(0, MaxControllerCount);
+}
+
+/**
+ * Simple function to get all of the possible human players. So the first 4 of 8 players
+ * @return a std::span containing the first 4 players
+ */
+[[nodiscard]] constexpr auto getConnectedHumanPlayers(){
+	std::vector<std::reference_wrapper<const Player>> humanPlayers;
+	humanPlayers.reserve(MaxControllerCount);
+	for(const Player &player : getHumanPlayers()){
+		if(player.isRealPlayer()){
+			humanPlayers.push_back(std::ref(player));
+		}
+	}
+
+	return humanPlayers;
+}
+
 [[nodiscard]] inline Player &getPlayerInFirst() {
-	std::span currentPlayerList = getCurrentPlayerList();
-	for(auto &ply: currentPlayerList) {
+	for(auto &ply: getCurrentPlayerList()) {
 		if(ply.placement == 0) {
 			return ply;
 		}
 	}
-	[[unlikely]] throw std::logic_error("Somehow no players in first place");
+	std::unreachable();
+}
+
+[[nodiscard]] constexpr Type toGearType(const Character::Type &type){
+	auto underlying = 1 << std::to_underlying(type);
+	return Type{underlying};
 }

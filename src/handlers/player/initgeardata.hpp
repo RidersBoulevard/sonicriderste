@@ -28,7 +28,7 @@ constexpr std::array<TypeStats, 3> StatPresets = {{
 		{{{{0.370370358228683, 0.671296298503876, 0.731481492519379, 0.0030864195432514, 0.000895061704795808, 0.000578703708015382, 80}, {0.462962955236435, 0.671296298503876, 0.791666686534882, 0.00385802472010255, 0.000640432117506862, 0.000192901221453212, 80}, {0.462962955236435, 0.671296298503876, 0.851851880550385, 0.00385802472010255, 0.000640432117506862, 0.000578703708015382, 90}}}, 0.800000011920929, 0.0253072753548622, 0.00959931127727032, 0.00261799385771155},
 }};
 
-constexpr std::array<f32, TotalCharacterAmount> CharacterWeights = {
+constexpr std::array<f32, Character::Total> CharacterWeights = {
 		1.1F, //sonic
 		0.9F, //tails
 		1.4F, //knuckles
@@ -62,7 +62,7 @@ constexpr std::array<f32, 3> EmerlTopSpeedBonus = {
 		pSpeed(20), pSpeed(15), pSpeed(5)
 };
 
-constexpr std::array<f32, ArchetypeCount> Archetype_TopSpeedBonus = {
+constexpr std::array<f32, std::to_underlying(CharacterArchetype::Count)> Archetype_TopSpeedBonus = {
 		pSpeed(5.0f), // all rounder (+5)
 		pSpeed(0), // late booster
 		pSpeed(10.1f), // top speed (+10)

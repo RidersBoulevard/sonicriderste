@@ -1,15 +1,15 @@
 #include "customcss.hpp"
 #include "cosmetics/player/exloads.hpp"
+#include "riders/controller.hpp"
 #include "lib/sound.hpp"
-#include "lib/stdlib.hpp"
 
-std::array<bool, 4> PlayerCharacterInformationBox;
+std::bitset<4> PlayerCharacterInformationBox;
 
 ASMUsed void SetPlayerInformationBox(u32 index, const CSSObject& object) {
     if (object.cssSelectionState[index] != 1) { return; }
 
     const Controller &input = GameControllers[index];
-    if (input.toggleFaceButtons.hasAny(ZButton)) {
+    if (input.toggleFaceButtons.hasAny(Buttons::Z)) {
         const bool isBoxOpen = !PlayerCharacterInformationBox[index];
         PlayerCharacterInformationBox[index] = isBoxOpen;
         if (isBoxOpen) {
@@ -25,5 +25,6 @@ ASMUsed bool CheckPlayerInformationBox(const u32 index, const CSSObject& object)
 }
 
 ASMUsed void ClearPlayerInformationBox() {
-    TRK_memset(&PlayerCharacterInformationBox, 0, sizeof(PlayerCharacterInformationBox));
+	PlayerCharacterInformationBox.reset();
+    //memset(&PlayerCharacterInformationBox, 0, sizeof(PlayerCharacterInformationBox));
 }

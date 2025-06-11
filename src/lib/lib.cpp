@@ -2,16 +2,29 @@
 #include "cosmetics/player/exloads.hpp"
 #include <array>
 
-void Custom_CreateHUDElement(void* textureStructs, u32 textureID, u32 textureRGBA, HUDStruct *hud) {
+void Custom_CreateHUDElement(void* textureStructs, u32 textureID, u32 textureRGBA, const HUDStruct *hud, const f32 aspectRatio) {
     InitTextureHook(textureStructs, textureID);
     HookTexture(3);
 
+    f32 scaleX;
+    f32 scaleY;
+    if (aspectRatio == 0.0f) {
+        // if no aspect ratio was given, just use hud->scale directly
+        scaleX = hud->scale;
+        scaleY = hud->scale;
+    } else {
+        // apply aspect ratio
+        const f32 part = hud->scale / (aspectRatio + 1);
+        scaleX = part;
+        scaleY = part * aspectRatio;
+    }
+
 	// calculate texture boundaries
 	std::array<f32, 4> textureBoundaries = {
-			static_cast<f32>(hud->textureX) * hud->scale,
-			static_cast<f32>(hud->textureY) * hud->scale,
-			static_cast<f32>(hud->textureX + hud->textureXLength) * hud->scale,
-			static_cast<f32>(hud->textureY + hud->textureYLength) * hud->scale
+			static_cast<f32>(hud->textureX) * scaleX,
+			static_cast<f32>(hud->textureY) * scaleY,
+			static_cast<f32>(hud->textureX + hud->textureXLength) * scaleX,
+			static_cast<f32>(hud->textureY + hud->textureYLength) * scaleY
 	};
 
     const u32 xLength = hud->screenX + hud->textureXLength;
@@ -73,22 +86,22 @@ ASMUsed u32 SetupCustomAnimationArchive(u8 *packManStart, u32 *packManOffsetStar
     auto gearType = player.gearType;
 
     if (player.extremeGear == ExtremeGear::OpaOpa) {
-        gearType = static_cast<GearType>(3);
-        attackObj.motptrsID = (character * 5) + gearType;
-        attackObj.character = 0x11;
+        gearType = GearType{3};
+        attackObj.motptrsID = (character * 5) + std::to_underlying(gearType);
+        attackObj.character = Character::Silver;
     }
     else {
-        attackObj.motptrsID = (character * 5) + gearType;
+        attackObj.motptrsID = (character * 5) + std::to_underlying(gearType);
         attackObj.character = character;
     }
 
-    u8 *idInfo = lbl_001F1140[character].gearTypePtrs[gearType];
+    u8 *idInfo = lbl_001F1140[character].gearTypePtrs[std::to_underlying(gearType)];
 
     /*
     EnabledEXLoads exLoads{};
     FetchEnabledEXLoadIDs(&player, exLoads);
 
-    if (exLoads.characterExLoadID == HatsuneMikuEXLoad) {
+    if (exLoads.characterExLoadID == HatsuneMiku) {
         idInfo = MikuAnimationMap.data();
     }
     */
@@ -97,7 +110,7 @@ ASMUsed u32 SetupCustomAnimationArchive(u8 *packManStart, u32 *packManOffsetStar
         return setupFileCount;
     }
 
-    const u32 exclusiveMotionIndex = player.gearType * 0x200 + tu16ExclusiveMotionNo;
+    const u32 exclusiveMotionIndex = std::to_underlying(player.gearType) * 0x200 + tu16ExclusiveMotionNo;
     u32 *exclusiveMotions = reinterpret_cast<u32*>(&gpsaMotion_PlayerNeo[exclusiveMotionIndex]);
 
     while (true) {

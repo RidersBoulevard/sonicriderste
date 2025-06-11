@@ -3,22 +3,25 @@
 #include "main.hpp"
 #include "riders/gamemode.hpp"
 #include "riders/object.hpp"
+#include "gears/supertails.hpp"
 
 ASMDefined {
 	USED ObjectGroups ObjectGroup_Player_SuperTailsRenderText = ObjectGroups::Object_SuperTailsRenderText;
 }
 
 bool Player_IsHUDVisible(const Player &player) {
-	if ((geGame_ModeDetail - CurrentGameMode) < 2) return FALSE;
-	if (gu32Game_PauseFlag) return FALSE;
-	if (RuleSettings & 0x80) return FALSE;
-	if (player.flags.hasAny(static_cast<PlayerFlags>(0x80000))) return FALSE;
+	if ((geGame_ModeDetail - CurrentGameMode) < 2) { return false; }
+	if (gu32Game_PauseFlag != 0u) { return false; }
+	if ((RuleSettings & 0x80) != 0) { return false; }
+	if (player.flags.hasAny(static_cast<PlayerFlags>(0x80000))) { return false; }
 
-	for (auto & i : lbl_100178D4) {
-		if (i[player.index] != nullptr) { return FALSE; }
+	for (auto &i : gpsRotValueTask) {
+		if (i[player.index] != nullptr) {
+			return false;
+		}
 	}
 
-	return TRUE;
+	return true;
 }
 
 constexpr std::array<u16, 2> CustomText2P_Y = {
@@ -33,33 +36,37 @@ constexpr m2darray<u16, 4, 2> CustomText4P_XY = {{
 }};
 
 ASMUsed void Player_SuperTailsRenderText() {
-	for (u32 i = 0; i < InGamePlayerCount; i++) {
-		const Player &player = players[i];
-		if (!Player_IsHUDVisible(player)) { continue; }
-		if (CustomTextArchiveFile[0] == nullptr) { continue; }
-		if (!isSuperCharacter(player, Tails)) { continue; } // Make sure this is super tails
+	if (CustomTextArchiveFile[0] == nullptr) { return; }
+	const auto humanPlayers = getConnectedHumanPlayers();
+	for (const auto ref : humanPlayers) {
+		const auto &player = ref.get(); // Unwrap referance_wrapper
+        if (!isSuperCharacter(player, Character::Tails)) { continue; } // Make sure this is super tails
+        if (!Player_IsHUDVisible(player)) { continue; }
 		if (player.superFormState != 0) { continue; } // make sure he isn't super
-		if (player.rings < 50) { continue; } // make sure tails can actually transform
+		if (player.rings < supertailsdef::MAGNETCOST) { continue; } // make sure tails can actually spend rings
 
-		switch (InGamePlayerCount) {
+        // if magnet can be activated, convert true into 1, which is the text ID for magnet text, otherwise it's 0 for the other text
+        const u32 textID = static_cast<u32>(player.rings < supertailsdef::REQUIREDTRANSFORMRINGS);
+
+		switch (humanPlayers.size()) {
 			case 1:
-				RenderText(52, 116, ~0U, 100, 0, 0, &CustomTextArchiveFile[0], gpasTexList_SubFont.unk4, lbl_001D2E7C);
+				RenderText(52, 116, ~0U, 100, 0, textID, CustomTextArchiveFile.data(), gpasTexList_SubFont.unk4, lbl_001D2E7C);
 				continue;
 			case 2: {
-				u32 y = CustomText2P_Y[player.index];
-				RenderText(46, y, ~0U, 100, 0, 0, &CustomTextArchiveFile[0], gpasTexList_SubFont.unk4, lbl_001D2E7C);
+				const u32 &y = CustomText2P_Y[player.index];
+				RenderText(46, y, ~0U, 100, 0, textID, CustomTextArchiveFile.data(), gpasTexList_SubFont.unk4, lbl_001D2E7C);
 				continue;
 			}
 			case 3:
 			case 4: {
-				u32 x = CustomText4P_XY[player.index][0];
-				u32 y = CustomText4P_XY[player.index][1];
+				const auto &[x, y] = CustomText4P_XY[player.index];
+				//const u32 &x = CustomText4P_XY[player.index][0];
+				//const u32 &y = CustomText4P_XY[player.index][1];
 
-				RenderText(x, y, ~0U, 100, 0, 0, &CustomTextArchiveFile[0], gpasTexList_SubFont.unk4, lbl_001D2E7C);
+				RenderText(x, y, ~0U, 100, 0, textID, CustomTextArchiveFile.data(), gpasTexList_SubFont.unk4, lbl_001D2E7C);
 				continue;
 			}
-			default:
-				continue;
+			default: std::unreachable();
 		}
 	}
 }

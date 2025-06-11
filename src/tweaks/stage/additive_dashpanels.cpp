@@ -68,7 +68,7 @@ ASMUsed void lbl_DashPanelSpeed(f32 dashPanelSpeed, Player *player, ObjectNode *
 		}
 		// case SuperHangOn:
 		// {
-		//     if (exLoads.gearExLoadID == HyperHangOnEXLoad)
+		//     if (exLoads.gearExLoadID == HyperHangOn)
 		//     {
 		//         if (hhoInfo->saturnMegadriveStatus == 2) {player->currentAir += (player->gearStats[player->level].maxAir * 20) / 100;}
 		//     }
@@ -78,15 +78,15 @@ ASMUsed void lbl_DashPanelSpeed(f32 dashPanelSpeed, Player *player, ObjectNode *
 			break;
 	}
 
-    if (player->characterArchetype == Windcatcher){
-        if (player->specialFlags.hasAny(ringGear)){
+    if (player->characterArchetype == CharacterArchetype::Windcatcher){
+        if (player->specialFlags.hasAny(SpecialFlags::ringGear)){
 			player->currentAir += (player->gearStats[player->level].maxAir * 3) / 100;
 		} else {
 			player->currentAir += (player->gearStats[player->level].maxAir * 10) / 100;
 		}
     }
 
-    if (player->characterArchetype == Mechanic) {
+    if (player->characterArchetype == CharacterArchetype::Mechanic) {
 		dashPanelSpeed *= 1.1f;
 	}
 

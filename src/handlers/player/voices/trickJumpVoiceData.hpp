@@ -1,6 +1,6 @@
 #pragma once
 
-constexpr std::array<std::optional<u8>, TotalCharacterAmount> TrickJumpVoice{
+constexpr std::array<std::optional<u8>, Character::Total> TrickJumpVoice{
 		0x00,			// Sonic
 		0x00,			// Tails
 		0x00,			// Knuckles

@@ -21,17 +21,13 @@ ASMDefined void *lbl_8021BB40;
 ASMDefined void *lbl_8021BB44;
 
 ASMUsed void ClearStageBanBSS() {
-	TRK_memset(&bss_StageBans, 0, sizeof(bss_StageBans));
+	//memset(&bss_StageBans, 0, sizeof(bss_StageBans));
+	bss_StageBans = {};
 }
 
 ASMUsed u8 CheckStageBan(StageSelectObject2 *stageSelectObject) {
-	u32 playerIndex;
 	BSS_StageBan *bss = &bss_StageBans;
-	if (bss->playerControl == bss->player_port[0]) {
-		playerIndex = 0;
-	} else {
-		playerIndex = 1;
-	}
+	const u32 playerIndex = bss->playerControl == bss->player_port[0] ? 0 : 1;
 
 	bool canPickHeroes = true;
 	bool canPickBabylon = true;
@@ -117,7 +113,8 @@ ASMUsed void Player_WinTournamentRace(const Player *player) {
 	}
 
 	// reset banned stages
-	TRK_memset(&bss->bannedStages, 0, sizeof(bss->bannedStages));
+	bss->bannedStages = {};
+	//memset(&bss->bannedStages, 0, sizeof(bss->bannedStages));
 
 	if (player->index == 0) {
 		// player 1 won
@@ -287,7 +284,7 @@ ASMUsed void StageBanHandler(GraphicalObject *subMenu) {
 
 		const Controller &playerInput = GameControllers[bss.playerControl];
 		bool isBanned = FALSE;
-		if (playerInput.toggleFaceButtons.hasAny(XButton)) {
+		if (playerInput.toggleFaceButtons.hasAny(Buttons::X)) {
 			u8 banCount;
 			u8 banPlayerIndex;
 			if (bss.playerControl == bss.player_port[0]) {
@@ -371,7 +368,7 @@ ASMUsed void StageBanHandler(GraphicalObject *subMenu) {
 					}
 				}
 			}
-		} else if (playerInput.toggleFaceButtons.hasAny(YButton)) {
+		} else if (playerInput.toggleFaceButtons.hasAny(Buttons::Y)) {
 			// unban a stage
 			u8 banCount;
 			u8 banPlayerIndex;
@@ -503,7 +500,7 @@ void TournamentRace_Task() {
             }
             break;
         case 4:
-            if (gsActivePad.toggleButtons.hasAny(AButton) && object1->menuState == 2) {
+            if (gsActivePad.toggleButtons.hasAny(Buttons::A) && object1->menuState == 2) {
                 object1->menuState = 3;
                 if (object1->selectedButton == 0) {
                     TournamentRace_SetLapCountRules(1);
@@ -513,9 +510,7 @@ void TournamentRace_Task() {
                 }
 
                 PlayAudioFromDAT(Sound::VSFX::MenuConfirm);
-            }
-
-            else if (gsActivePad.toggleButtons.hasAny(DPadUp, DPadDown, LStickUp, LStickDown)) {
+            } else if (gsActivePad.toggleButtons.hasAny(Buttons::DPadUp, Buttons::DPadDown, Buttons::LStickUp, Buttons::LStickDown)) {
                 object1->selectedButton ^= 1;
                 PlayAudioFromDAT(Sound::VSFX::MenuScroll);
             }

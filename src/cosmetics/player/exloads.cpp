@@ -1,255 +1,42 @@
 /** \file */
 
 #include "exloads.hpp"
-#include "lib/lib.hpp"
+#include "ninjanext.hpp"
 #include "skinsystem.hpp"
 #include "containers/graphicalobject.hpp"
-
-ASMUsed constexpr std::array<RGBA, EXLoadCount> EXLoadHUDColors = {
-        RGBA(0x0), // dummy data
-        RGBA(0x471394ff), // perfect nazo
-        RGBA(0xcf4731ff), // e10r
-        RGBA(0x101010FF), // dark sonic
-        RGBA(0xC0C0C0FF), // hyper sonic
-        RGBA(0x0), // Stardust Speeder II
-        RGBA(0x0), // Hyper Hang-On
-        RGBA(0x0), // The Professional
-        RGBA(0x0), // Ollie King Gear
-        RGBA(0xD2C864FF), // Windmaster Jet
-        RGBA(0x1239B8FF), // neo metal sonic
-        RGBA(0x0), // E99
-        RGBA(0x0), // The Beast
-        RGBA(0x0), // e10b, UNUSED - it uses original colors
-        RGBA(0x00ffe5ff), // hatsune miku
-        RGBA(0x0), // metal sonic scarf
-        RGBA(0x4a0015ff), // reala
-        RGBA(0x210d00ff), // gongon
-        RGBA(0x0), // dummy data
-        RGBA(0x0), // dummy data
-        RGBA(0x0), // dummy data
-        RGBA(0x0), // dummy data
-        RGBA(0x0), // dummy data
-        RGBA(0x0), // dummy data
-        RGBA(0x0), // dummy data
-        RGBA(0x0), // dummy data
-        RGBA(0x0), // dummy data
-        RGBA(0x01056bFF), // seelkadoom
-        RGBA(0x0), // super sonic ex load
-};
-
-ASMUsed constexpr std::array<EXLoadBoostColor, EXLoadCount> EXLoadBoostColors = {
-        {
-                // dummy data
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-
-                // perfect nazo
-                {
-                        RGBANormalized::fromNormalized(0.2196078431372549f, 0.0549019607843137f, 0.4588235294117647f),
-                        RGBANormalized::fromNormalized(0.0f, 0.0666666701436043f, 1.0f)
-                },
-
-                // e10r
-                {
-                        RGBANormalized::fromNormalized(1.0f, 0.345098f, 0.133333f),
-                        RGBANormalized::fromNormalized(0.133333f, 0.7843137254901961f, 1.0f)
-                },
-
-                // dark sonic
-                {
-                        RGBANormalized::fromNormalized(0.0f, 0.0392156862745098f, 0.5411764705882353f),
-                        RGBANormalized::fromNormalized(0.5686274509803922f, 0.5294117647058824f, 0.0f)
-                },
-
-                // hyper sonic
-                {
-                        RGBANormalized(255, 255, 255),
-                        RGBANormalized(0, 255, 0)
-                },
-
-                // Stardust Speeder II
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-
-                // Hyper Hang-On
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-
-                // The Professional
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-
-                // Ollie King Gear
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-
-                // Windmaster Jet
-                {
-                        RGBANormalized::fromNormalized(1.0f, 0.933333337306976f, 0.0f),
-                        RGBANormalized::fromNormalized(0.0f, 0.0666666701436043f, 1.0f)
-                },
-
-                // neo metal sonic
-                {
-                        RGBANormalized::fromNormalized(0.1215686274509804f, 0.1490196078431373f, 1.0f),
-                        RGBANormalized::fromNormalized(1.0f, 0.9725490196078431f, 0.1215686274509804f)
-                },
-
-                // E99
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-
-                // The Beast
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-
-                // e10b, UNUSED - uses original character boost colors
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-
-                // hatsune miku
-                {
-                        RGBANormalized::fromNormalized(0.2705882352941176f, 1.0f, 0.9254901960784314f),
-                        RGBANormalized::fromNormalized(1.0f, 0.2705882352941176f, 0.3450980392156863f)
-                },
-
-                // metal sonic scarf
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-
-                // reala
-                {
-                        RGBANormalized::fromNormalized(0.8f, 0.0f, 0.0352941176470588f),
-                        RGBANormalized::fromNormalized(0.0f, 0.8f, 0.7647058823529412f)
-                },
-
-                // gongon
-                {
-                        RGBANormalized::fromNormalized(0.5294117647058824f, 0.3490196078431373f, 0.2745098039215686f),
-                        RGBANormalized::fromNormalized(0.2745098039215686f, 0.4549019607843137f, 0.5294117647058824f)
-                },
-
-                // dummy data
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-
-                // dummy data
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-
-                // dummy data
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-
-                // dummy data
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-
-                // dummy data
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-
-                // dummy data
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-
-                // dummy data
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-
-                // dummy data
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-
-                // dummy data
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-
-                // seelkadoom
-                {
-                        RGBANormalized(0, 10, 255),
-                        RGBANormalized(84, 84, 84)
-                },
-
-                // super sonic ex load
-                {
-                        RGBANormalized(true),
-                        RGBANormalized(true)
-                },
-        }
-};
+#include "lib/lib.hpp"
+#include "riders/gamemode.hpp"
 
 ASMDefined void *const gp2DSys;
 
 /**
  * Saves currently selected EX load information for each Player.
- * For each Player, there is an array with size 2.
- * Index 0 corresponds to the specific character EX load (refer to EXLoadInfo).
- * Index 1 corresponds to the specific gear EX load (refer to EXLoadInfo).
  */
-m2darray<CurrentEXLoadInfo, MaxPlayerCount, 2> Player_EXLoadData;
+std::array<CurrentEXLoadInfo, MaxPlayerCount> Player_EXLoadData;
 
 /**
- * Gets a specific Player's chosen EX load ID from ::EXLoads, if any is selected.
+ * Gets a specific Player's chosen EX load ID from ::EXLoad, if any is selected.
  *
  * @param player The Player to fetch from.
- * @param exLoads Where the result of the function is saved. If no EX load is selected, ::NoneEXLoad is returned.
+ * @param exLoads Where the result of the function is saved. If no EX load is selected, EXLoad::None is returned.
+ * @deprecated Please use @ref Player::characterExload()
  */
-[[nodiscard]] EnabledEXLoads FetchEnabledEXLoadIDs(const Player &player) {// Change into member function? or possibly the constructor
-	EnabledEXLoads exLoads{};
-	if(player.aiControl && player.playerType) { return exLoads; }
+[[nodiscard,deprecated]] EnabledEXLoads FetchEnabledEXLoadIDs(const Player &player) {
+	if((player.aiControl && player.playerType) || !player.hasExload()) { return {}; }
 
-	const u8 &controllerPort = player.input->port;
-
-	u16 exLoadIndex = Player_EXLoadData[controllerPort][CharacterEXLoadMode].exLoadIndex;
-	if(exLoadIndex != 0U) {
-		exLoads.characterExLoadID = CharacterEXLoadDataSlots[exLoadIndex].exLoadID;
-	}
-	exLoadIndex = Player_EXLoadData[controllerPort][GearEXLoadMode].exLoadIndex;
-	if(exLoadIndex != 0U) {
-		exLoads.gearExLoadID = GearEXLoadDataSlots[exLoadIndex].exLoadID;
-	}
+	EnabledEXLoads exLoads{
+		.characterExLoadID = player.characterExload().exLoadID,
+		.gearExLoadID = player.gearExload().exLoadID,
+	};
 
 	return exLoads;
 }
 
-ASMUsed void FetchEnabledEXLoadIDs(const Player *player, EnabledEXLoads &exLoads) {
+/**
+ *
+ * @copydoc FetchEnabledEXLoadIDs(const Player &)
+ */
+ASMUsed [[deprecated]] void FetchEnabledEXLoadIDs(const Player *player, EnabledEXLoads &exLoads) {
 	if(player->aiControl && player->playerType) { return; }
 
 	exLoads = FetchEnabledEXLoadIDs(*player);
@@ -260,9 +47,9 @@ ASMUsed void FetchEnabledEXLoadIDs(const Player *player, EnabledEXLoads &exLoads
  *
  * @param player The Player to check.
  */
-ASMUsed bool IsAnyE10EXLoad(const Player *player) {
-	auto exLoads = FetchEnabledEXLoadIDs(*player);
-	return (exLoads.characterExLoadID == E10BEXLoad || exLoads.characterExLoadID == E10REXLoad);
+ASMUsed bool IsAnyE10EXLoad(const Player &player) {
+	auto exLoads = player.characterExload();
+	return exLoads.exLoadID == EXLoad::E10B || exLoads.exLoadID == EXLoad::E10R || exLoads.exLoadID == EXLoad::E10Y;
 }
 
 /**
@@ -270,9 +57,8 @@ ASMUsed bool IsAnyE10EXLoad(const Player *player) {
  *
  * @param player The Player to check.
  */
-ASMUsed bool SYBIsSuperSonicEXLoad(const Player *player) {
-	auto exLoads = FetchEnabledEXLoadIDs(*player);
-	return (exLoads.characterExLoadID == SSEXLoad);
+ASMUsed bool SYBIsSuperSonicEXLoad(const Player &player) {
+	return player.characterExload().exLoadID == EXLoad::SuperSonic;
 }
 
 /**
@@ -283,21 +69,18 @@ ASMUsed bool SYBIsSuperSonicEXLoad(const Player *player) {
  */
 [[nodiscard]] EXLoadColors CheckEXLoadHUDColors(const Player &player) {
 	if(player.aiControl && player.playerType) { return {}; }
-	if(FetchEnabledEXLoadIDs(player).characterExLoadID == E10BEXLoad) { return {}; }
+	if(!player.hasExload()) { return {}; }
 
-	const u8 &controllerPort = player.input->port;
+	const auto &characterExload = player.characterExload();
 
-	u16 exLoadIndex = Player_EXLoadData[controllerPort][CharacterEXLoadMode].exLoadIndex;
-	if(exLoadIndex != 0U) {
-		if(EXLoadHUDColors[CharacterEXLoadDataSlots[exLoadIndex].exLoadID]) {
-			return {(void *) EXLoadHUDColors.data(), CharacterEXLoadDataSlots[exLoadIndex].exLoadID};
-		}
+	if(characterExload.exLoadID == EXLoad::E10B) { return {}; }
+	if(characterExload.hudColor()) {
+		return characterExload.exloadColor();
 	}
-	exLoadIndex = Player_EXLoadData[controllerPort][GearEXLoadMode].exLoadIndex;
-	if(exLoadIndex != 0U) {
-		if(EXLoadHUDColors[GearEXLoadDataSlots[exLoadIndex].exLoadID]) {
-			return {(void *) EXLoadHUDColors.data(), GearEXLoadDataSlots[exLoadIndex].exLoadID};
-		}
+
+	const auto &gearExload = player.gearExload();
+	if(gearExload.hudColor()) {
+		return gearExload.exloadColor();
 	}
 	return {};
 }
@@ -320,22 +103,18 @@ void CheckEXLoadHUDColors(const Player *player, EXLoadColors &returnValues) {
  */
 [[nodiscard]] EXLoadColors CheckEXLoadBoostColors(const Player &player) {
 	if(player.aiControl && player.playerType) { return {}; }
+	if(!player.hasExload()) { return {}; }
 
-	if(FetchEnabledEXLoadIDs(player).characterExLoadID == E10BEXLoad) { return {}; }
+	const auto &characterExload = player.characterExload();
+	if(characterExload.exLoadID == EXLoad::E10B) { return {}; }
 
-	const u8 &controllerPort = player.input->port;
-
-	u16 exLoadIndex = Player_EXLoadData[controllerPort][CharacterEXLoadMode].exLoadIndex;
-	if(exLoadIndex != 0U) {
-		if(EXLoadBoostColors[CharacterEXLoadDataSlots[exLoadIndex].exLoadID].rgbaFirstLayer) {
-			return {(void *) EXLoadBoostColors.data(), CharacterEXLoadDataSlots[exLoadIndex].exLoadID};
-		}
+	if(characterExload.boostColor().rgbaFirstLayer) {
+		return characterExload.exloadBoostColor();
 	}
-	exLoadIndex = Player_EXLoadData[controllerPort][GearEXLoadMode].exLoadIndex;
-	if(exLoadIndex != 0U) {
-		if(EXLoadBoostColors[GearEXLoadDataSlots[exLoadIndex].exLoadID].rgbaFirstLayer) {
-			return {(void *) EXLoadBoostColors.data(), GearEXLoadDataSlots[exLoadIndex].exLoadID};
-		}
+
+	const auto &gearExload = player.gearExload();
+	if(gearExload.boostColor().rgbaFirstLayer) {
+		return gearExload.exloadBoostColor();
 	}
 	return {};
 }
@@ -350,8 +129,8 @@ void CheckEXLoadBoostColors(const Player *player, EXLoadColors &returnValues) {
 	returnValues = CheckEXLoadBoostColors(*player);
 }
 
-#include "lib/stdlib.hpp"
 #include "macros.h"
+#include "lib/stdlib.hpp"
 
 ASMUsed void _CheckEXLoadHUDColors() {
 	asm(R"(
@@ -396,23 +175,23 @@ ASMUsed void _CheckEXLoadBoostColors() {
  * @return The EXLoadTypes result for which type of cycling needs to be performed.
  */
 [[nodiscard]] inline EXLoadTypes CheckEXLoadControls(const Player &player) {
-	if(player.input->holdFaceButtons.hasAny(LButton)) {
-		return AllEXLoadTypes;
+	if(player.input->holdFaceButtons.hasAny(Buttons::L)) {
+		return EXLoadTypes::AllTypes;
 	}
 	if(player.input->rightStickHorizontal > 10) {
-		return LLoadTypeForwards;
+		return EXLoadTypes::CosmeticForwards;
 	}
 	if(player.input->rightStickHorizontal < -10) {
-		return LLoadTypeBackwards;
+		return EXLoadTypes::CosmeticBackwards;
 	}
 	if(player.input->rightStickVertical > 10) {
-		return EXLoadTypeForwards;
+		return EXLoadTypes::GameplayAlteringForwards;
 	}
 	if(player.input->rightStickVertical < -10) {
-		return EXLoadTypeBackwards;
+		return EXLoadTypes::GameplayAlteringBackwards;
 	}
 
-	return NoneEXLoadType;
+	return EXLoadTypes::None;
 }
 
 inline void ApplyVisual(CSSObject &object) {
@@ -429,11 +208,11 @@ inline void ApplyVisual(CSSObject &object) {
  * @param player The Player to apply the visuals to.
  * @param object Reference to the Object used for handling the CSS.
  */
-USED void ApplyEXLoadFancyVisuals(const Player &player, CSSObject &object) {
+ASMUsed void ApplyEXLoadFancyVisuals(const Player &player, CSSObject &object) {
 	const u8 controllerPort = player.input->port;
 
-	if(Player_EXLoadData[controllerPort][CharacterEXLoadMode].exLoadDelayTime == 0 && Player_EXLoadData[controllerPort][GearEXLoadMode].exLoadDelayTime == 0) {
-		if(CheckEXLoadControls(player) != NoneEXLoadType) {
+	if(Player_EXLoadData[controllerPort].delayTime == 0) {
+		if(CheckEXLoadControls(player) != EXLoadTypes::None) {
 			ApplyVisual(object);
 		}
 	}
@@ -455,17 +234,17 @@ USED void ApplyEXLoadFancyVisuals(const Player &player, CSSObject &object) {
  */
 [[nodiscard]] bool CheckIfEXLoadCanBeApplied(const Player &player, const EXLoadInfo &info) {
 	bool canApplyCharacter;
-	if(info.character != -1) {
+	if(info.character != Character::Invalid) {
 		// quick exception for e10b character id and super sonic ex load, those exloads are always allowed through
 		canApplyCharacter = info.character == player.character ||
-                (info.character == E10G && player.character == E10R) ||
-                (info.character == Sonic && player.character == SuperSonic);
+                (info.character == Character::E10G && player.character == Character::E10R) ||
+                (info.character == Character::Sonic && player.character == Character::SuperSonic);
 	} else {
 		canApplyCharacter = true;
 	}
 
 	bool canApplyGear;
-	if(info.gear != -1) {
+	if(info.gear != Character::Invalid) {
 		canApplyGear = info.gear == player.extremeGear;
 	} else {
 		canApplyGear = true;
@@ -479,24 +258,16 @@ USED void ApplyEXLoadFancyVisuals(const Player &player, CSSObject &object) {
  *
  * @param player The Player to update.
  */
-ASMUsed void UpdateEXLoadData(Player *player) {
-	EXLoadInfo info;// NOLINT(cppcoreguidelines-pro-type-member-init)
-	const u8 &controllerPort = player->input->port;
-
-	u16 exLoadIndex = Player_EXLoadData[controllerPort][CharacterEXLoadMode].exLoadIndex;
-	if(exLoadIndex != 0U) {
-		info = CharacterEXLoadDataSlots[exLoadIndex];
-
-		if(!CheckIfEXLoadCanBeApplied(*player, info)) {
-			Player_EXLoadData[controllerPort][CharacterEXLoadMode].exLoadIndex = 0;
+ASMUsed void UpdateEXLoadData(Player &player) {
+	auto &exload = player.exload();
+	if(player.hasCharacterExload()) {
+		if(!CheckIfEXLoadCanBeApplied(player, *exload.characterExload)) {
+			exload.characterExload = {};
 		}
 	}
-	exLoadIndex = Player_EXLoadData[controllerPort][GearEXLoadMode].exLoadIndex;
-	if(exLoadIndex != 0U) {
-		info = GearEXLoadDataSlots[exLoadIndex];
-
-		if(!CheckIfEXLoadCanBeApplied(*player, info)) {
-			Player_EXLoadData[controllerPort][GearEXLoadMode].exLoadIndex = 0;
+	if(player.hasGearExload()) {
+		if(!CheckIfEXLoadCanBeApplied(player, *exload.gearExload)) {
+			exload.gearExload = {};
 		}
 	}
 }
@@ -506,66 +277,66 @@ ASMUsed void UpdateEXLoadData(Player *player) {
  *
  * @param player The Player whose EX loads to scroll.
  * @param exLoadDataSlots The applicable EX load slots.
- * @param exLoadMode Which subset type the provided slots are (refer to ::EXLoadModes).
+ * @param exLoadMode Which subset type the provided slots are (refer to ::EXLoadMode).
  * @param exLoadType Which scrolling behavior needs to be used. This value can be obtained from CheckEXLoadControls().
  * @return The newly rotated index that corresponds to the array parameter.
  */
-[[nodiscard]] u32 RotateEXLoadAndFetch(const Player &player, std::span<const EXLoadInfo> exLoadDataSlots, const EXLoadModes &exLoadMode, const EXLoadTypes &exLoadType) {
+[[nodiscard]] void RotateEXLoadAndFetch(Player &player, std::span<const EXLoadInfo> exLoadDataSlots, const EXLoadMode &exLoadMode, const EXLoadTypes &exLoadType) {
 	// set the correct ex load type to check if it can be applied, so that it corresponds to the enum in the slot structs
-	EXLoadTypes checkType = NoneEXLoadType;
-	if(exLoadType == LLoadTypeForwards || exLoadType == LLoadTypeBackwards) {
-		checkType = LLoadType;
-	} else if(exLoadType == EXLoadTypeForwards || exLoadType == EXLoadTypeBackwards) {
-		checkType = EXLoadType;
+	EXLoadTypes checkType = EXLoadTypes::None;
+	if(exLoadType == EXLoadTypes::CosmeticForwards || exLoadType == EXLoadTypes::CosmeticBackwards) {
+		checkType = EXLoadTypes::Cosmetic;
+	} else if(exLoadType == EXLoadTypes::GameplayAlteringForwards || exLoadType == EXLoadTypes::GameplayAlteringBackwards) {
+		checkType = EXLoadTypes::GameplayAltering;
 	}
 
-	const u8 controllerPort = player.input->port;
-	u32 index = Player_EXLoadData[controllerPort][exLoadMode].exLoadIndex;
+	auto &exload = player.exload();
+	auto &ptr = exLoadMode == CharacterEXLoadMode ? exload.characterExload : exload.gearExload;
+	if(ptr == nullptr) {
+		ptr = exLoadDataSlots.data();
+	}
 	bool toRotate = true;
 	while(toRotate) {
-		if(exLoadType == AllEXLoadTypes || exLoadType == LLoadTypeForwards || exLoadType == EXLoadTypeForwards) {
-			index += 1;
-			if(index >= exLoadDataSlots.size()) { index = 0; }
-		} else if(exLoadType == LLoadTypeBackwards || exLoadType == EXLoadTypeBackwards) {
-			index -= 1;
-			if(static_cast<s32>(index) < 0) { index = exLoadDataSlots.size() - 1; }
+		if(exLoadType == EXLoadTypes::AllTypes || exLoadType == EXLoadTypes::CosmeticForwards || exLoadType == EXLoadTypes::GameplayAlteringForwards) {
+			if(++ptr > &exLoadDataSlots.back()) {
+				ptr = exLoadDataSlots.data();
+			}
+		} else if(exLoadType == EXLoadTypes::CosmeticBackwards || exLoadType == EXLoadTypes::GameplayAlteringBackwards) {
+			if(--ptr < exLoadDataSlots.data()) {
+				ptr = &exLoadDataSlots.back();
+			}
 		}
 
-		const EXLoadInfo &current = exLoadDataSlots[index];
+		const EXLoadInfo &current = *ptr;
 
-		if(current.exLoadType == NoneEXLoadType) {
-			toRotate = false;
+		if(current.exLoadType == EXLoadTypes::None) {
+			ptr = nullptr;
+			break;
 		}
-
-		else if(current.exLoadType == checkType || exLoadType == AllEXLoadTypes) {
+		if(current.exLoadType == checkType || exLoadType == EXLoadTypes::AllTypes) {
 			toRotate = !CheckIfEXLoadCanBeApplied(player, current);
 		}
 	};
-
-	return index;
 }
 
 /**
  * Takes care of updating #Player_EXLoadData every time a Player scrolls through the possible applicable EX loads.
  *
  * @param player The Player to update.
- * @param exLoadMode Which type of EX load slots to apply and scroll through (refer to ::EXLoadModes).
+ * @param exLoadMode Which type of EX load slots to apply and scroll through (refer to ::EXLoadMode).
  * @param exLoadType Which scrolling behavior needs to be used. This value can be obtained from CheckEXLoadControls().
  */
-void ApplyNextEXLoad(const Player &player, const EXLoadModes &exLoadMode, const EXLoadTypes &exLoadType) {
-	u32 exLoadIndex = 0;
-	if(exLoadMode == CharacterEXLoadMode) {
-		exLoadIndex = RotateEXLoadAndFetch(player, CharacterEXLoadDataSlots, exLoadMode, exLoadType);
-	} else if(exLoadMode == GearEXLoadMode) {
-		exLoadIndex = RotateEXLoadAndFetch(player, GearEXLoadDataSlots, exLoadMode, exLoadType);
+void ApplyNextEXLoad(Player &player, const EXLoadMode &exLoadMode, const EXLoadTypes &exLoadType) {
+	switch (exLoadMode) {
+		default: return;
+		case EXLoadMode::CharacterEXLoadMode:
+			RotateEXLoadAndFetch(player, CharacterEXLoadDataSlots, exLoadMode, exLoadType);
+			break;
+		case EXLoadMode::GearEXLoadMode:
+			RotateEXLoadAndFetch(player, GearEXLoadDataSlots, exLoadMode, exLoadType);
+			break;
 	}
-
-	if(exLoadMode < 2) {
-		const u8 controllerPort = player.input->port;
-
-		Player_EXLoadData[controllerPort][exLoadMode].exLoadIndex = exLoadIndex;
-		Player_EXLoadData[controllerPort][exLoadMode].exLoadDelayTime = 15;
-	}
+	player.exload().delayTime = CurrentEXLoadInfo::MaxDelayTime;
 }
 
 /**
@@ -573,20 +344,19 @@ void ApplyNextEXLoad(const Player &player, const EXLoadModes &exLoadMode, const 
  * Also takes care of making sure there is a delay between spamming the EX load scroll controls.
  *
  * @param player The Player to check.
- * @param exLoadMode Which type of EX load slots to check against (refer to ::EXLoadModes).
+ * @param exLoadMode Which type of EX load slots to check against (refer to ::EXLoadMode).
  */
-void CheckPlayerEXLoadButton(const Player &player, const EXLoadModes &exLoadMode) {
-	const u8 controllerPort = player.input->port;
-	u8 &delayTime = Player_EXLoadData[controllerPort][exLoadMode].exLoadDelayTime;
+void CheckPlayerEXLoadButton(Player &player, const EXLoadMode &exLoadMode) {
+	u8 &delayTime = player.exload().delayTime;
 
 	if(delayTime == 0) {
 		const EXLoadTypes type = CheckEXLoadControls(player);
-		if(type != NoneEXLoadType) {
+		if(type != EXLoadTypes::None) {
 			ApplyNextEXLoad(player, exLoadMode, type);
 		}
+	} else if(--delayTime > CurrentEXLoadInfo::MaxDelayTime) [[unlikely]]{
+		delayTime = 0;
 	}
-
-	delayTime = static_cast<u8>(clamp<s8>(static_cast<s8>(delayTime - 1), 0));
 }
 
 /**
@@ -594,29 +364,29 @@ void CheckPlayerEXLoadButton(const Player &player, const EXLoadModes &exLoadMode
  *
  * @param object The GraphicalObject that handles character portrait textures.
  */
-USED void Character_UpdateGraphicalEXLoad(GraphicalObject *object) {
+ASMUsed void Character_UpdateGraphicalEXLoad(GraphicalObject *object) {
 	if(object->active == 0) { return; }
 
-	const Player &player = players[object->idStruct.idIndex];
-	CheckPlayerEXLoadButton(player, CharacterEXLoadMode);
+	Player &player = players[object->idStruct.idIndex];
+	CheckPlayerEXLoadButton(player, EXLoadMode::CharacterEXLoadMode);
 
-	const u8 &controllerPort = player.input->port;
-	const u8 &exLoadIndex = Player_EXLoadData[controllerPort][CharacterEXLoadMode].exLoadIndex;
-
-	const EXLoadInfo &info = CharacterEXLoadDataSlots[exLoadIndex];
-
-	if(exLoadIndex != 0) {
+	if(player.hasCharacterExload()) {
+		const EXLoadInfo &info = player.characterExload();
 		if(CheckIfEXLoadCanBeApplied(player, info)) {
-			if(IsAnyE10EXLoad(&player) && player.character == E10R) { return; }
+			if(IsAnyE10EXLoad(player) && player.character == Character::E10R) { return; }
 
-			if (static_cast<s16>(info.portraitTextureID) != -1)
+			if (static_cast<s16>(info.portraitTextureID) != -1){
 				object->textureIDs[0].textureSlot1 = info.portraitTextureID;
+			}
 
-            if (static_cast<s16>(info.characterTextTextureID) != -1)
-                object->textureIDs[0].textureSlot2 = info.characterTextTextureID;
+            if (static_cast<s16>(info.characterTextTextureID) != -1){
+				object->textureIDs[0].textureSlot2 = info.characterTextTextureID;
+			}
 
-            if (info.characterType != DefaultTypeCharacter)
-                object->textureIDs[0].textureSlot3 = info.characterType + 114;
+            if (info.characterType != CharacterType::DefaultTypeCharacter){
+				const auto characterType = std::to_underlying(info.characterType);
+				object->textureIDs[0].textureSlot3 = characterType + 114;
+			}
 		}
 	}
 }
@@ -626,14 +396,11 @@ USED void Character_UpdateGraphicalEXLoad(GraphicalObject *object) {
  *
  * @param object The GraphicalObject that handles the aforementioned textures.
  */
-USED void Gear_UpdateGraphicalEXLoad(GraphicalObject *object) {
+ASMUsed void Gear_UpdateGraphicalEXLoad(GraphicalObject *object) {
 	// not locked in gear selection object uses textureSlot1 for portrait, textureSlot5 for gear text
 	// locked in gear selection object uses textureSlot4 for gear text
 
 	if(object->active == 0) { return; }
-
-	const Player &player = players[object->idStruct.idIndex];
-	const u8 &controllerPort = player.input->port;
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "cppcoreguidelines-pro-type-reinterpret-cast"
@@ -644,34 +411,37 @@ USED void Gear_UpdateGraphicalEXLoad(GraphicalObject *object) {
 	auto *cssObject = static_cast<CSSObject *>(*objectptr);
 #pragma clang diagnostic pop
 
+	Player &player = players[object->idStruct.idIndex];
+	const u8 &controllerPort = player.input->port;
+
 	if(cssObject->cssSelectionState[controllerPort] < 4) {
-		CheckPlayerEXLoadButton(player, GearEXLoadMode);
+		CheckPlayerEXLoadButton(player, EXLoadMode::GearEXLoadMode);
 	}
 
-	const auto &exLoadIndex = Player_EXLoadData[controllerPort][GearEXLoadMode].exLoadIndex;
-	const auto &info = GearEXLoadDataSlots[exLoadIndex];
-
-    const auto &characterExLoadIndex = Player_EXLoadData[controllerPort][CharacterEXLoadMode].exLoadIndex;
-	const auto &characterInfo = CharacterEXLoadDataSlots[characterExLoadIndex];
+	const auto &info = player.gearExload();
+	const auto &characterInfo = player.characterExload();
 
 	if(object->idStruct.graphicalDataID == NotLockedGearSelectionID) {
-        if (characterExLoadIndex != 0) {
+        if (player.hasCharacterExload()) {
             // character ex load is applied, need to check if their default gear is different and if they have different character text texture
 
             if (CheckIfEXLoadCanBeApplied(player, characterInfo)) {
                 if (player.extremeGear == ExtremeGear::Default) {
-                    if (static_cast<s16>(characterInfo.defaultGearPortraitTextureID) != -1)
-                        object->textureIDs[0].textureSlot1 = characterInfo.defaultGearPortraitTextureID;
+                    if (static_cast<s16>(characterInfo.defaultGearPortraitTextureID) != -1){
+						object->textureIDs[0].textureSlot1 = characterInfo.defaultGearPortraitTextureID;
+					}
 
-                    if (static_cast<s16>(characterInfo.gearTextTextureID) != -1)
-                        object->textureIDs[0].textureSlot5 = characterInfo.gearTextTextureID;
+                    if (static_cast<s16>(characterInfo.gearTextTextureID) != -1){
+						object->textureIDs[0].textureSlot5 = characterInfo.gearTextTextureID;
+					}
                 }
 
-                if (static_cast<s16>(characterInfo.characterTextTextureID) != -1)
-                    object->textureIDs[0].textureSlot2 = characterInfo.characterTextTextureID;
+                if (static_cast<s16>(characterInfo.characterTextTextureID) != -1){
+					object->textureIDs[0].textureSlot2 = characterInfo.characterTextTextureID;
+				}
             }
         }
-        if (exLoadIndex != 0) {
+        if (player.hasGearExload()) {
             // gear ex load overrides character ex load's default gear
 
 			if(CheckIfEXLoadCanBeApplied(player, info)) {
@@ -685,7 +455,7 @@ USED void Gear_UpdateGraphicalEXLoad(GraphicalObject *object) {
 			}
 		}
 	} else if (object->idStruct.graphicalDataID == LockedGearSelectionID) {
-        if (characterExLoadIndex != 0) {
+        if (player.hasCharacterExload()) {
             // character ex load is applied, need to check if their default gear is different and if they have different character text texture
 
             if (CheckIfEXLoadCanBeApplied(player, characterInfo)) {
@@ -698,7 +468,7 @@ USED void Gear_UpdateGraphicalEXLoad(GraphicalObject *object) {
                     object->textureIDs[0].textureSlot1 = characterInfo.characterTextTextureID;
             }
         }
-		if (exLoadIndex != 0) {
+		if (player.hasGearExload()) {
             // gear ex load overrides character ex load's default gear
 
 			if(CheckIfEXLoadCanBeApplied(player, info)) {
@@ -711,18 +481,30 @@ USED void Gear_UpdateGraphicalEXLoad(GraphicalObject *object) {
 }
 
 /**
- * Takes care of binding Hatsune Miku's leek she holds at level 3 to her right hand whenever she performs her attack.
- * Only used on the ::HatsuneMikuEXLoad EX load.
+ * Takes care of binding Hatsune Miku's leek and microphone she holds to her right hand whenever she performs her attack.
+ * Only used on the ::HatsuneMiku EX load.
  *
  * @param player The Player to apply binding to.
- * @param savePtr Where to save the leek's matrix multiplication result.
+ * @param savePtr Where to save the attack part's matrix multiplication result.
+ * @param level Which level attack is currently being performed.
  */
-ASMUsed void HatsuneMiku_BindLeekToBoneLvl3Attack(Player &player, Matrix3x3F &savePtr) {
-	auto exLoads = FetchEnabledEXLoadIDs(player);
-	if(exLoads.characterExLoadID == HatsuneMikuEXLoad) {
-		Matrix3x3F *mtxList = gpsaMtxList_Player[player.index];
-		const u32 rightHandBone = 43;
+ASMUsed void HatsuneMiku_BindAttackPartsToBone(Player &player, Matrix3x3F &savePtr, const u8 level) {
+	if(player.characterExload().exLoadID != EXLoad::HatsuneMiku) { return; }
+
+	Matrix3x3F *mtxList = gpsaMtxList_Player[player.index];
+	constexpr u32 rightHandBone = 43;
+
+	if (level == 2) {
+		// level 3 leek
 		nnMultiplyMatrix(&player.unkC4, mtxList + rightHandBone, savePtr);
+	} else {
+		// level 1 microphone
+		Matrix3x3F translateMat;
+		nnMakeTranslateMatrix(&translateMat, 0.1f, 0.0f, -0.05f);
+
+		Matrix3x3F modelMatrix;
+		nnMultiplyMatrix(&player.unkC4, mtxList + rightHandBone, modelMatrix);
+		nnMultiplyMatrix(&modelMatrix, &translateMat, savePtr);
 	}
 }
 
@@ -734,21 +516,19 @@ ASMUsed void HatsuneMiku_BindLeekToBoneLvl3Attack(Player &player, Matrix3x3F &sa
  * @param filename The original filename.
  * @return The new filename, whether that be modified from the original or not.
  */
-USED const char *GetEXLoadFilenameSuperForm(Player *player, const char filename[5]) {
-	auto exLoads = FetchEnabledEXLoadIDs(*player);
-
-	if(player->extremeGear != ExtremeGear::ChaosEmerald) {
+ASMUsed const char *GetEXLoadFilenameSuperForm(const Player &player, const char *filename) {
+	if(player.extremeGear != ExtremeGear::ChaosEmerald) {
 		return filename;
 	}
 
-	switch(exLoads.gearExLoadID) {
-		case PerfectNazo:
+	switch(player.gearExload().exLoadID) {
+		case EXLoad::PerfectNazo:
 			filename = "PN18";
 			break;
-		case HyperSonicEXLoad:
+		case EXLoad::HyperSonic:
 			filename = "PH18";
 			break;
-		case DarkSonicEXLoad:
+		case EXLoad::DarkSonic:
 			filename = "PG18";
 			break;
 		default:
@@ -766,53 +546,58 @@ USED const char *GetEXLoadFilenameSuperForm(Player *player, const char filename[
  * @param gearType The type of gear the Player is using.
  * @return nullptr if the EX load doesn't have a model assigned to it, otherwise the filename of the model.
  */
-[[nodiscard]] const char *GetEXLoadCharacterModel(Player *player, const GearType gearType) {
-	switch(FetchEnabledEXLoadIDs(*player).characterExLoadID) {
-		case HatsuneMikuEXLoad:
+[[nodiscard]] std::optional<std::string> GetEXLoadCharacterModel(const Player &player, const GearType gearType) {
+	if (!player.isRealPlayer() && isInGame()) {return std::nullopt;}
+	switch(player.characterExload().exLoadID) {
+		case EXLoad::HatsuneMiku:
 			return "EC0";
-		case MetalSonicNoScarfEXLoad:
-            if (gearType == Bike) {
+		case EXLoad::MetalSonicNoScarf:
+            if (gearType == GearType::Bike) {
                 return "EC1B";
             }
 			return "EC1";
-		case RealaEXLoad:
+		case EXLoad::Reala:
 			return "EC2";
-		case GonGonEXLoad:
+		case EXLoad::GonGon:
 			return "EC3";
-        case NeoMetalEXLoad:
+        case EXLoad::NeoMetal:
             return "EC4";
-        case SelkadoomEXLoad:
-            if (gearType == Bike) {
+        case EXLoad::Selkadoom:
+            if (gearType == GearType::Bike) {
                 return "EC5B";
             }
             return "EC5";
+		case EXLoad::Jackle:
+            return "EC6";
 		default:
-			return nullptr;
+			return std::nullopt;
 	}
 }
 
 /**
  * Gets the first two starting letters of an EX load's skate models' filename, if applicable.
  * The model ID of the skates then get appended to the end of this filename.
- * For example, if ::RealaEXLoad is picked alongside ::Darkness, the final filename would become "S270".
+ * For example, if ::Reala is picked alongside ::Darkness, the final filename would become "S270".
  *
  * @param player The Player to get the result from.
  * @return nullptr if the EX load doesn't have a model assigned to it, otherwise the start of the model's filename.
  */
-[[nodiscard]] const char *GetEXLoadSkateModelStart(Player *player) {
-	switch(FetchEnabledEXLoadIDs(*player).characterExLoadID) {
-		case HatsuneMikuEXLoad:
+[[nodiscard]] std::optional<std::string> GetEXLoadSkateModelStart(const Player &player) {
+	switch(player.characterExload().exLoadID) {
+		case EXLoad::HatsuneMiku:
 			return "S0";
-        case MetalSonicNoScarfEXLoad:
+        case EXLoad::MetalSonicNoScarf:
             return "S1";
-		case RealaEXLoad:
+		case EXLoad::Reala:
 			return "S2";
-		case GonGonEXLoad:
+		case EXLoad::GonGon:
 			return "S3";
-        case SelkadoomEXLoad:
+        case EXLoad::Selkadoom:
             return "S5";
+		case EXLoad::Jackle:
+			return "S6";
 		default:
-			return nullptr;
+			return std::nullopt;
 	}
 }
 
@@ -828,20 +613,43 @@ USED const char *GetEXLoadFilenameSuperForm(Player *player, const char filename[
 	const std::span characterEXLoadDataSlots = {CharacterEXLoadDataSlots.data(), CharacterEXLoadDataSlots.size()};
 	const std::span gearEXLoadDataSlots = {GearEXLoadDataSlots.data(), GearEXLoadDataSlots.size()};
 
-	const std::span exLoadDataSlots = type == OnlyCharacter ? characterEXLoadDataSlots : gearEXLoadDataSlots;
+	const std::span exLoadDataSlots = type == EXLoadHoverTypes::OnlyCharacter ? characterEXLoadDataSlots : gearEXLoadDataSlots;
 
 	for(const auto &slot: exLoadDataSlots) {
-		if(slot.exLoadID == NoneEXLoad) { continue; }
+		if(slot.exLoadID == EXLoad::None) { continue; }
 
 		if(CheckIfEXLoadCanBeApplied(player, slot)) { return true; }
 	}
 	return false;
 }
 
+/**
+ * Checks if player is currently using the specified character EX load.
+ *
+ * @param player The player to check.
+ * @param exLoad The EX load ID to check for.
+ * @return true if player is using the EX load ID, otherwise false
+ */
+ASMUsed [[nodiscard]] bool CheckPlayerHasCharacterEXLoadID(const Player &player, const EXLoad exLoad) {
+	return player.characterExload().id() == std::to_underlying(exLoad);
+}
+
+/**
+ * Checks if player is currently using the specified gear EX load.
+ *
+ * @param player The player to check.
+ * @param exLoad The EX load ID to check for.
+ * @return true if player is using the EX load ID, otherwise false
+ */
+ASMUsed [[nodiscard]] bool CheckPlayerHasGearEXLoadID(const Player &player, const EXLoad exLoad) {
+	return player.gearExload().id() == std::to_underlying(exLoad);
+}
+
 /// Used to clear #Player_EXLoadData when necessary.
 ASMUsed void ClearPlayerEXLoadBSS() {
-	TRK_memset(Player_EXLoadData.data(), 0, sizeof(Player_EXLoadData));
-	//std::fill(, Player_EXLoadData.end(), 0);
+	//memset(Player_EXLoadData.data(), 0, sizeof(Player_EXLoadData));
+	//std::fill(Player_EXLoadData.begin(), Player_EXLoadData.end(), CurrentEXLoadInfo());
+	std::ranges::fill(Player_EXLoadData, CurrentEXLoadInfo{});
 }
 
 /*
@@ -849,10 +657,241 @@ ASMUsed void ClearPlayerEXLoadBSS() {
  * Takes care of very special EX loads, that don't need an EX load ID set to them (like Super Sonic EX load).
  */
 ASMUsed void ClearSpecificEXLoads() {
-    for (u32 i = 0; i < MaxPlayerCount; i++) {
-        auto &charExLoadInfo = Player_EXLoadData[i][CharacterEXLoadMode];
-        if (CharacterEXLoadDataSlots[charExLoadInfo.exLoadIndex].exLoadID == SSEXLoad) {
-            charExLoadInfo.exLoadIndex = 0;
-        }
-    }
+	for(auto &player : players) {
+		const auto &charExLoadInfo = player.characterExload();
+		if(charExLoadInfo.exLoadID == EXLoad::SuperSonic) {
+			player.exload().characterExload = {};
+		}
+	}
 }
+
+ASMUsed constexpr std::array<RGBA32, EXLoadCount> EXLoadHUDColors = {
+		RGBA32(0x0), // dummy data
+		RGBA32(0x471394ff), // perfect nazo
+		RGBA32(0xcf4731ff), // e10r
+		RGBA32(0x101010FF), // dark sonic
+		RGBA32(0xC0C0C0FF), // hyper sonic
+		RGBA32(0x0), // Stardust Speeder II
+		RGBA32(0x0), // Hyper Hang-On
+		RGBA32(0x0), // The Professional
+		RGBA32(0x0), // Ollie King Gear
+		RGBA32(0xD2C864FF), // Windmaster Jet
+		RGBA32(0x1239B8FF), // neo metal sonic
+		RGBA32(0x0), // E99
+		RGBA32(0x0), // The Beast
+		RGBA32(0x0), // e10b, UNUSED - it uses original colors
+		RGBA32(0x00ffe5ff), // hatsune miku
+		RGBA32(0x0), // metal sonic scarf
+		RGBA32(0x4a0015ff), // reala
+		RGBA32(0x210d00ff), // gongon
+		RGBA32(0x0), // dummy data
+		RGBA32(0x0), // dummy data
+		RGBA32(0x0), // dummy data
+		RGBA32(0x0), // dummy data
+		RGBA32(0x0), // dummy data
+		RGBA32(0x0), // dummy data
+		RGBA32(0x0), // dummy data
+		RGBA32(0x0), // dummy data
+		RGBA32(0x0), // dummy data
+		RGBA32(0x01056bFF), // seelkadoom
+		RGBA32(0x0), // super sonic ex load
+		RGBA32(0x0), // throttle
+		RGBA32(0xFF5D00FF), // jackle
+		RGBA32(0xFFDC0FFF), // E10Y
+};
+
+ASMUsed constexpr std::array<EXLoadBoostColor, EXLoadCount> EXLoadBoostColors = {
+		{
+				// dummy data
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// perfect nazo
+				{
+						RGBANormalized::fromNormalized(0.2196078431372549f, 0.0549019607843137f, 0.4588235294117647f),
+						RGBANormalized::fromNormalized(0.0f, 0.0666666701436043f, 1.0f)
+				},
+
+				// e10r
+				{
+						RGBANormalized::fromNormalized(1.0f, 0.345098f, 0.133333f),
+						RGBANormalized::fromNormalized(0.133333f, 0.7843137254901961f, 1.0f)
+				},
+
+				// dark sonic
+				{
+						RGBANormalized::fromNormalized(0.0f, 0.0392156862745098f, 0.5411764705882353f),
+						RGBANormalized::fromNormalized(0.5686274509803922f, 0.5294117647058824f, 0.0f)
+				},
+
+				// hyper sonic
+				{
+						RGBANormalized(255, 255, 255),
+						RGBANormalized(0, 255, 0)
+				},
+
+				// Stardust Speeder II
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// Hyper Hang-On
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// The Professional
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// Ollie King Gear
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// Windmaster Jet
+				{
+						RGBANormalized::fromNormalized(1.0f, 0.933333337306976f, 0.0f),
+						RGBANormalized::fromNormalized(0.0f, 0.0666666701436043f, 1.0f)
+				},
+
+				// neo metal sonic
+				{
+						RGBANormalized::fromNormalized(0.1215686274509804f, 0.1490196078431373f, 1.0f),
+						RGBANormalized::fromNormalized(1.0f, 0.9725490196078431f, 0.1215686274509804f)
+				},
+
+				// E99
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// The Beast
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// e10b, UNUSED - uses original character boost colors
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// hatsune miku
+				{
+						RGBANormalized::fromNormalized(0.2705882352941176f, 1.0f, 0.9254901960784314f),
+						RGBANormalized::fromNormalized(1.0f, 0.2705882352941176f, 0.3450980392156863f)
+				},
+
+				// metal sonic scarf
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// reala
+				{
+						RGBANormalized::fromNormalized(0.8f, 0.0f, 0.0352941176470588f),
+						RGBANormalized::fromNormalized(0.0f, 0.8f, 0.7647058823529412f)
+				},
+
+				// gongon
+				{
+						RGBANormalized::fromNormalized(0.5294117647058824f, 0.3490196078431373f, 0.2745098039215686f),
+						RGBANormalized::fromNormalized(0.2745098039215686f, 0.4549019607843137f, 0.5294117647058824f)
+				},
+
+				// dummy data
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// dummy data
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// dummy data
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// dummy data
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// dummy data
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// dummy data
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// dummy data
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// dummy data
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// dummy data
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// seelkadoom
+				{
+						RGBANormalized(0, 10, 255),
+						RGBANormalized(84, 84, 84)
+				},
+
+				// super sonic ex load
+				{
+						RGBANormalized(true),
+						RGBANormalized(true)
+				},
+
+				// Throttle
+                {
+                        RGBANormalized(true),
+                        RGBANormalized(true)
+                },
+
+				// Jackle
+				{
+                        RGBANormalized(255, 93, 0),
+                        RGBANormalized(0, 10, 255)
+                },
+
+				// E10Y
+				{
+                        RGBANormalized(255, 220, 15),
+                        RGBANormalized(26, 18, 255)
+                },
+		}
+};

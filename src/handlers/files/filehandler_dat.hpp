@@ -3,6 +3,7 @@
 #include "globalDefs.hpp"
 #include "types.hpp"
 
+#include <memory>
 #include <string_view>
 
 struct DATSpecs {
@@ -39,8 +40,30 @@ struct DATFile {
 	}
 };
 
-ASMDefined DATSpecs* DumpFile(const char [], u32);
+ASMDefined void* DumpFile(const char filename[], bool lowHeap = true);
 
-ASMDefined void LoadCustomDATFile(DATFile& customDat);
+template<typename T>
+[[nodiscard]] inline std::unique_ptr<T> DumpFile(const char *filename, bool lowHeap = true){
+	T* ptr = static_cast<T*>(DumpFile(filename, lowHeap));
+	return std::unique_ptr<T>(ptr);
+}
+
+ASMUsed void LoadMainMenuDatFiles();
+ASMUsed void LoadStageDatFiles();
+
+constexpr auto LongStandingDatFileCount = DATFILE_LONG_STANDING_FILE_COUNT;
+ASMDefined u8 LoadedDynamicDATFileCount;
+
+void FreeDynamicDatFileByIndex(u8 index = LoadedDynamicDATFileCount);
+
+ASMDefined DATFile& LoadCustomDATFile(DATFile& customDat); // Returns first argument
+ASMDefined void FreeDATFiles(u8 indexToStartFreeing = LongStandingDatFileCount);
+ASMDefined void FreeDATFileByIndex(u8 index);
 ASMUsed void LoadDATFileDynamic(const char filename[]);
 ASMUsed void DATFileHandler();
+
+ASMDefined char* DumpPackManFile(const char* filename, bool lowHeap = false);
+ASMDefined void SetArchiveBinary(const char*, u32, u32);
+ASMDefined void GetSet_Tex(void *packmanStart, u32 *offsetFromStart, void *saveptr, u32 mallocHi);
+ASMDefined void PackMan_SetupRenderedText(void *packmanStart, u32 *offsetFromStart, void *saveptr);
+void FileHandler_LongLasting();

@@ -8,7 +8,7 @@ ASMDefined void OSResumeThread(void *thread);
 ASMDefined void OSCancelThread(void *thread);
 
 //What does this return?
-ASMDefined void *_OSGetCurrentContext();
+ASMDefined void *OSGetCurrentThread();
 
 class alignas(32) Thread {
 public:

@@ -1,29 +1,29 @@
-#include "cosmetics/player/exloads.hpp"
+#include "riders/player.hpp"
 #include "filehandler_dat.hpp"
 
 ASMDefined void* tex_HotswapTextures;
 
 ASMUsed void* TextureHotswapHandler(Player *player, void* gvrTexture, u32 textureID) {
+	if (player->character != Character::E10R) { return gvrTexture; }
     void* customTexture = tex_HotswapTextures;
-    u32 exLoadIndex;
-    if (player->character != E10R) return gvrTexture;
-    if (!customTexture) return gvrTexture;
+    if (customTexture == nullptr) { return gvrTexture; }
 
-    exLoadIndex = Player_EXLoadData[player->input->port][CharacterEXLoadMode].exLoadIndex;
-
-    if (CharacterEXLoadDataSlots[exLoadIndex].exLoadID == E10REXLoad) {
-        customTexture = (u8*)customTexture + 0x2E40; // skip to e10r textures
+    if (player->characterExload().exLoadID == EXLoad::E10R) {
+        customTexture = static_cast<u8*>(customTexture) + 0x2E40; // skip to e10r textures
+    }
+    else if (player->characterExload().exLoadID == EXLoad::E10Y) {
+        customTexture = static_cast<u8*>(customTexture) + 0x5C80; // SYB: skip to e10y textures
     }
 
     if (textureID == 2) {
         gvrTexture = customTexture;
     } else if (textureID == 1) {
-        gvrTexture = (u8*)customTexture + 0x2B20;
+        gvrTexture = static_cast<u8*>(customTexture) + 0x2B20;
     }
 
     return gvrTexture;
 }
 
 ASMUsed void InitializeTextureHotswap() {
-    tex_HotswapTextures = DumpFile("POT", 1);
+    tex_HotswapTextures = DumpFile("POT");
 }

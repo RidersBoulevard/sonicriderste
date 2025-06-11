@@ -4,25 +4,24 @@
 
 #pragma once
 
-#include "../types.hpp"
 #include "../globalDefs.hpp"
-
-enum CharacterEnums : u8 {
-	Sonic, Tails, Knuckles, Amy, Jet, Storm, Wave, Eggman, Cream, Rouge, Shadow, SuperSonic,
-	Nights, Aiai, Ulala, E10G, E10R, Silver, MetalSonic, Emerl, Blaze, Chaos, Tikal,
-	// Add new characters above
-	TotalCharacterAmount
-};
-static_assert(TotalCharacterAmount < 32, "Too many characters! This will break Gear::useFlags!");
+#include "../types.hpp"
 
 struct Character {
-	enum TypeEnum : u8{
-		SpeedType,
-		FlyType,
-		PowerType,
-		NoType
+	enum Enum : u8 {
+		Sonic, Tails, Knuckles, Amy, Jet, Storm, Wave, Eggman, Cream, Rouge, Shadow, SuperSonic,
+		Nights, Aiai, Ulala, E10G, E10R, Silver, MetalSonic, Emerl, Blaze, Chaos, Tikal,
+		// Add new characters above
+		Total,
+		Invalid = 0xFF
 	};
-	TypeEnum type;
+	enum class Type : u8{
+		Speed,
+		Fly,
+		Power,
+		None
+	};
+	Type type;
 	u8 statPreset;
 
     /**
@@ -48,24 +47,25 @@ struct Character {
 	lvlStats power;
 	lvlStats cornering;
 };
+static_assert(std::to_underlying(Character::Enum::Total) < 32, "Too many characters! This will break Gear::useFlags!");
 static_assert(sizeof(Character) == 32);
-ASMDefined std::array<Character, TotalCharacterAmount> Characters;
+ASMDefined std::array<Character, Character::Total> Characters;
 
 /// Holds all existing distinct character archetypes.
-enum CharacterArchetypes : u8{
-	NoEXLoadArchetype = 0xFF,
+enum class CharacterArchetype : u8{
+	NoEXLoad = 0xFF,
 	AllRounder = 0,
 	LateBooster,
-	TopSpeedArchetype,
-	CombatArchetype,
-	DriftArchetype,
-	NoTypeArchetype,
-	SuperSonicArchetype,
-	BoostArchetype,
-	TricksterArchetype,
-	NoneArchetype,
+	TopSpeed,
+	Combat,
+	Drift,
+	NoType,
+	SuperSonic,
+	Boost,
+	Trickster,
+	None,
 	Windcatcher,
 	Turning,
 	Mechanic,
-	ArchetypeCount,
+	Count,
 };

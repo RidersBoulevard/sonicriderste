@@ -38,19 +38,20 @@
 //#include "gears/faster.hpp"
 //#include "gears/hyperhangon.hpp"
 //#include "gears/slidebooster.hpp"
-//#include "gears/olliekinggear.hpp"
-//#include "gears/dynamo.hpp"
 //#include "gears/turbostar.hpp"
 // #include "gears/airtank.hpp"
-//#include "gears/eggsterminator.hpp"
 #include "handlers/menu/debugmenu/debugmenu_handlers.hpp"
+#include "gears/omnipotence.hpp"
+#include "tweaks/stage/itemrngchange.hpp"
+#include "gears/advantagep.hpp"
+#include "gears/gambler.hpp"
 
 // ASMDefined void Player_Autopilot(Player *player); // _Main/text.s ; C240F4D8
 
 ASMUsed void PlayerHandler(Player *player) {
     // this is just a main function that calls all the handlers
 
-    if (player->state != Fly) player->splashCanyonFlyRoute = FALSE;
+    if (player->state != PlayerState::Fly) player->splashCanyonFlyRoute = FALSE;
 
     lbl_Slipstream(player);
     lbl_FastFall(player);
@@ -69,7 +70,7 @@ ASMUsed void PlayerHandler(Player *player) {
     Player_FlyHoopDashHandler(player);
     Player_LCancelHandler(player);
     Player_GRHandler(player);
-    Player_DriftTips(player);
+    // Player_DriftTips(player);
     Player_LimiterCut(player);
     Player_CrazyStop(player);
     Player_HangOn(player);
@@ -88,31 +89,30 @@ ASMUsed void PlayerHandler(Player *player) {
     Player_HyperSonicUpdatePlayerStats(player);
     Player_HyperSonicTotalLinkCalc(player);
     Player_HyperSonicRingStream(player);
-    Player_Faster(player);
+    // Player_Faster(player);
     // Player_HyperHangOn(player);
     // Player_TheProfessional(player);
     Player_SlideBooster(player);
-    // Player_OllieKingGear(player);
-    // Player_Dynamo(player);
     Player_TurboStar(player);
     // Player_AirTank(player);
-    // Player_Eggsterminator(player);
     // Player_TheBeast(player);
     Player_IgnoreTurbulenceHandler(player);
     Player_AirOutButton(player);
     Player_Afterburner(player);
     Player_windcatcher(player);
     // Player_ZGSuperSonic(player);
-    // Player_Excalibur(player);
-    // Player_HangOnAT(player);
     // Player_NeoII(player);
     // Player_SuperStorm(player);
     Player_lightBoardEffect(player);
     Player_moneyCrisis(player);
     Player_storeFlagInfo(player);
-    Player_checkGearIfUsesBlastGauge(player);
-    Player_resetGauge(player);
-    Player_TornadoBoostApplications(player);
+    Player_BlastGaugeUpdateStatus(*player);
+    // Player_TornadoBoostApplications(player);
     DebugMenuHandler_InfiniteAir(player);
     DebugMenuHandler_InfiniteRings(player);
+    Player_SuperShadow(player);
+    Player_Omnipotence(player);
+    RNGChangesReset(player);
+    Player_AdvantageP(player);
+    Player_GamblerBoost(player);
 }

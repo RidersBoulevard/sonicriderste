@@ -1,4 +1,5 @@
 #include "gears/turbostar.hpp"
+#include "lib/stdlib.hpp"
 
 constexpr std::array<f32, 3> EmerlDriftCapBonus = {
 		pSpeed(30), pSpeed(15), pSpeed(5)
@@ -11,16 +12,17 @@ ASMUsed void *Player_DriftCap(Player *player, f32 return_array[2], f32 currentDr
 
 	currentDriftCap += player->level * pSpeed(10);
 
-	if(player->character == Emerl) {
-		currentDriftCap += EmerlDriftCapBonus[player->level];
+	if(player->character == Character::Emerl) {
+		if (!player->specialFlags.hasAny(SpecialFlags::ringGear))
+		{currentDriftCap += EmerlDriftCapBonus[player->level];}
 	}
 
-	if(player->extremeGear == ExtremeGear::SlideBooster) {
-		currentDriftCap -= pSpeed(10);
-	} else {
+	// if(player->extremeGear == ExtremeGear::SlideBooster) {
+	// 	currentDriftCap -= pSpeed(10);
+	// } else {
 		switch(player->characterArchetype) {
-			case DriftArchetype:
-			case NoTypeArchetype:
+			case CharacterArchetype::Drift:
+			case CharacterArchetype::NoType:
 				if(player->specialFlags.hasAny(static_cast<SpecialFlags>(0x00200000U))) {
 					addCap = pSpeed(10);
 				} else {
@@ -31,7 +33,7 @@ ASMUsed void *Player_DriftCap(Player *player, f32 return_array[2], f32 currentDr
 				f3 += addCap;
 				break;
 
-			case AllRounder:
+			case CharacterArchetype::AllRounder:
 				if(player->specialFlags.hasAny(static_cast<SpecialFlags>(0x00200000U))) {
 					addCap = pSpeed(5);
 				} else {
@@ -58,23 +60,56 @@ ASMUsed void *Player_DriftCap(Player *player, f32 return_array[2], f32 currentDr
 					if(player->gearSpecificFlags[TurboStar::Level4]) currentDriftCap += pSpeed(10);
 					break;
 
+				case Grinder:
+					currentDriftCap += pSpeed(15);
+					break;
 				case MagicCarpet:
-				case AutoSlider:
 					currentDriftCap += pSpeed(10);
 					break;
+				case AutoSlider:
+					currentDriftCap += pSpeed(20);
+					break;
+
+				case SlideBooster:
+					currentDriftCap -= pSpeed(10);
+					if (player->characterArchetype == CharacterArchetype::Drift) {currentDriftCap -= pSpeed(10);}
+					break;
+				
+				case ChaosEmerald:
+					if (player->character == Character::SuperSonic) {currentDriftCap += pSpeed(15);}
 
 				default:
-					if(player->specialFlags.hasAny(ringGear)) {
+					if(player->specialFlags.hasAny(SpecialFlags::ringGear)) {
 						currentDriftCap += pSpeed(10);
 					}
+					break;
+				
+				case ExtremeGear::TheCrazy:
+					currentDriftCap += pSpeed(10);
+					s32 driftTips = ((player->driftDashFrames - 50) * player->gearStats[player->level].maxAir) / 1000;
+					driftTips = clamp(driftTips, (player->gearStats[player->level].maxAir / 100), (player->gearStats[player->level].maxAir * 10 / 100));
+					player->currentAir += driftTips;
 					break;
 			}
 		} else {
 			currentDriftCap += pSpeed(10);
 		}
-	}
+	// }
 
 	return_array[0] = currentDriftCap;
 	return_array[1] = f3;
 	return return_array;
+}
+
+ASMUsed void Player_DriftCapOvercharge(Player* player, f32 currentDriftCap) {
+	// f0 should be currentDriftCap
+	// If current speed is less than drift cap, set it to drift cap
+	if (player->speed <= currentDriftCap) {
+		player->speed = currentDriftCap;
+		return;
+	}
+	f32 newDriftCap = (player->speed - currentDriftCap) * 0.5;
+	newDriftCap *= (player->extremeGear == ExtremeGear::SlideBooster) ? 0.15 : 1;
+	// Else if current speed is greater than drift cap, add drift cap to it
+	player->speed += (player->characterArchetype == CharacterArchetype::Drift) ? newDriftCap * 2: newDriftCap; 
 }

@@ -1,9 +1,17 @@
 #pragma once
 
-#include "riders/character.hpp"
-#include "types.hpp"
-
 #include <array>
+#include <optional>
+
+#include "types.hpp"
+#include "riders/character.hpp"
+
+enum class Language : s32 {
+	Japanese = 0,
+	English = 1,
+};
+
+ASMDefined Language GameLanguage;
 
 ASMDefined void PlayAudioFromDAT(u32);
 
@@ -39,6 +47,7 @@ namespace Sound{
 			Tikal 			= 0xA938,
 			MSFX			= 0xA939,
 			Nights 			= 0xA93A,
+			CSSV			= 0xA93B,
 			// exloads below
 			NeoMetalSonic	= 0xA97B,
 			HyperSonic		= 0xA97C,
@@ -48,12 +57,17 @@ namespace Sound{
 		};
 	}
 
-	constexpr u32 ComposeSound(const ID::CharacterSoundIDs &characterSoundID, const u8 &soundID){
+	constexpr u32 ComposeSound(const ID::CharacterSoundIDs &characterSoundID, u8 soundID){
 		return static_cast<u32>(characterSoundID << 16 | soundID << 8);
 	}
 
-	inline void PlaySound(const ID::CharacterSoundIDs &characterSoundID, const u8 &soundID){
+	inline void PlaySound(const ID::CharacterSoundIDs &characterSoundID, u8 soundID){
 		PlayAudioFromDAT(ComposeSound(characterSoundID, soundID));
+	}
+
+	inline void PlaySound(const ID::CharacterSoundIDs &characterSoundID, std::optional<u8> soundID){
+		if(!soundID) { return; }
+		PlaySound(characterSoundID, *soundID);
 	}
 
 	namespace SFX{
@@ -81,7 +95,10 @@ namespace Sound{
 			HOTrans3 				= ComposeSound(ID::SFX, 0x14),
 			GoldExp 				= ComposeSound(ID::SFX, 0x15),
 			CovFModeSwitch 			= ComposeSound(ID::SFX, 0x16),
-			SuperLeap 				= ComposeSound(ID::SFX, 0x17)
+			SuperLeap 				= ComposeSound(ID::SFX, 0x17),
+            AdvPTOP1 				= ComposeSound(ID::SFX, 0x18),
+            AdvPTOP2 				= ComposeSound(ID::SFX, 0x19),
+            AdvPTOP3 				= ComposeSound(ID::SFX, 0x1A),
 		};
 	}
 
@@ -101,7 +118,7 @@ namespace Sound{
 }
 
 // This is for getting the ID by the characters index
-constexpr std::array<Sound::ID::CharacterSoundIDs, TotalCharacterAmount> CharacterVoiceIDs = {
+constexpr std::array<Sound::ID::CharacterSoundIDs, std::to_underlying(Character::Total)> CharacterVoiceIDs = {
 		Sound::ID::Sonic,
 		Sound::ID::Tails,
 		Sound::ID::Knuckles,

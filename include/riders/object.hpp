@@ -12,7 +12,7 @@
 
 /// Contains the specific IDs assigned to commonly seen stage objects.
 enum ObjectTypes {
-	ItemBox = 0x7DA, FlightRing = 0x848, DashPanel = 0x83E, WhiteCaveWeb = 0x1F40, Car = 0x13A8
+	ItemBox = 0x7DA, PowerObject = 0x820, FlightRing = 0x848, DashPanel = 0x83E, WhiteCaveWeb = 0x1F40, MetalCityCar = 0x13A8, NightChaseCar = 0x13A7
 };
 
 /// Contains all the item ID values for an item box object.
@@ -61,7 +61,14 @@ struct ObjectNode {
 	u16 object_group;
 	void* object;
 	u8 state;
-	u16 object_type;
+    union {
+        u16 object_type;
+        u16 userDataU16;
+        struct {
+            u8 _padding;
+            u8 userDataU8;
+        };
+    };
 	u8 culling_group;
 	u16 item_id;
 	u16 object_id;
@@ -146,10 +153,10 @@ struct ParticleTaskObject1 {
 	/* 0x54 */ u32 unk54;
 	/* 0x58 */ u32 unk58;
 	/* 0x5C */ u32 unk5C;
-	/* 0x60 */ void* unk60;
+	/* 0x60 */ const void* particleParams;
 	/* 0x64 */ u32 unk64;
-	/* 0x68 */ void* unk68;
-	/* 0x6C */ void* unk6C;
+	/* 0x68 */ void* texList;
+	/* 0x6C */ void* baseModelMatrix;
 	/* 0x70 */ u8 unk70;
 	/* 0x71 */ u8 unk71;
 	/* 0x72 */ u8 unk72;

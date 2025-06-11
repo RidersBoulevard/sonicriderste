@@ -12,14 +12,15 @@
         case Gambler:
             return 150;
         case ChaosEmerald:
-            if (player->character != Tails) {
-                break;
-            }
-            return 200;
+            break;
+            // if (player->character != Character::Tails) {
+            //     break;
+            // }
+            // return 200;
         case CoverF:
             return 200;
         case CoverS:
-            return 130;
+            return 125;
         case CoverP:
             return 300;
         default:

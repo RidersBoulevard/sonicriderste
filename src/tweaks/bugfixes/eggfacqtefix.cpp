@@ -9,7 +9,7 @@ struct EggFacQTEObject1 {
 
 ASMUsed u32 EggFactoryQTEGlitchFix(Player *player, u32 respawnPoint) {
 	if(CurrentStage != EggFactory) { return respawnPoint; }
-	if(respawnPoint == 0x7 && player->state == QTE) { // the broken respawn point
+	if(respawnPoint == 0x7 && player->state == PlayerState::QTE) { // the broken respawn point
 		respawnPoint = 0x53;
 		for(auto &object: getObjectList()) {
 			if(object.object_group == 0x89E4) {

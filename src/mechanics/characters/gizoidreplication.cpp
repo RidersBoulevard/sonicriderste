@@ -33,7 +33,7 @@ constexpr f32 GR_TurbulenceDelay = toFrames(2);
 void Player_EnableGizoidReplication(Player *player, Player *grPlayer, u32 extraGRState) {
 	GizoidReplicationInfo &grInfo = PlayerGizoidReplication[player->index];
 
-	if(player->character != Emerl) { return; }
+	if(player->character != Character::Emerl) { return; }
 	//if (grInfo->isEnabled) return;
 
 	PlayAudioFromDAT(Sound::SFX::EmerlCopyType);
@@ -45,10 +45,10 @@ void Player_EnableGizoidReplication(Player *player, Player *grPlayer, u32 extraG
 }
 
 void Player_GRHandler(Player *player) {
-	if(player->character != Emerl) { return; }
+	if(player->character != Character::Emerl) { return; }
 
-	if((InGamePlayerCount < 2) && player->state == StartLine) {
-		if(player->input->toggleFaceButtons.hasAny(ZButton)) {// Press Z button before starting the race to rotate types in single player
+	if((InGamePlayerCount < 2) && player->state == PlayerState::StartLine) {
+		if(player->input->toggleFaceButtons.hasAny(Buttons::Z)) {// Press Z button before starting the race to rotate types in single player
 			PlayAudioFromDAT(Sound::SFX::EmerlCopyType);
 			Flag<Type> newType = player->typeAttributes << static_cast<Type>(1);// rotate to next type
 			if(newType > Type::Power) { newType = Type::Speed; }                // reset to speed type
@@ -59,17 +59,17 @@ void Player_GRHandler(Player *player) {
 
 	GizoidReplicationInfo &grInfo = PlayerGizoidReplication[player->index];
 	if(grInfo.timer > 0.0F) {
-		if((player->state == RailGrind || player->state == Fly || ((player->previousState == RailGrind || player->previousState == Fly))) && grInfo.timer <= toFrames(5)) {
+		if((player->state == PlayerState::RailGrind || player->state == PlayerState::Fly || ((player->previousState == PlayerState::RailGrind || player->previousState == PlayerState::Fly))) && grInfo.timer <= toFrames(5)) {
 			grInfo.timer = toFrames(5);
 		} else {
-			if(player->state == QTE || player->state == QTE2 || (player->state >= FrontflipRamp && player->state <= TurbulenceTrick2) || player->state == Fall || player->state == StartLine || player->state == TurbulenceRide) {
+			if(player->state == PlayerState::QTE || player->state == PlayerState::QTE2 || (player->state >= PlayerState::FrontflipRamp && player->state <= PlayerState::TurbulenceTrick2) || player->state == PlayerState::Fall || player->state == PlayerState::StartLine || player->state == PlayerState::TurbulenceRide) {
 				grInfo.timer += 0.0f;
 				// Emerl's GR timer is not depleted during QTEs, tricks state, falling state, and using pits.
 			} else {
 				grInfo.timer -= 1.0f;
 			}
 		}
-		grInfo.timer = clamp(grInfo.timer, 0.0f);
+		grInfo.timer = clamp(grInfo.timer);
 
 	} else {
 		if(grInfo.isEnabled) {
@@ -82,7 +82,7 @@ void Player_GRHandler(Player *player) {
 
 	if(!grInfo.isEnabled) {
 		Player *grPlayer;
-		if(player->state == TurbulenceRide) {
+		if(player->state == PlayerState::TurbulenceRide) {
 			if(grInfo.enableDelayTimer < GR_TurbulenceDelay) {
 				grInfo.enableDelayTimer += 1.0f;
 			} else {
@@ -116,8 +116,6 @@ ASMUsed void Player_GRPlayerBump(Player *player, Player *grPlayer) {
 }
 
 ASMUsed void Player_GRAttacking(Player *player, Player *grPlayer) {
-	EnabledEXLoads exLoads;
-	FetchEnabledEXLoadIDs(player, exLoads);
 	// HHOInfo *hhoInfo = &PlayerHHOInfo[player->index];
 	Player_EnableGizoidReplication(player, grPlayer, GR_AttackingPlayerState);
 	// if (exLoads.gearExLoadID == HyperHangOnEXLoad)

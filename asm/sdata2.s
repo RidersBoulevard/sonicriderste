@@ -279,8 +279,8 @@ lbl_8021C4E8:
 .global lbl_8021C4EC
 lbl_8021C4EC:
 	.4byte 0xca700000
-.global lbl_8021C4F0
-lbl_8021C4F0:
+.global __GXData
+__GXData:
 	.4byte lbl_801CF0A0 + 0x80
 .global lbl_8021C4F4
 lbl_8021C4F4:

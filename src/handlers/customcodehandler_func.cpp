@@ -32,7 +32,7 @@ const void* CustomCodehandler_Retrieve(u32 input) {
         case CCH_CharacterHUDColorPtr:
             return &AllCharacterHUDColors;
         case CCH_DumpFileFunction:
-            return reinterpret_cast<void *>(&DumpFile);
+            return reinterpret_cast<void *>(static_cast<void*(*)(const char *, bool)>(&DumpFile));
         case CCH_DumpPackManFileFunction:
             return reinterpret_cast<void *>(&DumpPackManFile);
         case CCH_UpdatePlayerStateFunction:

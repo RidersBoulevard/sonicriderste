@@ -1,5 +1,6 @@
 #pragma once
 
+#include "globalDefs.hpp"
 #include "riders/player.hpp"
 
 #pragma GCC diagnostic push
@@ -11,10 +12,4 @@ struct BlastGaugeInfo {
 
 extern std::array<BlastGaugeInfo, MaxPlayerCount> PlayerBlastGaugeInfo;
 
-ASMUsed void Player_checkGearIfUsesBlastGauge(Player *player);
-ASMUsed s32 Player_blastGaugeHandler(Player *player);
-ASMUsed void Player_resetGauge(Player *player);
-//ASMDefined void lbl_drawDynamicGauge();
-//ASMDefined void lbl_airGearDrawAirGauge();
-ASMDefined void lbl_drawAirGauge(); // allows drawing the air gauge for any gear if called
-ASMDefined void lbl_0002AD54(); // skips drawing the gauge
+void Player_BlastGaugeUpdateStatus(Player &player);

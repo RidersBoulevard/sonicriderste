@@ -21,15 +21,15 @@ struct SkinSystemInfo {
 };
 
 struct SkinSystemData {
-    u8 skinID;
-    u8 delay;
+    u8 skinID = 0;
+    u8 delay = 0;
 };
 
 constexpr u32 SkinCount = 2;
 
 constexpr std::array<SkinSystemInfo, SkinCount> PlayerSkinSystemInfo = {{
         {static_cast<u16>(-1), static_cast<u16>(-1), static_cast<u32>(-1)}, // this means no skin is applied
-        {Sonic, 0xA7, 0},
+        {Character::Sonic, 0xA7, 0},
 }};
 
 extern std::array<SkinSystemData, MaxPlayerCount> PlayerSkinSystemData;

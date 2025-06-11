@@ -1,11 +1,12 @@
 #pragma once
 
-#include "cosmetics/player/exloads.hpp"
-#include "lib/sound.hpp"
 #include <optional>
 
+#include "lib/sound.hpp"
+#include "riders/player.hpp"
+
 namespace Sound {
-	inline void PlaySound(const Player &player, const u8 &soundID) {
+	inline void PlaySound(const Player &player, u8 soundID) {
 		if(player.aiControl) { return; }
 		if(player.characterVoiceID != 0) [[likely]] {
 			PlaySound(player.characterVoiceID, soundID);
@@ -18,22 +19,22 @@ namespace Sound {
 		//	charID = ID::NeoMetalSonic;
 		//}
 		//switch(exloadInfo.gearExLoadID) {
-		//	case HyperSonicEXLoad:
+		//	case HyperSonic:
 		//		charID = ID::HyperSonic;
 		//		break;
 		//	default: break;
 		//}
 		//switch(exloadInfo.characterExLoadID) {
-		//	case HatsuneMikuEXLoad:
+		//	case HatsuneMiku:
 		//		charID = ID::Miku;
 		//		break;
-		//	case RealaEXLoad:
+		//	case Reala:
 		//		charID = ID::Reala;
 		//		break;
-		//	case GonGonEXLoad:
+		//	case GonGon:
 		//		charID = ID::GonGon;
 		//		break;
-		//	case NeoMetalEXLoad:
+		//	case NeoMetal:
 		//		charID = ID::NeoMetalSonic;
 		//		break;
 		//	default: break;
@@ -45,7 +46,7 @@ namespace Sound {
 		//}
 	}
 
-	inline void PlaySound(const Player &player, const std::optional<u8> &soundID){
+	inline void PlaySound(const Player &player, std::optional<u8> soundID){
 		if(!soundID) { return; }
 		PlaySound(player, *soundID);
 	}
@@ -117,7 +118,7 @@ struct TrickLandVoiceLineList : public VoiceLineList {
 			case CRank: return cRank;
 			default: break;
 		}
-		[[unlikely]] return const_cast<std::optional<u8>&>(defaultValue); //throw std::out_of_range("rank outside of range of TrickRanks.");
+		std::unreachable();
 	}
 
 	constexpr const std::optional<u8> &operator[](TrickRanks rank) const {
@@ -219,8 +220,8 @@ struct AttackingVoiceLineList : public VoiceLineList {
 		if consteval {
 			throw std::out_of_range("Level outside valid range");
 		}
-		// For some reason, having a throw here causes a try/catch to get generated which still breaks, so return default instead
-		[[unlikely]] return const_cast<std::optional<AttackingVoiceLinePair> &>(defaultPair);
+		// For some reason, having a throw here causes a try/catch to get generated which still breaks
+		std::unreachable();
 	}
 
 	constexpr const std::optional<AttackingVoiceLinePair> &operator[](size_t index) const {

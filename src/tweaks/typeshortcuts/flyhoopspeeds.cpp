@@ -6,6 +6,9 @@
 #include "mechanics/magneticimpulse.hpp"
 #include "riders/object.hpp"
 #include "riders/stage.hpp"
+#include "gears/omnipotence.hpp"
+#include "gears/blastGaugeGears.hpp"
+#include "handlers/player/specialflagtweaks.hpp"
 
 constexpr std::array<f32, TotalStageAmount> StageBaseSpeeds = {
 		0.0f,      // test stage
@@ -13,7 +16,7 @@ constexpr std::array<f32, TotalStageAmount> StageBaseSpeeds = {
 		0.0f,      // splash canyon
 		0.925926f, // egg factory
 		0.347222f, // green cave
-		0.0462963f,// sand ruins
+		0.185185189f,// sand ruins 0.0462963f 0.185185189f
 		0.185185f, // babylon garden
 		0.324074f, // digital dimension
 		0.509306f, // sega carnival
@@ -101,6 +104,9 @@ ASMUsed f32 CustomFlyHoopVerticalSpeeds(ObjectNode *object, Player *player, f32 
 				case 0x138:
 					multiplier = 1.5f;
 					break;
+				case 0x13D:
+					multiplier = 0.2f;
+					break;
 				default:
 					break;
 			}
@@ -184,6 +190,11 @@ ASMUsed f32 CustomFlyHoopVerticalSpeeds(ObjectNode *object, Player *player, f32 
 					break;
 			}
 			break;
+		// case BabylonGarden:
+		// 	if (object->object_id >= 0xE1 && object->object_id <= 0xE3) {
+		// 		multiplier = 0.45f;
+		// 	}
+		// 	break;
 		default:
 			break;
 	}
@@ -237,7 +248,17 @@ inline f32 SpecificFlyHoops(ObjectNode *object, Player *player, f32 currentHoopS
 			break;
 		case SkyRoad:
 			if(object_id >= 0xD4 && object_id <= 0xD6) {
-				currentHoopSpeed *= 1.4f;
+				currentHoopSpeed *= 1.2f;
+			}
+			break;
+		case SandRuins:
+			if(object_id >= 0x13A && object_id <= 0x13D) {
+				currentHoopSpeed *= 1.5f;
+			}
+			break;
+		case DigitalDimension:
+			if(object_id >= 0x130 && object_id <= 0x133) {
+				currentHoopSpeed *= 1.5f;
 			}
 			break;
 		case DarkDesert:
@@ -249,6 +270,11 @@ inline f32 SpecificFlyHoops(ObjectNode *object, Player *player, f32 currentHoopS
 			if(object_id >= 0x2D1 && object_id <= 0x2D3) {
 				currentHoopSpeed *= 0.875f;
 			}
+			break;
+		// case BabylonGarden:
+		// 	if (object_id >= 0xE1 && object_id <= 0xE3) {
+		// 		currentHoopSpeed *= 1.5f;
+		// 	}
 			break;
 		default:
 			break;
@@ -263,7 +289,7 @@ inline f32 SpecificFlyHoops(ObjectNode *object, Player *player, f32 currentHoopS
 
 inline f32 FlyCharacter_DualType(Player *player, f32 currentFlyHoopSpeed) {
 	const auto &characterType = player->characterptr->type;
-	if(characterType == Character::FlyType) {
+	if(characterType == Character::Type::Fly) {
 		currentFlyHoopSpeed *= 0.975f;
 	} else {
 		currentFlyHoopSpeed *= 0.95f;
@@ -271,25 +297,29 @@ inline f32 FlyCharacter_DualType(Player *player, f32 currentFlyHoopSpeed) {
 	return currentFlyHoopSpeed;
 }
 
-inline f32 FlyCharacter_AllType(/*Player *player, */ f32 currentFlyHoopSpeed) {
-	//u8 characterType = player->characterptr->type;
+inline f32 FlyCharacter_AllType(Player *player, f32 currentFlyHoopSpeed) {
+	const auto &characterType = player->characterptr->type;
 	// if (player->character == MetalSonic && player->extremeGear == ChaosEmerald) {
 	// 	currentFlyHoopSpeed *= 0.925f + (player->objectLinkCount * 0.08f);
 	// }
 	// else {
-	currentFlyHoopSpeed *= 0.925f;
+	SpecialFlagInfo *spfInfo = &PlayerSpecialFlagInfo[player->index];
+	if(characterType == Character::Type::Fly && player->extremeGear == ExtremeGear::Omnipotence) {
+		currentFlyHoopSpeed *= 0.95f;
+	} 
+	// else if (player->gearExload().exLoadID == EXLoad::DarkSonic && spfInfo->gearChange >= 3 && player->level == 2) {
+	// 	// skip
+	// }
+	else currentFlyHoopSpeed *= 0.925f;
 	// }
 	return currentFlyHoopSpeed;
 }
 
 ASMUsed void CustomFlyHoopSpeeds(Player *player, ObjectNode *object, f32 currentFlyHoopSpeed, f32 angle) {
-	EnabledEXLoads exLoads;
-	FetchEnabledEXLoadIDs(player, exLoads);
-
 	const f32 flyHoopSpeed = currentFlyHoopSpeed * angle;
 	f32 newFlyHoopSpeed = flyHoopSpeed + StageBaseSpeeds[CurrentStage];
 	newFlyHoopSpeed = SpecificFlyHoops(object, player, newFlyHoopSpeed);
-	if(player->character == Emerl) {
+	if(player->character == Character::Emerl) {
 		GizoidReplicationInfo *grInfo = &PlayerGizoidReplication[player->index];
 		if(grInfo->isEnabled && InGamePlayerCount >= 2) {
 			const auto typeCount = player->getTypeCount();
@@ -304,8 +334,8 @@ ASMUsed void CustomFlyHoopSpeeds(Player *player, ObjectNode *object, f32 current
 	switch(player->extremeGear) {
 		using namespace ExtremeGear;
 		case CoverS:
-			if(player->characterptr->type != 0x1) {
-				newFlyHoopSpeed *= 1.085f;
+			if(player->characterptr->type != Character::Type::Fly) {
+				newFlyHoopSpeed *= 1.115f;
 			}
 			break;
 		case Access:
@@ -315,33 +345,26 @@ ASMUsed void CustomFlyHoopSpeeds(Player *player, ObjectNode *object, f32 current
 			}
 			break;
 		case ChaosEmerald:
-			if(player->character == MetalSonic) {
+			if(player->character == Character::MetalSonic) {
 				newFlyHoopSpeed += (player->objectLinkCount * 0.08f);
-			} else if(player->character == Tails && player->superFormState != 0) {
+			} else if(player->character == Character::Tails && player->superFormState != 0) {
 				newFlyHoopSpeed *= 1.1f;
 			}
 			break;
+		case Omnipotence: {
+			OmnipotenceInfo *OMNInfo = &PlayerOMNInfo[player->index];
+			if((OMNInfo->lastShortcutType != 2)) {
+				// if (player->character == E10G) {newFlyHoopSpeed *= 1.05f;}
+				// else 
+				if (OMNInfo->lastShortcutType != 0) {newFlyHoopSpeed *= 1.085f;}
+			}
+			break;
+		}
 		// case SuperHangOn:
 		// {
 		//     HHOInfo *hhoInfo = &PlayerHHOInfo[player->index];
-		//     if (exLoads.gearExLoadID == HyperHangOnEXLoad && player->characterptr->type == 0x1 && hhoInfo->extraType == FlyType && hhoInfo->saturnMegadriveStatus == 2) newFlyHoopSpeed *= 1.085f;
+		//     if (exLoads.gearExLoadID == HyperHangOn && player->characterptr->type == 0x1 && hhoInfo->extraType == FlyType && hhoInfo->saturnMegadriveStatus == 2) newFlyHoopSpeed *= 1.085f;
 		//     break;
-		// }
-		// case TurboStar:
-		// {
-		// 	OKGInfo *okgInfo = &PlayerOKGInfo[player->index];
-		//     if (exLoads.gearExLoadID == OllieKingGearEXLoad) flyHoopSpeed += (okgInfo->currentSpeed*0.10f);
-		// 	break;
-		// }
-		// case DefaultGear:
-		// {
-		// 	if (exLoads.gearExLoadID == WindmasterJetEXLoad)
-		//     {
-		// 		WindmasterInfo *wmInfo = &PlayerWMInfo[player->index];
-		//         if (wmInfo->lastShortcutType == (u8)1) newFlyHoopSpeed += ((player->objectLinkCount+(u32)1)*0.08f);
-		// 		// if (wmInfo->lastShortcutType == (u8)1) newFlyHoopSpeed *= 1.1f;
-		//     }
-		// 	break;
 		// }
 		default:
 			break;
@@ -351,18 +374,19 @@ ASMUsed void CustomFlyHoopSpeeds(Player *player, ObjectNode *object, f32 current
 	if(typeCount == 2) {
 		newFlyHoopSpeed = FlyCharacter_DualType(player, newFlyHoopSpeed);
 	} else if(typeCount == 3) {
-		newFlyHoopSpeed = FlyCharacter_AllType(/*player,*/ newFlyHoopSpeed);
+		newFlyHoopSpeed = FlyCharacter_AllType(player, newFlyHoopSpeed);
 	}
 
 	// Experimental new hoop dash V2
 	PlayerFlyHoopDashProperties *properties = &playerFlyHoopDashProperties[player->index];
-	if(player->input->holdFaceButtons.hasAny(BButton, XButton, LButton)) {
+	BlastGaugeInfo *bgInfo = &PlayerBlastGaugeInfo[player->index];
+	if(player->input->holdFaceButtons.hasAny(Buttons::B, Buttons::X, Buttons::L)) {
 		newFlyHoopSpeed *= 1.2f;
 		PlayAudioFromDAT(Sound::SFX::RailHoopDash);// dash sfx
 		Player_InitBoostParticles(player);
 		// properties->gainDelay are the amount of frames it delays the air gain.
 		// change this value here to change the delay time
-		if(!player->specialFlags.hasAny(ringGear)) {
+		if(!player->specialFlags.hasAny(SpecialFlags::ringGear)) {
 			properties->gainDelay = 30.0f;
 		}
 
@@ -373,9 +397,16 @@ ASMUsed void CustomFlyHoopSpeeds(Player *player, ObjectNode *object, f32 current
 		properties->hasUsed = TRUE;
 
 		// "player->magneticImpulse_timer - 60.0f" is the time (in frames) it takes from the MI timer
-		// change this value here to change the amount of time it takes away
-		f32 newMI = player->magneticImpulse_timer - 60.0f;
-		player->magneticImpulse_timer = clamp(newMI, 0.f);
+		// change this value here to change the amount of time it takes 
+		f32 newMI;
+		if(player->character == Character::SuperSonic
+			&& bgInfo->currentGauge > 0
+			&& player->gearExload().exLoadID != EXLoad::HyperSonic)
+			{newMI = player->magneticImpulse_timer;} 
+		else {newMI = player->magneticImpulse_timer - 60.0f;}
+
+		player->magneticImpulse_timer = clamp(newMI);
+
 	} else if(properties->gainDelay > 0.0f) {
 		properties->gainDelay = 0.0f;
 	}

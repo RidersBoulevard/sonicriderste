@@ -43768,9 +43768,9 @@ lbl_80117C98:
 	.4byte 0x616c697a
 	.4byte 0x65642e2e
 	.4byte 0x2e0a0000
-.global lbl_80117E90
-lbl_80117E90:
-	.4byte func_8000AA68
+.global OSAlarmResetFunctionInfo
+OSAlarmResetFunctionInfo:
+	.4byte OSAlarmOnReset
 	.4byte 0xFFFFFFFF
 	.4byte 0x00000000
 	.4byte 0x00000000
@@ -44006,8 +44006,8 @@ lbl_80117EA0:
 	.4byte 0x46726565
 	.4byte 0x0a000000
 	.4byte 0x00000000
-.global lbl_80118238
-lbl_80118238:
+.global DSPInitCode
+DSPInitCode:
 	.4byte 0x029f0010
 	.4byte 0x029f0033
 	.4byte 0x029f0034
@@ -44514,8 +44514,8 @@ lbl_801189E0:
 	.4byte 0x2f30322f
 	.4byte 0x30310000
 	.4byte 0x00000000
-.global lbl_801189F0
-lbl_801189F0:
+.global HankakuToCode
+HankakuToCode:
 	.4byte 0x020c020d
 	.4byte 0x020e020f
 	.4byte 0x02100211
@@ -44612,8 +44612,8 @@ lbl_801189F0:
 	.4byte 0x02a402a5
 	.4byte 0x02a602a7
 	.4byte 0x02a802a9
-.global lbl_80118B70
-lbl_80118B70:
+.global Zenkaku2Code
+Zenkaku2Code:
 	.4byte 0x00000001
 	.4byte 0x00020003
 	.4byte 0x00040005
@@ -45226,8 +45226,8 @@ lbl_80118B70:
 	.4byte 0x031a031b
 	.4byte 0x00000000
 	.4byte 0x00000000
-.global lbl_80119500
-lbl_80119500:
+.global InterruptPrioTable
+InterruptPrioTable:
 	.4byte 0x00000100
 	.4byte 0x00000040
 	.4byte 0xf8000000
@@ -45252,9 +45252,9 @@ lbl_80119530:
 	.4byte 0x79706520
 	.4byte 0x2533640a
 	.4byte 0x00000000
-.global lbl_80119558
-lbl_80119558:
-	.4byte func_8000E2DC
+.global ResetFunctionInfo
+ResetFunctionInfo:
+	.4byte OnReset
 	.4byte 0x0000007F
 	.4byte 0x00000000
 	.4byte 0x00000000
@@ -46366,7 +46366,7 @@ lbl_8011A5AC:
 	.4byte 0x00000000
 .global lbl_8011A618
 lbl_8011A618:
-	.4byte func_80019CE0
+	.4byte PAD_OnReset
 	.4byte 0x0000007F
 	.4byte 0x00000000
 	.4byte 0x00000000
@@ -52858,7 +52858,7 @@ lbl_80120950:
 	.4byte 0x3e000000
 .global lbl_80120AD8
 lbl_80120AD8:
-	.4byte func_80027E68
+	.4byte CARD_OnReset
 	.4byte 0x0000007f
 	.4byte 0x00000000
 	.4byte 0x00000000
@@ -53123,7 +53123,7 @@ lbl_80120E0C:
 	.4byte 0x00070000
 .global lbl_80120ECC
 lbl_80120ECC:
-	.4byte func_8002DB98
+	.4byte __GXShutdown
 	.4byte 0x0000007f
 	.4byte 0x00000000
 	.4byte 0x00000000
@@ -53574,8 +53574,8 @@ lbl_801214AC:
 	.4byte lbl_80034960
 	.4byte lbl_80034C20
 	.4byte 0x00000000
-.global lbl_80121540
-lbl_80121540:
+.global __files
+__files:
 	.4byte 0x00000000
 	.4byte 0x0A800000
 	.skip 0x14
@@ -53583,11 +53583,11 @@ lbl_80121540:
 	.4byte 0x00000100
 	.4byte lbl_801CF7D0 + 0x238
 	.skip 0x14
-	.4byte func_8004BA88
-	.4byte func_8003F610
-	.4byte func_8003F608
+	.4byte __read_console
+	.4byte __write_console
+	.4byte __close_console
 	.4byte 0x00000000
-	.4byte lbl_80121540 + 0x50
+	.4byte __files + 0x50
 
 	.4byte 0x00000001
 	.4byte 0x12800000
@@ -53596,11 +53596,11 @@ lbl_80121540:
 	.4byte 0x00000100
 	.4byte lbl_801CF7D0 + 0x138
 	.skip 0x14
-	.4byte func_8004BA88
-	.4byte func_8003F610
-	.4byte func_8003F608
+	.4byte __read_console
+	.4byte __write_console
+	.4byte __close_console
 	.4byte 0x00000000
-	.4byte lbl_80121540 + 0xA0
+	.4byte __files + 0xA0
 
 	.4byte 0x00000002
 	.4byte 0x10800000
@@ -53609,11 +53609,11 @@ lbl_80121540:
 	.4byte 0x00000100
 	.4byte lbl_801CF7D0 + 0x38
 	.skip 0x14
-	.4byte func_8004BA88
-	.4byte func_8003F610
-	.4byte func_8003F608
+	.4byte __read_console
+	.4byte __write_console
+	.4byte __close_console
 	.4byte 0x00000000
-	.4byte lbl_80121540 + 0xF0
+	.4byte __files + 0xF0
 
 	.skip 0x50
 .global lbl_80121680

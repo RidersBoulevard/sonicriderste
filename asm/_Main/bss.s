@@ -62,11 +62,11 @@ gsCameraMisc:
 .global gu32StageCameraMotionNum
 gu32StageCameraMotionNum:
     .skip 0x4
-.global lbl_10006B20
-lbl_10006B20:
+.global gasCameraPtr
+gasCameraPtr:
     .skip 0x80
-.global lbl_10006BA0
-lbl_10006BA0:
+.global gpsMotion_Camera
+gpsMotion_Camera:
     .skip 0x40
 .global lbl_10006BE0
 lbl_10006BE0:
@@ -75,38 +75,38 @@ lbl_10006BE0:
 playerCameraStruct:
     # 0x25C in size, in player order
     .skip 0x154C
-.global lbl_100081F4
-lbl_100081F4:
+.global gu32LightDetailNum
+gu32LightDetailNum:
     .skip 0x4
 .global gpsLightDetailDefault
 gpsLightDetailDefault:
     .skip 0x8
-.global lbl_10008200
-lbl_10008200:
+.global gu32ObjMtxPalMaxSize
+gu32ObjMtxPalMaxSize:
     .skip 0x4
 .global gpsObjMtxPal
 gpsObjMtxPal:
     .skip 0x4
-.global lbl_10008208
-lbl_10008208:
+.global gu32ObjNodeStatusMaxSize
+gu32ObjNodeStatusMaxSize:
     .skip 0x4
 .global gpsObjNodeStat
 gpsObjNodeStat:
     .skip 0x4
-.global lbl_10008210
-lbl_10008210:
+.global gpsStageObjTop
+gpsStageObjTop:
     .skip 0x4
-.global lbl_10008214
-lbl_10008214:
+.global gpsObjPortal
+gpsObjPortal:
     .skip 0x4
-.global lbl_10008218
-lbl_10008218:
+.global gpsMapPortal
+gpsMapPortal:
     .skip 0x4
-.global lbl_1000821C
-lbl_1000821C:
+.global gpsMapPortalNo2
+gpsMapPortalNo2:
     .skip 0x4
-.global lbl_10008220
-lbl_10008220:
+.global gpsPitPortal
+gpsPitPortal:
     .skip 0x4
 .global lbl_10008224
 lbl_10008224:
@@ -129,14 +129,14 @@ lbl_10008238:
 .global lbl_1000823C
 lbl_1000823C:
     .skip 0x4
-.global lbl_10008240
-lbl_10008240:
+.global gpsTexList_Map
+gpsTexList_Map:
     .skip 0x8
-.global lbl_10008248
-lbl_10008248:
+.global gpsObject_Sky
+gpsObject_Sky:
     .skip 0x4
-.global lbl_1000824C
-lbl_1000824C:
+.global gpsTexList_Sky
+gpsTexList_Sky:
     .skip 0x4
 .global lbl_10008250
 lbl_10008250:
@@ -201,26 +201,26 @@ lbl_1000829C:
 .global lbl_100082A0
 lbl_100082A0:
     .skip 0x4
-.global lbl_100082A4
-lbl_100082A4:
+.global gpsObject_EffectLanding
+gpsObject_EffectLanding:
     .skip 0x4
-.global lbl_100082A8
-lbl_100082A8:
+.global gpsTexList_EffectLanding
+gpsTexList_EffectLanding:
     .skip 0x4
-.global lbl_100082AC
-lbl_100082AC:
+.global gpsMtxPal_EffectLanding
+gpsMtxPal_EffectLanding:
     .skip 0x4
-.global lbl_100082B0
-lbl_100082B0:
+.global gpsNodeStat_EffectLanding
+gpsNodeStat_EffectLanding:
     .skip 0x4
-.global lbl_100082B4
-lbl_100082B4:
+.global gpsMotion_EffectLanding
+gpsMotion_EffectLanding:
     .skip 0x4
-.global lbl_100082B8
-lbl_100082B8:
+.global gpsMatMotObj_EffectLanding
+gpsMatMotObj_EffectLanding:
     .skip 0x4
-.global lbl_100082BC
-lbl_100082BC:
+.global gpsMatMotion_EffectLanding
+gpsMatMotion_EffectLanding:
     .skip 0x4
 .global gpsObject_EffectAirCharge
 gpsObject_EffectAirCharge:
@@ -228,14 +228,14 @@ gpsObject_EffectAirCharge:
 .global gpsTexList_EffectAirCharge
 gpsTexList_EffectAirCharge:
     .skip 0x4
-.global lbl_100082C8
-lbl_100082C8:
+.global gpsMtxPal_EffectAirCharge
+gpsMtxPal_EffectAirCharge:
     .skip 0x4
 .global gpsNodeStat_EffectAirCharge
 gpsNodeStat_EffectAirCharge:
     .skip 0x4
-.global lbl_100082D0
-lbl_100082D0:
+.global gpsMotion_EffectAirCharge
+gpsMotion_EffectAirCharge:
     .skip 0x4
 .global gpsMatMotObj_EffectAirCharge
 gpsMatMotObj_EffectAirCharge:
@@ -363,119 +363,119 @@ lbl_10008374:
 .global lbl_10008378
 lbl_10008378:
     .skip 0x4
-.global lbl_1000837C
-lbl_1000837C:
+.global gpsObject_EffectTurf
+gpsObject_EffectTurf:
     .skip 0x4
-.global lbl_10008380
-lbl_10008380:
+.global gpsTexList_EffectTurf
+gpsTexList_EffectTurf:
     .skip 0x4
-.global lbl_10008384
-lbl_10008384:
+.global gpsMtxPal_EffectTurf
+gpsMtxPal_EffectTurf:
     .skip 0x4
-.global lbl_10008388
-lbl_10008388:
+.global gpsNodeStat_EffectTurf
+gpsNodeStat_EffectTurf:
     .skip 0x4
-.global lbl_1000838C
-lbl_1000838C:
+.global gpsMotion_EffectTurf
+gpsMotion_EffectTurf:
     .skip 0x4
-.global lbl_10008390
-lbl_10008390:
+.global gpsMatMotObj_EffectTurf
+gpsMatMotObj_EffectTurf:
     .skip 0x4
-.global lbl_10008394
-lbl_10008394:
+.global gpsMatMotion_EffectTurf
+gpsMatMotion_EffectTurf:
     .skip 0x4
-.global lbl_10008398
-lbl_10008398:
+.global gpsObject_EffectTurbResist
+gpsObject_EffectTurbResist:
     .skip 0x4
-.global lbl_1000839C
-lbl_1000839C:
+.global gpsTexList_EffectTurbResist
+gpsTexList_EffectTurbResist:
     .skip 0x4
-.global lbl_100083A0
-lbl_100083A0:
+.global gpsMtxPal_EffectTurbResist
+gpsMtxPal_EffectTurbResist:
     .skip 0x4
-.global lbl_100083A4
-lbl_100083A4:
+.global gpsNodeStat_EffectTurbResist
+gpsNodeStat_EffectTurbResist:
     .skip 0x4
-.global lbl_100083A8
-lbl_100083A8:
+.global gpsMotion_EffectTurbResist
+gpsMotion_EffectTurbResist:
     .skip 0x4
-.global lbl_100083AC
-lbl_100083AC:
+.global gpsMatMotObj_EffectTurbResist
+gpsMatMotObj_EffectTurbResist:
     .skip 0x4
-.global lbl_100083B0
-lbl_100083B0:
+.global gpsMatMotion_EffectTurbResist
+gpsMatMotion_EffectTurbResist:
     .skip 0x4
-.global lbl_100083B4
-lbl_100083B4:
+.global gpsObject_EffectAtkBoost
+gpsObject_EffectAtkBoost:
     .skip 0x4
-.global lbl_100083B8
-lbl_100083B8:
+.global gpsTexList_EffectAtkBoost
+gpsTexList_EffectAtkBoost:
     .skip 0x4
-.global lbl_100083BC
-lbl_100083BC:
+.global gpsMtxPal_EffectAtkBoost
+gpsMtxPal_EffectAtkBoost:
     .skip 0x4
-.global lbl_100083C0
-lbl_100083C0:
+.global gpsNodeStat_EffectAtkBoost
+gpsNodeStat_EffectAtkBoost:
     .skip 0x4
-.global lbl_100083C4
-lbl_100083C4:
+.global gpsMotion_EffectAtkBoost
+gpsMotion_EffectAtkBoost:
     .skip 0x4
-.global lbl_100083C8
-lbl_100083C8:
+.global gpsMatMotObj_EffectAtkBoost
+gpsMatMotObj_EffectAtkBoost:
     .skip 0x4
-.global lbl_100083CC
-lbl_100083CC:
+.global gpsMatMotion_EffectAtkBoost
+gpsMatMotion_EffectAtkBoost:
     .skip 0x4
-.global lbl_100083D0
-lbl_100083D0:
+.global gpsObject_EffectMagBarrier
+gpsObject_EffectMagBarrier:
     .skip 0x4
-.global lbl_100083D4
-lbl_100083D4:
+.global gpsTexList_EffectMagBarrier
+gpsTexList_EffectMagBarrier:
     .skip 0x4
-.global lbl_100083D8
-lbl_100083D8:
+.global gpsMtxPal_EffectMagBarrier
+gpsMtxPal_EffectMagBarrier:
     .skip 0x4
-.global lbl_100083DC
-lbl_100083DC:
+.global gpsNodeStat_EffectMagBarrier
+gpsNodeStat_EffectMagBarrier:
     .skip 0x4
-.global lbl_100083E0
-lbl_100083E0:
+.global gpsMotion_EffectMagBarrier
+gpsMotion_EffectMagBarrier:
     .skip 0x4
-.global lbl_100083E4
-lbl_100083E4:
+.global gpsMatMotObj_EffectMagBarrier
+gpsMatMotObj_EffectMagBarrier:
     .skip 0x4
-.global lbl_100083E8
-lbl_100083E8:
+.global gpsMatMotion_EffectMagBarrier
+gpsMatMotion_EffectMagBarrier:
     .skip 0x4
-.global lbl_100083EC
-lbl_100083EC:
+.global gpsObject_EffectInvincible
+gpsObject_EffectInvincible:
     .skip 0x4
-.global lbl_100083F0
-lbl_100083F0:
+.global gpsTexList_EffectInvincible
+gpsTexList_EffectInvincible:
     .skip 0x4
-.global lbl_100083F4
-lbl_100083F4:
+.global gpsMtxPal_EffectInvincible
+gpsMtxPal_EffectInvincible:
     .skip 0x4
-.global lbl_100083F8
-lbl_100083F8:
+.global gpsNodeStat_EffectInvincible
+gpsNodeStat_EffectInvincible:
     .skip 0x4
-.global lbl_100083FC
-lbl_100083FC:
+.global gpsMotion_EffectInvincible
+gpsMotion_EffectInvincible:
     .skip 0x4
-.global lbl_10008400
-lbl_10008400:
+.global gpsMatMotObj_EffectInvincible
+gpsMatMotObj_EffectInvincible:
     .skip 0x4
-.global lbl_10008404
-lbl_10008404:
+.global gpsMatMotion_EffectInvincible
+gpsMatMotion_EffectInvincible:
     .skip 0x4
-.global lbl_10008408
-lbl_10008408:
+.global gpsTexList_Effect
+gpsTexList_Effect:
     .skip 0x4
-.global lbl_1000840C
-lbl_1000840C:
+.global gpsTexList_Score
+gpsTexList_Score:
     .skip 0x4
-.global lbl_10008410
-lbl_10008410:
+.global gpsTexList_Score2
+gpsTexList_Score2:
     .skip 0x4
 .global texList_GTSE_0
 texList_GTSE_0:
@@ -492,17 +492,17 @@ lbl_10008420:
 .global lbl_10008424
 lbl_10008424:
     .skip 0x4
-.global lbl_10008428
-lbl_10008428:
+.global gpsTexList_EffectSunAndLensFlare
+gpsTexList_EffectSunAndLensFlare:
     .skip 0x4
 .global lbl_1000842C
 lbl_1000842C:
     .skip 0x4
-.global lbl_10008430
-lbl_10008430:
+.global gpsTexList_EffectFlowLine
+gpsTexList_EffectFlowLine:
     .skip 0x4
-.global lbl_10008434
-lbl_10008434:
+.global gpsTexList_EffectBackRibbon
+gpsTexList_EffectBackRibbon:
     .skip 0x4
 .global gpsTexList_EffectAirChargeParticle
 gpsTexList_EffectAirChargeParticle:
@@ -516,8 +516,8 @@ lbl_10008440:
 .global lbl_10008444
 lbl_10008444:
     .skip 0x4
-.global lbl_10008448
-lbl_10008448:
+.global gpsTexList_EffectBoardRibbon
+gpsTexList_EffectBoardRibbon:
     .skip 0x4
 .global lbl_1000844C
 lbl_1000844C:
@@ -543,26 +543,26 @@ lbl_10008464:
 .global lbl_10008468
 lbl_10008468:
     .skip 0xC
-.global lbl_10008474
-lbl_10008474:
+.global gpsMatMotion_EffectDmg
+gpsMatMotion_EffectDmg:
     .skip 0xC
-.global lbl_10008480
-lbl_10008480:
+.global gpsMatMotObj_EffectDmg
+gpsMatMotObj_EffectDmg:
     .skip 0xC
-.global lbl_1000848C
-lbl_1000848C:
+.global gpsMotion_EffectDmg
+gpsMotion_EffectDmg:
     .skip 0xC
-.global lbl_10008498
-lbl_10008498:
+.global gpsNodeStat_EffectDmg
+gpsNodeStat_EffectDmg:
     .skip 0xC
-.global lbl_100084A4
-lbl_100084A4:
+.global gpsMtxPal_EffectDmg
+gpsMtxPal_EffectDmg:
     .skip 0xC
-.global lbl_100084B0
-lbl_100084B0:
+.global gpsTexList_EffectDmg
+gpsTexList_EffectDmg:
     .skip 0xC
-.global lbl_100084BC
-lbl_100084BC:
+.global gpsObject_EffectDmg
+gpsObject_EffectDmg:
     .skip 0xC
 .global lbl_100084C8
 lbl_100084C8:
@@ -588,50 +588,50 @@ lbl_100093D4:
 .global lbl_10009714
 lbl_10009714:
     .skip 0x1DC
-.global lbl_100098F0
-lbl_100098F0:
+.global gpsTexList_EffectSpeedDown
+gpsTexList_EffectSpeedDown:
     .skip 0x8
-.global lbl_100098F8
-lbl_100098F8:
+.global gpsObject_EffectSpeedDown
+gpsObject_EffectSpeedDown:
     .skip 0x8
-.global lbl_10009900
-lbl_10009900:
+.global gpsMatMotion_EffectTurbTrickArrow
+gpsMatMotion_EffectTurbTrickArrow:
     .skip 0x8
-.global lbl_10009908
-lbl_10009908:
+.global gpsMatMotObj_EffectTurbTrickArrow
+gpsMatMotObj_EffectTurbTrickArrow:
     .skip 0x8
-.global lbl_10009910
-lbl_10009910:
+.global gpsNodeStat_EffectTurbTrickArrow
+gpsNodeStat_EffectTurbTrickArrow:
     .skip 0x8
-.global lbl_10009918
-lbl_10009918:
+.global gpsMtxPal_EffectTurbTrickArrow
+gpsMtxPal_EffectTurbTrickArrow:
     .skip 0x8
-.global lbl_10009920
-lbl_10009920:
+.global gpsTexList_EffectTurbTrickArrow
+gpsTexList_EffectTurbTrickArrow:
     .skip 0x8
-.global lbl_10009928
-lbl_10009928:
+.global gpsObject_EffectTurbTrickArrow
+gpsObject_EffectTurbTrickArrow:
     .skip 0x8
-.global lbl_10009930
-lbl_10009930:
+.global gpsMatMotion_EffectTornado
+gpsMatMotion_EffectTornado:
     .skip 0x8
-.global lbl_10009938
-lbl_10009938:
+.global gpsMatMotObj_EffectTornado
+gpsMatMotObj_EffectTornado:
     .skip 0x8
-.global lbl_10009940
-lbl_10009940:
+.global gpsMotion_EffectTornado
+gpsMotion_EffectTornado:
     .skip 0x8
-.global lbl_10009948
-lbl_10009948:
+.global gpsNodeStat_EffectTornado
+gpsNodeStat_EffectTornado:
     .skip 0x8
-.global lbl_10009950
-lbl_10009950:
+.global gpsMtxPal_EffectTornado
+gpsMtxPal_EffectTornado:
     .skip 0x8
-.global lbl_10009958
-lbl_10009958:
+.global gpsTexList_EffectTornado
+gpsTexList_EffectTornado:
     .skip 0x8
-.global lbl_10009960
-lbl_10009960:
+.global gpsObject_EffectTornado
+gpsObject_EffectTornado:
     .skip 0x158
 .global lbl_10009AB8
 lbl_10009AB8:
@@ -711,23 +711,23 @@ lbl_10009C54:
 .global lbl_10009C58
 lbl_10009C58:
     .skip 0x4
-.global lbl_10009C5C
-lbl_10009C5C:
+.global gc8MapDivPortalType
+gc8MapDivPortalType:
     .skip 0x1C
-.global lbl_10009C78
-lbl_10009C78:
+.global gu8MapDivType
+gu8MapDivType:
     .skip 0x1C
-.global lbl_10009C94
-lbl_10009C94:
+.global gpsMatMotion_DivMap
+gpsMatMotion_DivMap:
     .skip 0x68
-.global lbl_10009CFC
-lbl_10009CFC:
+.global gpsMatMotObj_DivMap
+gpsMatMotObj_DivMap:
     .skip 0x68
-.global lbl_10009D64
-lbl_10009D64:
+.global gpsMotion_DivMap
+gpsMotion_DivMap:
     .skip 0x68
-.global lbl_10009DCC
-lbl_10009DCC:
+.global gpsObject_DivMap
+gpsObject_DivMap:
     .skip 0xA8
 .global lbl_10009E74
 lbl_10009E74:
@@ -750,20 +750,20 @@ gpsaMtxList_Player:
 .global lbl_1000DEC4
 lbl_1000DEC4:
     .skip 0x80
-.global lbl_1000DF44
-lbl_1000DF44:
+.global gpsaTrsListObject_Player
+gpsaTrsListObject_Player:
     .skip 0x20
-.global lbl_1000DF64
-lbl_1000DF64:
+.global gpsaUnitMtxPal_Player
+gpsaUnitMtxPal_Player:
     .skip 0x20
-.global lbl_1000DF84
-lbl_1000DF84:
+.global gpsaNodeStat_Player
+gpsaNodeStat_Player:
     .skip 0x40
-.global lbl_1000DFC4
-lbl_1000DFC4:
+.global gpsaTexList_Player
+gpsaTexList_Player:
     .skip 0x20
-.global lbl_1000DFE4
-lbl_1000DFE4:
+.global gpsaObject_Player
+gpsaObject_Player:
     .skip 0x28
 .global lbl_1000E00C
 lbl_1000E00C:
@@ -813,14 +813,14 @@ gpsAirChargeEffectTask:
 .global gpsAirCautionEffectTask
 gpsAirCautionEffectTask:
     .skip 0x10
-.global lbl_100178D4
-lbl_100178D4:
+.global gpsRotValueTask
+gpsRotValueTask:
     .skip 0x10
-.global lbl_100178E4
-lbl_100178E4:
+.global gpsTrickTask
+gpsTrickTask:
     .skip 0x10
-.global lbl_100178F4
-lbl_100178F4:
+.global gpsBonusTask
+gpsBonusTask:
     .skip 0x10
 .global lbl_10017904
 lbl_10017904:
@@ -834,44 +834,49 @@ geGame_ModeDetail:
 .global CurrentStage
 CurrentStage:
     .skip 0x4
-.global lbl_1001792C
-lbl_1001792C:
+.global gu32Game_IsUraStage
+gu32Game_IsUraStage:
     .skip 0x4
-.global lbl_10017930
-lbl_10017930:
+.global geGame_Flag
+geGame_Flag:
     .skip 0x4
-.global lbl_10017934
-lbl_10017934:
+.global gs8Game_GoalUserNum
+gs8Game_GoalUserNum:
     .skip 0x1
-.global lbl_10017935
-lbl_10017935:
+.global gs8Game_GoalPlayerNum
+gs8Game_GoalPlayerNum:
     .skip 0x1
-.global lbl_10017936
-lbl_10017936:
+.global gs8Game_RetirePlayerNum
+gs8Game_RetirePlayerNum:
     .skip 0x2
-.global lbl_10017938
-lbl_10017938:
+.global gu32DivMapNum
+gu32DivMapNum:
     .skip 0x4
-.global lbl_1001793C
-lbl_1001793C:
+.global gu32DivMapNo1Num
+gu32DivMapNo1Num:
     .skip 0x4
 .global RaceExitMethod
 RaceExitMethod:
+.global gu32EndOfGameFlag
+gu32EndOfGameFlag:
     .skip 0x4
 .global gpvGame_FreeFrame
 gpvGame_FreeFrame:
-    .skip 0x8
-.global lbl_1001794C
-lbl_1001794C:
+    .skip 0x4
+.global gpvGameRestart_FreeFrame
+gpvGameRestart_FreeFrame:
+    .skip 0x4
+.global gs8PauseCursor
+gs8PauseCursor:
     .skip 0x1
-.global lbl_1001794D
-lbl_1001794D:
+.global gs8ConfirmCursor
+gs8ConfirmCursor:
     .skip 0x1
-.global lbl_1001794E
-lbl_1001794E:
+.global gs8PauseEnter
+gs8PauseEnter:
     .skip 0x2
-.global lbl_10017950
-lbl_10017950:
+.global gpsStageTask
+gpsStageTask:
     .skip 0x4
 .global lbl_10017954
 lbl_10017954:
@@ -924,23 +929,23 @@ lbl_10017B44:
 .global lbl_10017B48
 lbl_10017B48:
     .skip 0x10
-.global lbl_10017B58
-lbl_10017B58:
+.global gsaObjPortalType
+gsaObjPortalType:
     .skip 0x20
 .global lbl_10017B78
 lbl_10017B78:
     .skip 0x4
-.global lbl_10017B7C
-lbl_10017B7C:
+.global gpsStageFogArray
+gpsStageFogArray:
     .skip 0x4
-.global lbl_10017B80
-lbl_10017B80:
+.global gu32FogNum
+gu32FogNum:
     .skip 0x4
 .global lbl_10017B84
 lbl_10017B84:
     .skip 0x4
-.global lbl_10017B88
-lbl_10017B88:
+.global gpsFogDefault
+gpsFogDefault:
     .skip 0xC
 .global lbl_10017B94
 lbl_10017B94:
@@ -957,20 +962,20 @@ lbl_10017BB0:
 .global lbl_10017BBC
 lbl_10017BBC:
     .skip 0xA4
-.global lbl_10017C60
-lbl_10017C60:
+.global gs8ColMapNum
+gs8ColMapNum:
     .skip 0x4
-.global lbl_10017C64
-lbl_10017C64:
+.global gpsCol_ActiveMap
+gpsCol_ActiveMap:
     .skip 0x4
-.global lbl_10017C68
-lbl_10017C68:
+.global gpsCol_MapNo2
+gpsCol_MapNo2:
     .skip 0x4
-.global lbl_10017C6C
-lbl_10017C6C:
+.global gpsCol_Cam
+gpsCol_Cam:
     .skip 0x8
-.global lbl_10017C74
-lbl_10017C74:
+.global gpsCol_Map
+gpsCol_Map:
     .skip 0xC
 .global lbl_10017C80
 lbl_10017C80:
@@ -999,17 +1004,17 @@ lbl_10017CC8:
 .global lbl_10017CDC
 lbl_10017CDC:
     .skip 0x4
-.global lbl_10017CE0
-lbl_10017CE0:
+.global gpsParFullParam_Leaf
+gpsParFullParam_Leaf:
     .skip 0x8
 .global lbl_10017CE8
 lbl_10017CE8:
     .skip 0x4
-.global lbl_10017CEC
-lbl_10017CEC:
+.global gs8Path_SkillNum
+gs8Path_SkillNum:
     .skip 0x4
-.global lbl_10017CF0
-lbl_10017CF0:
+.global gpsPath_Skill
+gpsPath_Skill:
     .skip 0xC
 .global lbl_10017CFC
 lbl_10017CFC:
@@ -1207,59 +1212,59 @@ lbl_10019C48:
 .global lbl_10019C60
 lbl_10019C60:
     .skip 0x4
-.global lbl_10019C64
-lbl_10019C64:
+.global gpsScriptFunc
+gpsScriptFunc:
     .skip 0x4
-.global lbl_10019C68
-lbl_10019C68:
+.global gpsPaticleTbl
+gpsPaticleTbl:
     .skip 0x4
 .global lbl_10019C6C
 lbl_10019C6C:
     .skip 0x4
-.global lbl_10019C70
-lbl_10019C70:
+.global gpsScriptShadow
+gpsScriptShadow:
     .skip 0x4
-.global lbl_10019C74
-lbl_10019C74:
+.global gpsMorMotion_ScriptPlayer
+gpsMorMotion_ScriptPlayer:
     .skip 0x200
-.global lbl_10019E74
-lbl_10019E74:
+.global gpsMatMotion_ScriptPlayer
+gpsMatMotion_ScriptPlayer:
     .skip 0x200
-.global lbl_1001A074
-lbl_1001A074:
+.global gpsMotion_ScriptPlayer
+gpsMotion_ScriptPlayer:
     .skip 0x200
 .global lbl_1001A274
 lbl_1001A274:
     .skip 0x4
-.global lbl_1001A278
-lbl_1001A278:
+.global gppsMorMotion_Script
+gppsMorMotion_Script:
     .skip 0x4
-.global lbl_1001A27C
-lbl_1001A27C:
+.global gppasMorObj_Script
+gppasMorObj_Script:
     .skip 0x8
-.global lbl_1001A284
-lbl_1001A284:
+.global gppsMorList_Script
+gppsMorList_Script:
     .skip 0x4
-.global lbl_1001A288
-lbl_1001A288:
+.global gppsMatMotion_Script
+gppsMatMotion_Script:
     .skip 0x4
-.global lbl_1001A28C
-lbl_1001A28C:
+.global gppasMatMotObj_Script
+gppasMatMotObj_Script:
     .skip 0x8
-.global lbl_1001A294
-lbl_1001A294:
+.global gppsMtxList_Script
+gppsMtxList_Script:
     .skip 0x4
-.global lbl_1001A298
-lbl_1001A298:
+.global gppsCamera_Script
+gppsCamera_Script:
     .skip 0x4
-.global lbl_1001A29C
-lbl_1001A29C:
+.global gppsMotion_Script
+gppsMotion_Script:
     .skip 0x4
-.global lbl_1001A2A0
-lbl_1001A2A0:
+.global gppsTexList_Script
+gppsTexList_Script:
     .skip 0x4
-.global lbl_1001A2A4
-lbl_1001A2A4:
+.global gppsObject_Script
+gppsObject_Script:
     .skip 0x4
 .global lbl_1001A2A8
 lbl_1001A2A8:
@@ -1267,11 +1272,11 @@ lbl_1001A2A8:
 .global lbl_1001A2AC
 lbl_1001A2AC:
     .skip 0x3F8
-.global lbl_1001A6A4
-lbl_1001A6A4:
+.global gsCut_Script
+gsCut_Script:
     .skip 0x40
-.global lbl_1001A6E4
-lbl_1001A6E4:
+.global LoadedDynamicDATFileCount
+LoadedDynamicDATFileCount:
     .skip 0x4
 .global lbl_1001A6E8
 lbl_1001A6E8:
@@ -1312,8 +1317,8 @@ lbl_10087A08:
 .global lbl_10087A10
 lbl_10087A10:
     .skip 0x44
-.global lbl_10087A54
-lbl_10087A54:
+.global gpasComPath
+gpasComPath:
     .skip 0xB8
 .global lbl_10087B0C
 lbl_10087B0C:
@@ -1450,8 +1455,8 @@ lbl_10087E00:
 .global lbl_10087E14
 lbl_10087E14:
     .skip 0x40
-.global lbl_10087E54
-lbl_10087E54:
+.global gpsParticleCrash_BreakDown
+gpsParticleCrash_BreakDown:
     .skip 0x4
 .global lbl_10087E58
 lbl_10087E58:
@@ -1573,11 +1578,11 @@ lbl_100880D3:
 .global gpsSpaniCommon2d
 gpsSpaniCommon2d:
     .skip 0x10
-.global lbl_100880E4
-lbl_100880E4:
+.global tpasTwScript2D
+tpasTwScript2D:
     .skip 0x80
-.global lbl_10088164
-lbl_10088164:
+.global gpsScript2DTexList
+gpsScript2DTexList:
     .skip 0x8
 .global lbl_1008816C
 lbl_1008816C:
@@ -1732,8 +1737,8 @@ lbl_100AE478:
 .global lbl_100AE47C
 lbl_100AE47C:
     .skip 0x8
-.global lbl_100AE484
-lbl_100AE484:
+.global tpasTwScriptStr
+tpasTwScriptStr:
     .skip 0x14
 .global lbl_100AE498
 lbl_100AE498:
@@ -1870,14 +1875,14 @@ lbl_100B8990:
 .global lbl_100B8998
 lbl_100B8998:
     .skip 0x4
-.global lbl_100B899C
-lbl_100B899C:
+.global gpasFrameTexCam
+gpasFrameTexCam:
     .skip 0x80
-.global lbl_100B8A1C
-lbl_100B8A1C:
+.global gpasFrameTexCamMot
+gpasFrameTexCamMot:
     .skip 0x80
-.global lbl_100B8A9C
-lbl_100B8A9C:
+.global gu8FrameTexMaxCamMotNum
+gu8FrameTexMaxCamMotNum:
     .skip 0x4
 .global lbl_100B8AA0
 lbl_100B8AA0:
@@ -1999,14 +2004,14 @@ lbl_100BA5AC:
 .global lbl_100BA5B4
 lbl_100BA5B4:
     .skip 0x8
-.global lbl_100BA5BC
-lbl_100BA5BC:
+.global tpsExShadowDraw
+tpsExShadowDraw:
     .skip 0x40
-.global lbl_100BA5FC
-lbl_100BA5FC:
+.global tpasTwScriptShadow
+tpasTwScriptShadow:
     .skip 0x48
-.global lbl_100BA644
-lbl_100BA644:
+.global tpasTwScriptLineEffect
+tpasTwScriptLineEffect:
     .skip 0x50
 .global lbl_100BA694
 lbl_100BA694:

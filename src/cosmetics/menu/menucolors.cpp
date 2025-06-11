@@ -1,7 +1,7 @@
 #include "menucolors.hpp"
 #include "lib/stdlib.hpp"
 
-constexpr std::array<RGBA, 11> CustomMenuColors = {{
+constexpr std::array<RGBA32, 11> CustomMenuColors = {{
     {0x7f, 0xff, 0xd4},	// Aquamarineblue
     {0x41, 0x69, 0xe1},	// Royalblue
     {0x99, 0x00, 0x00},	// CrimsonRed

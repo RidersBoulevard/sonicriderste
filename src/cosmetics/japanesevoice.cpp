@@ -1,13 +1,14 @@
 #include "lib/stdlib.hpp"
 #include "lib/thread.hpp"
+#include "lib/sound.hpp"
+#include "handlers/files/filehandler_dat.hpp"
+//#include "handlers/files/filehandler_dat.hpp"
 
-ASMDefined char str_VOICE_E_AFS;
-ASMDefined char str_VOICE_AFS;
-ASMDefined void lbl_8009E734(u32, void*, u32, void*);
-ASMDefined u32 lbl_8009E398(u32);
-ASMDefined void* lbl_10026720;
-ASMDefined u8 lbl_1001A6E4;
-ASMDefined u32 GameLanguage;
+//ASMDefined char str_VOICE_E_AFS;
+//ASMDefined char str_VOICE_AFS;
+//ASMDefined void lbl_8009E734(u32, void*, u32, void*);
+//ASMDefined u32 lbl_8009E398(u32);
+//ASMDefined void* lbl_10026720;
 
 //#define ThreadClassTesting
 
@@ -19,22 +20,19 @@ std::unique_ptr<Thread> JapaneseVoices_Thread;
 #endif
 
 void JapaneseVoiceToggleHandler() {
-    char *filename;
-
+	auto oldLanguage = GameLanguage;
     if ((RuleSettings & 0x100) != 0) {
         // japanese voices
-        GameLanguage = 0;
-        filename = &str_VOICE_AFS;
+        GameLanguage = Language::Japanese;
     } else {
         // english voices
-        GameLanguage = 1;
-        filename = &str_VOICE_E_AFS;
+        GameLanguage = Language::English;
     }
 
-    lbl_8009E734(0, filename, 0, &lbl_10026720);
-    lbl_1001A6E4 += 1;
-
-    while (lbl_8009E398(0) != 3){}
+	if(oldLanguage != GameLanguage){
+		FreeDATFiles();
+		LoadMainMenuDatFiles();
+	}
 
 #ifdef ThreadClassTesting
 	JapaneseVoices_Thread->Stop();
@@ -42,7 +40,7 @@ void JapaneseVoiceToggleHandler() {
 #endif
 #ifndef ThreadClassTesting
 	nnFree(JapaneseVoices_Thread);
-    OSCancelThread(_OSGetCurrentContext());
+    OSCancelThread(OSGetCurrentThread());
 #endif
 }
 

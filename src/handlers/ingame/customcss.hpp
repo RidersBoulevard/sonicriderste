@@ -1,6 +1,6 @@
 #pragma once
 
-#include "types.hpp"
+#include <bitset>
 
-extern std::array<bool, 4> PlayerCharacterInformationBox;
+extern std::bitset<4> PlayerCharacterInformationBox;
 

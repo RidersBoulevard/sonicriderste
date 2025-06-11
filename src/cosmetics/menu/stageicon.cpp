@@ -17,7 +17,7 @@ ASMUsed void StageIconInCSS(ObjectNode *object, StageIconObject1 *object1) {
     HUDStruct hud{};
 
     if (object->state == 0 && object1->state == 0x1) {
-        hud.scale = 0.0078125f; // texture scale (1 / texture width [128 in this case])
+        hud.scale = 1.f / 128.f; // texture scale (1 / texture width [128 in this case])
         hud.screenX = 530;
         hud.screenY = 406;
         hud.textureXLength = 0x2A;

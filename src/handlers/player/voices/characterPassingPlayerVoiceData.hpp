@@ -1,6 +1,6 @@
 #pragma once
 
-constexpr std::array<std::optional<u8>, TotalCharacterAmount> CharacterPassingPlayerVoice {
+constexpr std::array<std::optional<u8>, Character::Total> CharacterPassingPlayerVoice {
 		0x05,			// Sonic
 		0x05,			// Tails
 		0x05,			// Knuckles

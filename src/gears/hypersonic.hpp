@@ -32,5 +32,5 @@ void Player_HyperdriveHandler(Player *player);
 
 void Player_ZGSuperSonic(Player *player);
 
-void Player_Excalibur(Player *player);
+void Player_SuperShadow(Player *player);
 }

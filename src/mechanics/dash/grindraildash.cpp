@@ -4,6 +4,9 @@
 #include "lib/sound.hpp"
 #include "lib/stdlib.hpp"
 #include "riders/object.hpp"
+#include "gears/turbostar.hpp"
+#include "gears/hangon.hpp"
+#include "handlers/player/specialflagtweaks.hpp"
 
 ASMDefined u32 lbl_10017B18;
 ASMDefined f32 lbl_001C40C0;
@@ -65,43 +68,43 @@ void Player_InitBoostParticles(Player *player) {
 }
 
 void Player_GrindRailDashHandler(Player *player) {
-	EnabledEXLoads exLoads = FetchEnabledEXLoadIDs(*player);
 	BlastGaugeInfo *bgInfo = &PlayerBlastGaugeInfo[player->index];
 
-	if(player->state == RailGrind) {
+	if(player->state == PlayerState::RailGrind) {
 		if(player->grindRailDash != 2) {
-			if(player->input->toggleFaceButtons.hasAny(LButton)) {
+			if(player->input->toggleFaceButtons.hasAny(Buttons::L)) {
 				// initial cost
 				player->grindRailDash = 1;
 				PlayAudioFromDAT(Sound::SFX::RailHoopDash);// dash sfx
 				Player_InitBoostParticles(player);
-				if(player->specialFlags.hasAny(ringGear)) {
-					if(player->character == SuperSonic
+				if(player->specialFlags.hasAny(SpecialFlags::ringGear)) {
+					if(player->character == Character::SuperSonic
 					   && bgInfo->currentGauge > 0
-					   && exLoads.gearExLoadID != HyperSonicEXLoad){
-						bgInfo->currentGauge -= GrindRailDashInitialCosts[player->level];
+					   && player->gearExload().exLoadID != EXLoad::HyperSonic){
+						bgInfo->currentGauge -= GrindRailDashInitialCosts[player->level] * 2;
 						if(bgInfo->currentGauge < 0) bgInfo->currentGauge = 0;
 					} else {
 						s32 newAir = player->currentAir - (player->gearStats[player->level].maxAir * 5) / 100;
-						player->currentAir = clamp(newAir, 0);
+						player->currentAir = clamp(newAir);
 					}
 				}else{
-					if (player->characterArchetype == Mechanic) {
+					if (player->characterArchetype == CharacterArchetype::Mechanic) {
 						player->changeInAir_gain -= GrindRailDashInitialCostsMechanic[player->level];
 					} else player->changeInAir_gain -= GrindRailDashInitialCosts[player->level];
 				}
-			} else if(player->input->holdFaceButtons.hasAny(LButton) && player->grindRailDash == 1) {
-				if(player->currentAir > 0) {
+			} else if(player->input->holdFaceButtons.hasAny(Buttons::L) && player->grindRailDash == 1) {
+				if((player->currentAir > 0 && player->extremeGear != ExtremeGear::Beginner)
+					|| (player->extremeGear == ExtremeGear::Beginner && player->currentAir > 500)) {
 					player->speed += pSpeed(2);
 					f32 newMI;
-					if(player->character == SuperSonic
+					if(player->character == Character::SuperSonic
 					   && bgInfo->currentGauge > 0
-					   && exLoads.gearExLoadID != HyperSonicEXLoad){
+					   && player->gearExload().exLoadID != EXLoad::HyperSonic){
 						newMI = player->magneticImpulse_timer;// essentially does nothing with blast gauge
 					} else {
 						newMI = player->magneticImpulse_timer - 6.0f;
 					}
-					player->magneticImpulse_timer = clamp(newMI, 0.f);
+					player->magneticImpulse_timer = clamp(newMI);
 				} else {
 					player->grindRailDash = 2;
 				}
@@ -142,16 +145,13 @@ void Player_RingLossVisualsSFX(Player *player) {
 }
 
 ASMUsed void RingLoss_OnAttack(Player *player) {
-	EnabledEXLoads exLoads;
-	FetchEnabledEXLoadIDs(player, exLoads);
-
-	// if (exLoads.gearExLoadID == E99EXLoad)
-	// {
-	//     u32 ringRetain = player->rings;
-	//     player->rings = ringRetain;
-	//     return;
-	// }
-	if(player->specialFlags.hasAny(ringGear)) {
+	if (player->character == Character::SuperSonic && player->extremeGear == ExtremeGear::ChaosEmerald
+		&& player->gearExload().exLoadID != EXLoad::HyperSonic) {
+		BlastGaugeInfo *bgInfo = &PlayerBlastGaugeInfo[player->index];
+		s32 newGauge = bgInfo->currentGauge - 50000;
+		bgInfo->currentGauge = clamp(newGauge);
+	}
+	if(player->specialFlags.hasAny(SpecialFlags::ringGear)) {
 		u32 lossPercentage = 0;
 		switch(player->rings){
 			case 0 ... 15:
@@ -188,15 +188,28 @@ ASMUsed void RingLoss_OnAttack(Player *player) {
 		//	player->rings = newCoverPRings;
 		//}
 	} else {
-		const auto newRings = static_cast<s32>(((player->rings * 85) / 100) - 10);
-		player->rings = static_cast<u32>(clamp(newRings, 0));
+		auto newRings = static_cast<s32>(((player->rings * 85) / 100) - 10);
+		if (player->extremeGear == ExtremeGear::SuperHangOn) {
+			switch (player->level) {
+				case 1: 
+					if (newRings < 30) newRings = 30; 
+					break;
+				case 2:
+					if (player->gearSpecificFlags[SuperHangOn::Level4] == true) {
+						if (newRings < 90) newRings = 90;
+					} else if (newRings < 60) newRings = 60;
+					break;
+				default: break;
+			}
+		}
+		player->rings = static_cast<u32>(clamp(newRings));
 	}
 }
 
 ASMUsed void Player_GrindRailAttack(Player *attackingPlayer, Player *attackedPlayer) {
-	if((!attackedPlayer->specialFlags.hasAny(ringGear)) &&
-	   (attackedPlayer->state == RailGrind) &&
-	   (attackingPlayer->state == RailGrind) &&
+	if((!attackedPlayer->specialFlags.hasAny(SpecialFlags::ringGear)) &&
+	   (attackedPlayer->state == PlayerState::RailGrind) &&
+	   (attackingPlayer->state == PlayerState::RailGrind) &&
 	   (attackingPlayer->grindRailDash != 0)
 	   ) {
 		Player_RingLossVisualsSFX(attackedPlayer);

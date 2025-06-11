@@ -23,10 +23,10 @@ std::array<Matrix3x3F, MaxPlayerCount> SuperAuraOriginPoint{};
  *
  * @param player The Player to spawn the particles on.
  */
-ASMUsed void SuperSonicAuraCXX(Player* player) {
-    if (gu32GameCnt % 15 != 0 || gu32Game_PauseFlag) return;
+ASMUsed void SuperSonicAuraCXX(const Player &player) {
+    if (gu32GameCnt % 15 != 0 || (gu32Game_PauseFlag != 0u)) return;
 
-    SuperAuraDetail details = GetSuperAuraDetail(player);
+    const SuperAuraDetail details = GetSuperAuraDetail(player);
 
     auto *object = static_cast<ParticleTaskObject1*>(SetTask(&func_Particle_Task, details.particles->objectGroupID, 2)->object);
     object->unk72 = 4;
@@ -45,9 +45,9 @@ ASMUsed void SuperSonicAuraCXX(Player* player) {
     object->unk18 = 0;
 
     object->unk48 = &gcosNnSystemVecZeroFast;
-    object->unk60 = details.particles;
-    object->unk68 = *details.texList;
-    object->unk6C = &SuperAuraOriginPoint[player->index];
+    object->particleParams = details.particles;
+    object->texList = *details.texList;
+    object->baseModelMatrix = &SuperAuraOriginPoint[player.index];
     object->unk73 = ~0U;
     object->unk74 = 0;
 }
@@ -58,23 +58,20 @@ ASMUsed void SuperSonicAuraCXX(Player* player) {
  * @param player The Player to check.
  * @return The particle details.
  */
-SuperAuraDetail GetSuperAuraDetail(Player* player) {
-    EnabledEXLoads exLoads{};
-    FetchEnabledEXLoadIDs(player, exLoads);
-
+SuperAuraDetail GetSuperAuraDetail(const Player &player) {
     SuperAuraDetail detail = {&lbl_001EFF98, &texList_CustomParticles};
 
-    if (isSuperCharacter(*player, Knuckles)) {
+    if (isSuperCharacter(player, Character::Knuckles)) {
         detail.particles = &SuperKnucklesAuraParticles;
     } else {
-        switch (exLoads.gearExLoadID) {
-            case PerfectNazo:
+        switch (player.gearExload().exLoadID) {
+            case EXLoad::PerfectNazo:
                 detail.particles = &PerfectNazoAuraParticles;
                 break;
-            case DarkSonicEXLoad:
+            case EXLoad::DarkSonic:
                 detail.particles = &DarkSonicAuraParticles;
                 break;
-            case HyperSonicEXLoad:
+            case EXLoad::HyperSonic:
                 detail.particles = &HyperSonicAuraParticles;
                 break;
 			default: break;
@@ -89,8 +86,8 @@ SuperAuraDetail GetSuperAuraDetail(Player* player) {
  *
  * @param player The Player who's matrices to update.
  */
-ASMUsed void UpdateAuraMatrices(Player* player) {
-    nnMultiplyMatrix(&player->unkC4, (gpsaMtxList_Player[player->index]) + 7, SuperAuraOriginPoint[player->index]);
-    const Vector3F translation = MatrixExtractTranslation(&SuperAuraOriginPoint[player->index]);
-    nnMakeTranslateMatrix(&SuperAuraOriginPoint[player->index], translation.x, translation.y, translation.z);
+ASMUsed void UpdateAuraMatrices(Player &player) {
+    nnMultiplyMatrix(&player.unkC4, (gpsaMtxList_Player[player.index]) + 7, SuperAuraOriginPoint[player.index]);
+    const Vector3F translation = MatrixExtractTranslation(&SuperAuraOriginPoint[player.index]);
+    nnMakeTranslateMatrix(&SuperAuraOriginPoint[player.index], translation.x, translation.y, translation.z);
 }

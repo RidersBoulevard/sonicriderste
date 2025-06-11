@@ -6,10 +6,9 @@
 #include "types.hpp"
 
 #include <array>
-#include <ppu_intrinsics.h>
 
 namespace MagneticImpulse {
-	constexpr f32 NoTypeMultiplier = 2.0f;
+	constexpr f32 NoTypeMultiplier = 1.5f;
 	constexpr f32 DualTypeMultiplier = 0.8f;
 	constexpr f32 AllTypeMultiplier = 0.6f;
 
@@ -26,6 +25,7 @@ namespace MagneticImpulse {
 		f32 buffer = 0;
 		f32 interrupt = 0;
 		f32 maxMItimer = 0;
+        // TODO: move all the members that don't pertain to MI out of this struct
 		f32 ringPowerObjTimer = 0;
 		u32 afterburnerTimer = 0;
 		u32 windcatcherTurbGain = 0;
@@ -36,7 +36,17 @@ namespace MagneticImpulse {
 
 	void createGuaranteedMaxMIParticles(Player &player);
 	f32 calculateMultiplier(Player *player, f32 value);
-	f32 scaleUsingCurrentMI(Player &player, f32 value);
+
+	template<typename T>
+	T scaleUsingCurrentMI(Player &player, const T &value) {
+		T retVal{};
+		if(impulseData[player.index].magneticImpulse) {
+			const f32 MIPercentage = player.magneticImpulse_timer / MaximumCap;
+			retVal = static_cast<T>(static_cast<f32>(value) * MIPercentage);
+		}
+
+		return retVal;
+	}
 }// namespace MagneticImpulse
 namespace MI = MagneticImpulse;// Alias the namespace into something shorter
 

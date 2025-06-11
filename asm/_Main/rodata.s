@@ -13339,7 +13339,7 @@ lbl_001CCF78:
 .global lbl_001CD05C
 lbl_001CD05C:
     # 0x1CD05C
-    .4byte 0x02030202
+    .4byte 0x02030202 // texture indices for super sonic on which texture should the super form use
     .4byte 0x3F800000
     .4byte 0x3F4CCCCD
 .global lbl_001CD068
@@ -14044,8 +14044,8 @@ lbl_001CD950:
     .4byte 0x43160000
     .4byte 0x43960000
     .4byte 0x00000000
-    .single 45 // Wave Level 3 Stun Timer in battle mode, emerald chase (increments by 0.5)
-    .single 45 // Wave Level 3 Stun Timer (increments by 0.5)
+    .single 60 // Wave Level 3 Stun Timer in battle mode, emerald chase (increments by 0.5)
+    .single 60 // Wave Level 3 Stun Timer (increments by 0.5)
     .4byte 0x3F000000
     .4byte 0x41A00000
     .4byte 0x447A0000
@@ -26075,7 +26075,7 @@ data_C2453220:
     .single 8.5 # speed balancer wall bonk multiplier
     .4byte 0x00000000
     .single 10
-    .single 0.35 # 15 percent for speed balancer
+    .single 0.20 # 15 percent for speed balancer
 
 .global data_C24A7E70
 data_C24A7E70:
@@ -26219,7 +26219,7 @@ data_C247798C:
 
 .global data_C24DB384
 data_C24DB384:
-    .single 0.3
+    .single 0.1
 
 .global data_C2546FB4
 data_C2546FB4:
@@ -26852,6 +26852,7 @@ CSS_GearPortraitID:
     .8byte 0x00B000B100B200B3
     .8byte 0x00B400B500B600B7
     .8byte 0x00B800B900BA00BB
+    .2byte 0x00F5 # GunGear
     .8byte 0x0086008700880089 # from here starts different default gear portraits
     .8byte 0x008A008B008C0108 # eggman is 108
     .8byte 0x008E008D00CE0086 # SS is 0086 to mimic blue star
@@ -26872,6 +26873,7 @@ CSS_GearTextTextureID:
     .8byte 0x002A002B002C002D
     .8byte 0x002E002F00300031
     .8byte 0x0032003300340035
+    .2byte 0x00F6 # GunGear
     .8byte 0x0000000100020003 # from here starts different default gear texts
     .8byte 0x0004000500060109 # eggman is 0109
     .8byte 0x0008000700FB0000 # SS is 00 to mimic blue star
@@ -26940,12 +26942,18 @@ str_POX2:
     .asciz "POX2"
     .balign 4
 
+.global str_POX3
+str_POX3:
+    .asciz "POX3"
+    .balign 4
+
 .global data_C24C9294
 data_C24C9294:
     .single 1 # berserker additive range
     .single 4 # combat character attack range level 3
-    .single 3.2 # super neo metal base form
-    .single 4.1 # super neo metal super form
+    .single 3 # super neo metal base form
+    .single 4 # super neo metal super form
+    .single 0.5 # berserker additive range with anything that has greater than 3 attack range by default
  
 .global data_C24DB2D8
 data_C24DB2D8:
@@ -26988,7 +26996,7 @@ data_C248D9A0:
 asm_ShockAttackStunFrames:
     // all increment by 0.5 per frame
     .single 65 // Tails stun frames
-    .single 45 // Rouge stun frames
+    .single 65 // Rouge stun frames
     .single 45 // Ulala stun frames
 
 
@@ -27263,11 +27271,6 @@ ExtraDefaultGearTextID:
 SplashCanyonLastFlyRouteAirGain:
     .single 0.3 # OG: 0.5
 
-.global str_MSFX
-str_MSFX:
-    .asciz "MSFX.DAT"
-    .balign 4
-
 .global UlalaAssetsStructure
 UlalaAssetsStructure:
     # 0x1CF29C
@@ -27463,7 +27466,7 @@ SuperKnucklesAuraParticles:
 
 .global asm_MikuFlattenTimer
 asm_MikuFlattenTimer:
-    .single 180 // increments by 1
+    .single 150 // increments by 1
 
 .global asm_SuperShadowAttackRange
 asm_SuperShadowAttackRange:

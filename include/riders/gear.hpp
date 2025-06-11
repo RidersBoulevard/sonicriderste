@@ -4,8 +4,10 @@
 
 #pragma once
 
-#include "../types.hpp"
+#include <containers/vector3.hpp>
+
 #include "../flags.hpp"
+#include "../types.hpp"
 
 /**
  * Contains all of the game's Extreme Gears.
@@ -17,13 +19,16 @@ namespace ExtremeGear{
 		Gambler, PowerGear, OpaOpa, TheCrazy, Berserker, ERider, AirTank, HeavyBike, Destroyer, Omnipotence, CoverS, CoverF,
 		CoverP, HangOn, SuperHangOn, Darkness, Grinder, AdvantageS, AdvantageF, AdvantageP, Cannonball,
 
-		TotalGearAmount
+		GunGear,
+
+		TotalGearAmount,
+		Invalid = 0xFF
 	};
 
     constexpr auto BIKE_COUNT = 10;
 }
 
-enum GearType : u8 {
+enum class GearType : u8 {
 	Board, Skates, Bike, EggmanType
 };
 
@@ -37,7 +42,7 @@ enum class Type : u8{
 ENUM_FLAG_OPERATORS(Type) // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, readability-identifier-length, *-type-traits)
 
 /* 0x9D4 */
-enum SpecialFlags : u32{
+enum class SpecialFlags : u32{
 	noSpecialFlags 				= 0,
 	alwaysIgnoreTurbulence 		= 1<<0,
 	legendEffect 				= 1<<1,

@@ -116,7 +116,7 @@ ASMDefined void GraphicalObjectHandler_DebugMenuText(void *graphicalObject) {
     DebugMenu_RenderDescription();
 
     for (u32 i = 0, y = 100; i < debugMenu->maximumItems; i++, y += 20) {
-		const RGBA rgba = debugMenu->selectedItemRow == i ? 0xFF0000FF : ~0U;
+		const RGBA32 rgba = debugMenu->selectedItemRow == i ? 0xFF0000FF : ~0U;
 
 		auto options = debugMenu->page1Options[i];
         auto textID = DebugMenu_FetchTextIDAllToggles(options);
@@ -137,11 +137,11 @@ ASMDefined void GraphicalObjectHandler_DisplayMusicTextMenu(void *graphicalObjec
     RenderText(172, 20, ~0U, 480, 0, musicTextID, &CustomMusicTextData.textDataHeader, textTexture, -100.0f);
 }
 
-#define GAMELANGUAGE_COUNT 6
+constexpr auto GameLanguage_count = 6;
 
 ASMDefined s32 geMessageLanguage;
 
-constexpr std::array<u8, GAMELANGUAGE_COUNT> MessageTexts1 = {
+constexpr std::array<u8, GameLanguage_count> MessageTexts1 = {
         0xE,
         0x10, // English
         0x12,
@@ -150,7 +150,7 @@ constexpr std::array<u8, GAMELANGUAGE_COUNT> MessageTexts1 = {
         0x18
 };
 
-constexpr std::array<u8, GAMELANGUAGE_COUNT> MessageTexts2 = {
+constexpr std::array<u8, GameLanguage_count> MessageTexts2 = {
         0xF,
         0x11, // English
         0x13,
@@ -159,7 +159,7 @@ constexpr std::array<u8, GAMELANGUAGE_COUNT> MessageTexts2 = {
         0x19
 };
 
-constexpr std::array<std::array<u8, 20>, GAMELANGUAGE_COUNT> ModeTitleTexts = {
+constexpr std::array<std::array<u8, 20>, GameLanguage_count> ModeTitleTexts = {
         // extra ID at the end is for debug menu
         {
                 {
@@ -232,10 +232,10 @@ ASMDefined void GraphicalObjectHandler_EXLoadButtonCSS(GraphicalObject *gobject)
 
                 if (object1->cssSelectionState[playerIndex] == 1) {
                     // in character select
-                    gobject->active = CheckPlayerHoveringOverPossibleEXLoad(player, OnlyCharacter);
+                    gobject->active = CheckPlayerHoveringOverPossibleEXLoad(player, EXLoadHoverTypes::OnlyCharacter);
                 } else if (object1->cssSelectionState[playerIndex] == 2 || object1->cssSelectionState[playerIndex] == 3) {
                     // in gear select
-                    gobject->active = CheckPlayerHoveringOverPossibleEXLoad(player, OnlyGear);
+                    gobject->active = CheckPlayerHoveringOverPossibleEXLoad(player, EXLoadHoverTypes::OnlyGear);
                 } else {
                     gobject->active = false;
                 }
@@ -249,7 +249,7 @@ ASMDefined void GraphicalObjectHandler_EXLoadButtonCSS(GraphicalObject *gobject)
     Sys2d_DrawObject(gobject);
 }
 
-ASMDefined u32 func_8003505C(f32);                             /* extern */
+ASMDefined u32 __cvt_fp2unsigned(f32);                             /* extern */
 extern u16 lbl_001D37F8[];
 extern f32 lbl_001D3938;
 ASMDefined void lbl_000F9038(GraphicalObject *, u32, u32, u32, u32);
@@ -264,33 +264,73 @@ constexpr std::array<u16, 7> ExtraDefaultGearTextID = {
         522, // variable character, add new characters' IDs before this
 };
 
+constexpr std::array<u16, 1> NewGearTextID = {
+        767, // G.U.N. Gear
+};
+
 // decompiled
 ASMUsed void GraphicalObjectHandler_CSSInformationText(GraphicalObject* gobject) {
-    const u8 playerIndex = gobject->idStruct.idIndex;
-    CSSObject* object = *(static_cast<CSSObject**>(gp2DSys) + ((gobject->cullingGroup * (8/4)) + (0x6000 / 4)));
+    const u8 playerIndex    = gobject->idStruct.idIndex;
+	const CSSObject* object = *(static_cast<CSSObject**>(gp2DSys) + ((gobject->cullingGroup * (8/4)) + (0x6000 / 4)));
 
-    switch (object->state) {                        /* irregular */
+	switch (object->state) {                        /* irregular */
         case 0:
             gobject->extraTransformObjectID = 0x23;
             gobject->unk60 = 1;
             gobject->extraTransformIndex = -1;
             Sys2d_DrawObject(gobject);
-            gobject->unkB4 = func_8003505C(gobject->textureTransform.x);
+            gobject->unkB4 = __cvt_fp2unsigned(gobject->textureTransform.x);
             gobject->extraTransformObjectID = 0x22;
             gobject->unk60 = 3;
             gobject->extraTransformIndex = -1;
             gobject->extraTransformIndex = playerIndex;
-            return;
+			return;
+		case 1:
+			return;
         case 2:
             if (object->cssSelectionState[playerIndex] == 3) {
-                Player* player = &players[playerIndex];
+				const Player* player = &players[playerIndex];
                 const s8 gear = static_cast<s8>(player->extremeGear);
                 gobject->active = true;
 
                 u16 text = 0;
-                if (player->character > E10R && player->extremeGear == ExtremeGear::Default) {
+                if (player->character > Character::E10R && player->extremeGear == ExtremeGear::Default) {
                     // any new characters
-                    text = ExtraDefaultGearTextID[player->character - Silver];
+                    text = ExtraDefaultGearTextID[std::to_underlying(player->character) - std::to_underlying(Character::Silver)];
+                } else if (player->extremeGear > ExtremeGear::Cannonball) {
+                    // new gears
+                    text = NewGearTextID[player->extremeGear - ExtremeGear::GunGear];
+                } else if(player->extremeGear == ExtremeGear::ChaosEmerald){
+                    text = 548; // default case
+                    switch(player->character){
+                        case Character::MetalSonic:
+                            text = 772;
+                            break;
+                        case Character::Sonic:
+                            text = 768;
+                            if (player->gearExload().exLoadID == EXLoad::PerfectNazo){
+                                text = 773;
+                                break;
+                            } else if (player->gearExload().exLoadID == EXLoad::DarkSonic){
+                                text = 774;
+                                break;
+                            } else if (player->gearExload().exLoadID == EXLoad::HyperSonic){
+                                text = 775;
+                                break;
+                            }
+                            break;
+                        case Character::Knuckles:
+                            text = 770;
+                            break;
+                        case Character::Shadow:
+                            text = 771;
+                            break;
+                        case Character::Tails:
+                            text = 769;
+                            break;
+                        default:
+                            break;
+                    }
                 } else {
                     text = lbl_001D37F8[((static_cast<s8>(player->character) + 0x29) * static_cast<int>(gear == 0) - 1) + gear];
                 }
@@ -313,7 +353,6 @@ ASMUsed void GraphicalObjectHandler_CSSInformationText(GraphicalObject* gobject)
                                gasSubFont + 1,
                                gpasTexList_SubFont.unk4,
                                lbl_001D3938 + gobject->textureTransform.z);
-                    return;
                 }
             } else if (object->cssSelectionState[playerIndex] == 1 && PlayerCharacterInformationBox[playerIndex]) {
                 // in character selection
@@ -327,25 +366,22 @@ ASMUsed void GraphicalObjectHandler_CSSInformationText(GraphicalObject* gobject)
                 lbl_000F9038(gobject, 0U, 0x10000U, 2U, 0U);
 
                 Player* player = &players[playerIndex];
-                if (gobject->currentAnimationFrame2 >= 0x80000U && player->character < TotalCharacterAmount) {
-                    u16 text;
-                    auto exLoads = FetchEnabledEXLoadIDs(*player);
-                    auto exLoadSlotIndex = Player_EXLoadData[player->input->port][CharacterEXLoadMode].exLoadIndex;
-                    auto exLoadSlot = CharacterEXLoadDataSlots[exLoadSlotIndex];
+                if (gobject->currentAnimationFrame2 >= 0x80000U && player->character < Character::Total) {
+                    auto exLoads = player->characterExload();
 
-                    if (exLoads.characterExLoadID != 0 && EXLoadArchetypes[exLoads.characterExLoadID] != NoEXLoadArchetype
-                        && CheckIfEXLoadCanBeApplied(*player, exLoadSlot)) {
-                        text = EXLoadArchetypes[exLoads.characterExLoadID];
-                        if (exLoads.characterExLoadID == SelkadoomEXLoad) {text = 10;} // Special version of combat text
-                    } else if (player->character == Emerl) {
-                        text = 9;
-                    } else if (player->character == Shadow) {
-                        text = 10;
+                    CharacterArchetype text;
+                    if (player->hasCharacterExload() && exLoads.archetype() != CharacterArchetype::NoEXLoad && CheckIfEXLoadCanBeApplied(*player, exLoads)) {
+                        text = exLoads.archetype();
+                    	if (exLoads.exLoadID == EXLoad::Selkadoom) {text = CharacterArchetype{10};} // Special version of combat text
+                    } else if (player->character == Character::Emerl) {
+                        text = CharacterArchetype{9};
+                    } else if (player->character == Character::Shadow) {
+                    	text = CharacterArchetype{10};
                     } else {
                         u32 index;
-                        if (player->character == E10G &&
-                            (exLoads.characterExLoadID == E10BEXLoad || exLoads.characterExLoadID == E10REXLoad)) {
-                            index = E10R;
+                        if (player->character == Character::E10G &&
+                            (exLoads.exLoadID == EXLoad::E10B || exLoads.exLoadID == EXLoad::E10R || exLoads.exLoadID == EXLoad::E10Y)) {
+                            index = std::to_underlying(Character::E10R);
                         } else {
                             index = player->character;
                         }
@@ -359,11 +395,10 @@ ASMUsed void GraphicalObjectHandler_CSSInformationText(GraphicalObject* gobject)
                                gobject->unkB0,
                                gobject->unkB4,
                                0U,
-                               text,
+                               std::to_underlying(text),
                                &CharacterInformationFont.textDataHeader,
                                gpasTexList_SubFont.unk4,
                                lbl_001D3938 + gobject->textureTransform.z);
-                    return;
                 }
             } else {
                 gobject->active = false;
@@ -371,9 +406,8 @@ ASMUsed void GraphicalObjectHandler_CSSInformationText(GraphicalObject* gobject)
                     gobject->currentAnimationFrame2 = 0;
                     gobject->unk5C = 0;
                 }
-                case 1:
-                    return;
             }
             break;
+    	default: break;
     }
 }

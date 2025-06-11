@@ -16,18 +16,32 @@ void Player_HyperHangOn(Player *player) {
     HHOInfo *hhoInfo = &PlayerHHOInfo[player->index];
     if (exLoads.gearExLoadID != HyperHangOnEXLoad) return;
 
-    if (player->state == StartLine)
+    if (player->state == PlayerState::StartLine)
     {
         hhoInfo->attackCount = 0;
         hhoInfo->trickCount = 0;
         hhoInfo->pitCount = 0;
         hhoInfo->saturnMegadriveStatus = 0;
         hhoInfo->extraType = 0;
-        player->gearStats[player->level].airDrain = 10;
+        // player->gearStats[player->level].airDrain = 10;
+        player->currentAir = 30000;
         // player->gearStats[0].boostSpeed = HHO_BoostSpeeds[0];
         // player->gearStats[1].boostSpeed = HHO_BoostSpeeds[1];
         // player->gearStats[2].boostSpeed = HHO_BoostSpeeds[2];
     }
+
+    player->level = 1;
+    player->specialFlags |= (ringGear | thirtyPercentAir);
+    player->specialFlags &= ~(noSpeedLossChargingJump | iceImmunity);
+    player->gearStats[player->level].maxAir = 100000;
+    player->gearStats[player->level].topSpeed = pSpeed(210.0f);
+    player->gearStats[player->level].airDrain = 0x12;
+    player->gearStats[player->level].boostCost = 15000;
+    player->gearStats[player->level].driftCost = 0xA;
+    player->gearStats[player->level].tornadoCost = 5000;
+    player->gearStats[player->level].boostSpeed = pSpeed(260.0f);
+    // if (!(player->movementFlags & boosting)) player->gearStats[player->level].baseAccel = (f32)0x3FAED098;
+    player->gearStats[player->level].driftDashSpeed = pSpeed(80.0f);
 
     if ((hhoInfo->attackCount + hhoInfo->trickCount + hhoInfo->pitCount) >= (u8)5)
     {

@@ -1,6 +1,7 @@
-#include "cosmetics/player/exloads.hpp"
 #include <cmath>
 #include "containers/vector3.hpp"
+#include "cosmetics/player/exloads.hpp"
+#include "riders/player.hpp"
 #include "lib/stdlib.hpp"
 
 // acronym "Trs" in this case stands for translation, rotation, scale
@@ -99,10 +100,7 @@ ASMUsed void Blaze_QuillMovement(Player *player, std::array<NodeTrs, 71> &nodeTr
 }
 
 ASMUsed void MikuCharacterFeatures(Player *player, std::array<NodeTrs, 71> &nodeTrsList) {
-	EnabledEXLoads exLoads{};
-	FetchEnabledEXLoadIDs(player, exLoads);
-
-	if(exLoads.characterExLoadID == HatsuneMikuEXLoad) { Blaze_QuillMovement(player, nodeTrsList); }
+	if(player->characterExload().exLoadID == EXLoad::HatsuneMiku) { Blaze_QuillMovement(player, nodeTrsList); }
 }
 
 template <typename T>

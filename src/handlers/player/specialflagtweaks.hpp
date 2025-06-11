@@ -5,6 +5,7 @@
 #include "lib/sound.hpp"
 #include <cmath>
 #include "riders/object.hpp"
+#include "lib/stdlib.hpp"
 
 struct SpecialFlagInfo {
 	bool lightBoardEffect; // if the effect is active
@@ -37,7 +38,7 @@ ASMUsed void Player_ArchetypeTierAccelBuffs(Player* player);
 
 ASMUsed void Player_ApplyBoostSpeed(Player* player);
 
-void Player_TornadoBoostApplications(Player* player);
+ASMUsed void Player_TornadoBoostApplications(Player* player);
 
 ASMUsed u32 CustomBoostDuration(Player *player, u32 currentBoostDuration);
 
@@ -46,5 +47,9 @@ ASMDefined void lbl_0008CBD4(); // bomb
 ASMDefined void lbl_0008CB64(Player *player, u32 timer, f32 setSpeedCap); // ball and chain
 
 ASMDefined void lbl_0008CB1C(u32); // ball and chain model
+
+ASMUsed bool Player_ZIgnoreTornado(Player *player);
+
+ASMUsed void Player_AirGainOnAttack(Player *player);
 
 ASMDefined ObjectNode * gpsCurrentTask;

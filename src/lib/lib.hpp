@@ -28,6 +28,10 @@ ASMDefined void RenderText(
 		f32);
 
 ASMDefined u32 CenterText(u32 textLength, u32 lineSpacing, u32 textID, void *textTable);
+
+/// Draws a simple box over the screen.
+ASMDefined void Draw2d(u16 xPos, u16 yPos, u16 xLength, u16 yLength, u32 rgba, u32 always0_1, u32 always0_2, u32 always2);
+
 ASMDefined void utilBinSetUpMotion(void* savePtr, void* gnmFile);
 
 struct AttackObjReadManager{
@@ -46,7 +50,7 @@ ASMDefined u16 tu16ExclusiveMotionNo;
 
 ASMDefined std::array<void*, 0x1000> gpsaMotion_PlayerNeo;
 
-constexpr std::array<u8, TotalCharacterAmount+1> CharacterAnimationFiles = {
+constexpr std::array<u8, Character::Total+1> CharacterAnimationFiles = {
 		0x0,
 		0x1,
 		0x2,
@@ -73,45 +77,13 @@ constexpr std::array<u8, TotalCharacterAmount+1> CharacterAnimationFiles = {
 		0xA, // variable character
 };
 
-void Custom_CreateHUDElement(void *textureStructs, u32 textureID, u32 textureRGBA, HUDStruct *hud);
+void Custom_CreateHUDElement(void *textureStructs, u32 textureID, u32 textureRGBA, const HUDStruct *hud, const f32 aspectRatio = 0.0f);
 void GetPlayerPositionRotationMatrix(Player &player, Matrix3x3F &out);
 ASMUsed u32 SetupCustomAnimationArchive(u8 *packManStart, u32 *packManOffsetStart, u32 playerIndex);
 Vector3F MatrixExtractTranslation(Matrix3x3F *m);
 
-struct TexInfo {
-    u32 unk0;
-    char *filename;
-    u16 unk8;
-    u16 unkA;
-    u32 unkC;
-    u32 unk10;
-};
-static_assert(sizeof(TexInfo) == 0x14);
-
-// TODO: document this struct
-struct TexStruct {
-    fillerData<0x40> data;
-};
-
-struct TexStructHeader {
-    u32 texNum;
-    TexStruct *texStart;
-};
-
-constexpr TexInfo defaultTexInfo = {
-        0, nullptr, 1, 1, 0, 0
-};
-
-ASMDefined u32 InitTextureStruct(TexStruct *tex, const TexInfo *info = &defaultTexInfo, const void *gvrTexture = nullptr);
-
-/// estimates tex list size
-ASMDefined u32 func_80053E38(u32 texNum);
-
-/// sets up tex structs and saves a pointer to it
-ASMDefined void func_80053D20(void *savePtr, u32 texNum, TexStructHeader *texStructs);
-
 // getset_gno
-ASMDefined void lbl_000478A0(void *packManStart, void *packManOffsetStart, void *savePtr);
+ASMDefined void GetSet_Gno(void *packManStart, void *packManOffsetStart, void *savePtr);
 
 struct GVRTextureArchive {
     u16 texNum;

@@ -2,7 +2,7 @@
 
 ASMUsed void RingGear_RingsFromAirBoxes(Player *player) {
     s32 newAir;
-    if (player->specialFlags.hasAny(ringGear)) {
+    if (player->specialFlags.hasAny(SpecialFlags::ringGear)) {
         newAir = player->currentAir + (player->gearStats[player->level].maxAir / 20); // 5 rings
         if (newAir > player->gearStats[player->level].maxAir) {
             newAir = player->gearStats[player->level].maxAir;

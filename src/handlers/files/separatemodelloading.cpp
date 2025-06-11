@@ -4,19 +4,17 @@
 #include "lib/stdlib.hpp"
 #include "packman_handlers.hpp"
 #include "riders/gamemode.hpp"
+#include "filehandler_dat.hpp"
+#include "ninjanext.hpp"
 
-#include <cstdio>
-#include <cstring>
+#include <format>
 
-ASMDefined u32 nnHookModelTextures(void *);
-ASMDefined void nnDrawObjectExt(void *, void *, void *, u32, u32);
-ASMDefined void nnDrawObjectLtd(void *, void *, void *, u32, u32);
 ASMDefined void func_8004EBCC(void *, void *, void *);
 ASMDefined void lbl_8004F4BC(u32, void *);// the u32 is actually a pointer but i can't use it as void*
-ASMDefined void *bss_BoardOnlyModelData[];
+ASMDefined NNS_Object *bss_BoardOnlyModelData[];
 ASMDefined void *bss_BoardOnlyTextures[];
-ASMDefined void *lbl_1000DF64[];
-ASMDefined u32 lbl_0014CD08(char[], u32, u32, u32, void *, void *, u32, u32, u32);
+ASMDefined void *gpsaUnitMtxPal_Player[];
+ASMDefined u32 lbl_0014CD08(const char*, u32, u32, u32, void *, void *, u32, u32, u32);
 ASMDefined void nnScaleModelBoneCustom(Matrix3x3F *, u32, f32 *);
 
 std::array<CSSModel, MaxPlayerCount> cssModel;
@@ -31,28 +29,33 @@ std::bitset<MaxPlayerCount> IsSeparateBoardModelActive;
  * @param player The player whose board model file name to get.
  * @return The file name of the board model.
  */
-[[nodiscard]] std::array<char, 8> GetBoardFilename(Player *player) {
-    const EnabledEXLoads exLoads = FetchEnabledEXLoadIDs(*player);
-    std::array<char, 8> filename;// NOLINT(readability-magic-numbers,cppcoreguidelines-pro-type-member-init)
+[[nodiscard]] std::string GetBoardFilename(const Player &player) {
+    std::string filename;// NOLINT(readability-magic-numbers,cppcoreguidelines-pro-type-member-init)
 
-    if(player->extremeGear == ExtremeGear::Default) {
-        // for default boards
-
-        const Character &character = Characters[player->character];
+    if(player.extremeGear == ExtremeGear::Default) { // for default boards
+        const Character &character = Characters[player.character];
 
         // default case
-        sprintf(filename.data(), "P%c00", character.model);
+		filename = std::format("P{}00", static_cast<char>(character.model));
+        //sprintf(filename.data(), "P%c00", character.model);
 
-        if (player->isRealPlayer()) {
-            switch (exLoads.characterExLoadID) {
-                case E10REXLoad:
-                    sprintf(filename.data(), "P%c000", character.model);
+        if (player.isRealPlayer()) {
+            switch (player.characterExload().exLoadID) {
+                case EXLoad::E10R:
+					filename = std::format("P{}000", static_cast<char>(character.model));
+                    //sprintf(filename.data(), "P%c000", character.model);
                     break;
-                case RealaEXLoad:
-                    sprintf(filename.data(), "EB0");
+                case EXLoad::Reala:
+                case EXLoad::Jackle: // SYB: Jackle uses Reala's Default
+					filename = "EB0";
+                    //sprintf(filename.data(), "EB0");
                     break;
-                case HatsuneMikuEXLoad:
-                    sprintf(filename.data(), "EB1");
+                case EXLoad::HatsuneMiku:
+					filename = "EB1";
+                    //sprintf(filename.data(), "EB1");
+                    break;
+                case EXLoad::E10Y:
+					filename = std::format("P{}001", static_cast<char>(character.model));
                     break;
                 default:
                     break;
@@ -61,46 +64,47 @@ std::bitset<MaxPlayerCount> IsSeparateBoardModelActive;
     } else {
         // for anything else
 
-        const Gear &gear = Gears[player->extremeGear];
+        const Gear &gear = Gears[player.extremeGear];
 
         // default case
-        sprintf(filename.data(), "PB%d", gear.model);
+		filename = std::format("PB{}", gear.model);
+        //sprintf(filename.data(), "PB%d", gear.model);
 
-        switch (player->character) {
-            case Storm:
-                if (player->getGearTypeIndependent() != Bike) { break; }
-                sprintf(filename.data(), "PB%dB", gear.model);
+        switch (player.character) {
+            case Character::Storm:
+                if (player.getGearTypeIndependent() != GearType::Bike) { break; }
+				filename = std::format("PB{}B", gear.model);
+                //sprintf(filename.data(), "PB%dB", gear.model);
                 break;
 
                 // SYB: This is custom. GEAR REPLICA
-            case Ulala ... E10R:
-            case SuperSonic:
-                switch (player->extremeGear) {
+            case Character::Ulala ... Character::E10R:
+            case Character::SuperSonic:
+                switch (player.extremeGear) {
                     using namespace ExtremeGear;
-                    case HeavyBike:
-                        sprintf(filename.data(), "PB20B");
-                        break;
                     case Darkness:
-                        sprintf(filename.data(), "PD00");
+						filename = "PD00";
+                        //sprintf(filename.data(), "PD00");
                         break;
-                    case ERider ... AirTank:
-                    case Destroyer ... SuperHangOn:
+                    case ERider ... SuperHangOn:
                     case Grinder ... Cannonball:
-                        // every bike and skate besides heavy bike and darkness
-                        sprintf(filename.data(), "RB%d", gear.model);
+                        // every bike and skate besides darkness
+						filename = std::format("RB{}", gear.model);
+                        //sprintf(filename.data(), "RB%d", gear.model);
                         break;
                     default:
                         break;
                 }
                 break;
-            case Eggman:
-                switch (player->extremeGear) {
+            case Character::Eggman:
+                switch (player.extremeGear) {
                     using namespace ExtremeGear;
                     case ERider ... SuperHangOn:
                         break;
                     default:
                         // anything but the bikes use eggman's replica gear, egg meister
-                        sprintf(filename.data(), "PE00");
+						filename = "PE00";
+                        //sprintf(filename.data(), "PE00");
                         break;
                 }
                 break;
@@ -110,15 +114,16 @@ std::bitset<MaxPlayerCount> IsSeparateBoardModelActive;
     }
 
     // gear ex loads
-    switch (exLoads.gearExLoadID) {
-        case StardustSpeederEXLoad:
-            if (player->character != Eggman) {
-                sprintf(filename.data(), "EB2");
-            }
-            break;
-        default:
-            break;
-    }
+    // switch (player.gearExload().exLoadID) {
+    //     case EXLoad::StardustSpeeder:
+    //         if (player.character != Character::Eggman) {
+	// 			filename = "EB2";
+    //             //sprintf(filename.data(), "EB2");
+    //         }
+    //         break;
+    //     default:
+    //         break;
+    // }
 
     return filename;
 }
@@ -130,8 +135,8 @@ std::bitset<MaxPlayerCount> IsSeparateBoardModelActive;
  * @param gearType The type of the currently selected Extreme Gear.
  * @return true if has a separate board model, otherwise false.
  */
-[[nodiscard]] inline bool PlayerHasSeparateBoardModel(Player *player, GearType gearType) {
-    return gearType != Skates && player->extremeGear != ExtremeGear::ChaosEmerald;
+[[nodiscard]] inline bool PlayerHasSeparateBoardModel(const Player &player, GearType gearType) {
+    return gearType != GearType::Skates && player.extremeGear != ExtremeGear::ChaosEmerald;
 }
 
 /**
@@ -140,9 +145,9 @@ std::bitset<MaxPlayerCount> IsSeparateBoardModelActive;
  * @param player The player to check.
  * @return true if separate Eggmeister textures are needed, otherwise false
  */
-[[nodiscard]] bool PlayerIsEggmeister(Player *player) {
-    return player->character == Eggman &&
-    (player->extremeGear < ExtremeGear::ERider || player->extremeGear > ExtremeGear::SuperHangOn);
+[[nodiscard]] bool PlayerIsEggmeister(const Player &player) {
+    return player.character == Character::Eggman &&
+    (player.extremeGear < ExtremeGear::ERider || player.extremeGear > ExtremeGear::SuperHangOn);
 }
 
 /**
@@ -151,12 +156,12 @@ std::bitset<MaxPlayerCount> IsSeparateBoardModelActive;
  * @param player The player to get the ID from.
  * @return Eggmeister specific ID
  */
-[[nodiscard]] u32 GetEggmeisterGearID(const Player *player) {
-    if (player->extremeGear >= ExtremeGear::ERider && player->extremeGear <= ExtremeGear::SuperHangOn) {
+[[nodiscard]] u32 GetEggmeisterGearID(const Player &player) {
+    if (player.extremeGear >= ExtremeGear::ERider && player.extremeGear <= ExtremeGear::SuperHangOn) {
         throw std::logic_error("Bike found in GetEggmeisterGearID!");
     }
 
-    u32 gearID = player->extremeGear;
+    u32 gearID = player.extremeGear;
     if (gearID > ExtremeGear::ERider) {
         gearID -= ExtremeGear::BIKE_COUNT; // subtract all bikes
     }
@@ -170,7 +175,7 @@ std::bitset<MaxPlayerCount> IsSeparateBoardModelActive;
  * @param player The Player to get the index from.
  * @return Index of the correct Eggmeister texture archive file
  */
-[[nodiscard]] u32 GetEggmeisterTextureArchiveIndex(const Player *player) {
+[[nodiscard]] u32 GetEggmeisterTextureArchiveIndex(const Player &player) {
     auto gearID = GetEggmeisterGearID(player);
     return gearID / Eggmeister::MAX_TEXTURE_COUNT_PER_ARCHIVE;
 }
@@ -181,7 +186,7 @@ std::bitset<MaxPlayerCount> IsSeparateBoardModelActive;
  * @param player The Player to get the index from.
  * @return Index of the gear's texture file in the texture archive
  */
-[[nodiscard]] u32 GetEggmeisterTextureIndexInArchive(const Player *player) {
+[[nodiscard]] u32 GetEggmeisterTextureIndexInArchive(const Player &player) {
     auto gearID = GetEggmeisterGearID(player);
     return gearID % Eggmeister::MAX_TEXTURE_COUNT_PER_ARCHIVE;
 }
@@ -192,15 +197,14 @@ std::bitset<MaxPlayerCount> IsSeparateBoardModelActive;
  * @param player The Player who's using Eggmeister.
  * @return The correct Eggmeister texture archive filename.
  */
-[[nodiscard]] std::array<char, 8> GetEggmeisterTextureArchiveFilename(const Player *player) {
-    auto exLoads = FetchEnabledEXLoadIDs(*player);
-    if (exLoads.isExloadEnabled() && exLoads.gearExLoadID == StardustSpeederEXLoad) {
-        return std::array<char, 8>{"PETX"};
+[[nodiscard]] std::string GetEggmeisterTextureArchiveFilename(const Player &player) {
+    if (player.extremeGear == ExtremeGear::GunGear) {
+        return "PETX";
     }
 
-    std::array<char, 8> filename;
-    sprintf(filename.data(), "PET%d", GetEggmeisterTextureArchiveIndex(player) + 1);
-    return filename;
+    //std::string filename;
+    //sprintf(filename.data(), "PET%d", GetEggmeisterTextureArchiveIndex(player) + 1);
+    return std::format("PET{}", GetEggmeisterTextureArchiveIndex(player) + 1);
 }
 
 /**
@@ -211,19 +215,27 @@ std::bitset<MaxPlayerCount> IsSeparateBoardModelActive;
  * @param gearType The current gear type.
  * @return A new gear type.
  */
-[[nodiscard]] inline GearType GetGearTypeCSSExceptions(Player *player, GearType gearType) {
-    switch(player->character) {
-        case Ulala:
-            if (gearType == Bike) {
-                gearType = Board;
+[[nodiscard]] inline GearType GetGearTypeCSSExceptions(const Player &player, GearType gearType) {
+    switch(player.extremeGear) {
+        case ExtremeGear::GunGear:
+            gearType = GearType::Board;
+            break;
+        default:
+            break;
+    }
+
+    switch(player.character) {
+        case Character::Ulala:
+            if (gearType == GearType::Bike) {
+                gearType = GearType::Board;
             }
             return gearType;
-        case E10G:
-        case E10R:
-        case SuperSonic:
-            return Board;
-        case Eggman:
-            return EggmanType;
+        case Character::E10G:
+        case Character::E10R:
+        case Character::SuperSonic:
+            return GearType::Board;
+        case Character::Eggman:
+            return GearType::EggmanType;
         default:
             return gearType;
     }
@@ -235,19 +247,19 @@ std::bitset<MaxPlayerCount> IsSeparateBoardModelActive;
  * @param player The player to dump a board model for.
  * @param index The player's index.
  */
-ASMUsed void DumpBoardModel(Player *player, const u32 index) {
-    const bool hasSeparateBoardModel = PlayerHasSeparateBoardModel(player, player->gearType);
-	IsSeparateBoardModelActive[player->index] = hasSeparateBoardModel;
+ASMUsed void DumpBoardModel(Player &player, const u32 index) {
+    const bool hasSeparateBoardModel = PlayerHasSeparateBoardModel(player, player.gearType);
+	IsSeparateBoardModelActive[player.index] = hasSeparateBoardModel;
 
     if (hasSeparateBoardModel) {
         const auto filename = GetBoardFilename(player);
-        const auto *file = DumpPackManFile(filename.data(), 0);
+        const auto *file = DumpPackManFile(filename.c_str());
         SetArchiveBinary(file, index, 0);
     }
 
-	if(player->character == TotalCharacterAmount) {
+	if(player.character == Character::Total) {
 		// for variable character, force it to shadow
-		player->character = Shadow;
+		player.character = Character::Shadow;
 	}
 }
 
@@ -257,21 +269,22 @@ ASMUsed void DumpBoardModel(Player *player, const u32 index) {
  * @param player The player to dump a board model for.
  * @param index The player's index.
  */
-ASMUsed void DumpBoardModelCSS(Player *player, const u32 index) {
-	const auto gearType = GetGearTypeCSSExceptions(player, player->getGearTypeIndependent());
+ASMUsed void DumpBoardModelCSS(const Player &player, const u32 index) {
+	const auto gearType = GetGearTypeCSSExceptions(player, player.getGearTypeIndependent());
     const bool hasSeparateBoardModel = PlayerHasSeparateBoardModel(player, gearType);
     IsSeparateBoardModelActive[index] = hasSeparateBoardModel;
-	static m2darray<char, MaxControllerCount, 8> CSS_BoardFilename;// Used to be ASMDefined, Should this be static?
 
-    cssModel[index].file = nullptr;
+	CSSModel &modelData = cssModel[index];
+	modelData.file = nullptr;
 
     if (!hasSeparateBoardModel) { return; }
+	static std::array<std::string, MaxControllerCount> BoardModelFilenames;// Used to be ASMDefined, Should this be static?
 
-    auto filename = GetBoardFilename(player);
-    std::copy(filename.begin(), filename.end(), CSS_BoardFilename[index].data());
+	BoardModelFilenames[index] = GetBoardFilename(player);
+    //auto filename = GetBoardFilename(player);
+    //std::copy(filename.begin(), filename.end(), BoardModelFilenames[index].data());
 
-    CSSModel &modelData = cssModel[index];
-    modelData.count = lbl_0014CD08(CSS_BoardFilename[index].data(), 1, 1, 0, &modelData.file, &modelData.status, 1, 1, index);
+    modelData.count = lbl_0014CD08(BoardModelFilenames[index].c_str(), 1, 1, 0, &modelData.file, &modelData.status, 1, 1, index);
 }
 
 constexpr std::array<unsigned char, 4> GearTypeChars = {
@@ -285,103 +298,118 @@ constexpr std::array<unsigned char, 4> GearTypeChars = {
  * @param index The player's index.
  * @param originalFilename The file that needed to be dumped per vanilla code. This is used because certain character models still follow old naming conventions.
  */
-ASMUsed void DumpCharacterModel(Player *player, const u32 index, char originalFilename[]) {
-    const bool hasSeparateBoardModel = PlayerHasSeparateBoardModel(player, player->gearType);
-	char *file;
+ASMUsed void DumpCharacterModel(const Player &player, const u32 index, char originalFilename[]) {
+    const bool hasSeparateBoardModel = PlayerHasSeparateBoardModel(player, player.gearType);
+	std::string filename;
 
-	if(player->isRealPlayer() && PlayerSkinSystemData[player->input->port].skinID != 0) {
-		char filename[8];
-		char *skinArchive;
-		sprintf(filename, "CSP%c", Characters[player->character].model);
-		skinArchive = DumpPackManFile(filename, 0);
+	if(player.isRealPlayer() && PlayerSkinSystemData[player.input->port].skinID != 0) {
+		//std::array<char, 8> filename;
+		filename = std::format("CSP{}", static_cast<char>(Characters[player.character].model));
+		//sprintf(filename, "CSP%c", Characters[player.character].model);
+		char *skinArchive = DumpPackManFile(filename.c_str());
 		SetArchiveBinary(skinArchive, index, 0);
 	}
 
-	if(hasSeparateBoardModel) {
-		// not skates
+	char *file = nullptr;
+	if(hasSeparateBoardModel) { // not skates
+		//std::array<char, 8> filename;
+		auto exLoadFileName = GetEXLoadCharacterModel(player, player.gearType);
 
-		std::array<char, 8> filename;
-		const char *exLoadFileName = GetEXLoadCharacterModel(player, player->gearType);
-
-		if(exLoadFileName != nullptr) {
-			sprintf(filename.data(), "%s", exLoadFileName);
+		if(exLoadFileName) {
+			filename = *exLoadFileName;
+			//sprintf(filename.data(), "%s", exLoadFileName);
 		} else {
-			sprintf(filename.data(), "P%cC%c", Characters[player->character].model, GearTypeChars[player->gearType]);
+			filename = std::format("P{}C{}", static_cast<char>(Characters[player.character].model), static_cast<char>(GearTypeChars[std::to_underlying(player.gearType)]));
+			//sprintf(filename.data(), "P%cC%c", Characters[player.character].model, GearTypeChars[player.gearType]);
 		}
 
-		file = DumpPackManFile(filename.data(), 0);
-	} else if(player->gearType == Skates) {
-		std::array<char, 8> filename;
-		const char *skateModel = GetEXLoadSkateModelStart(player);
+		file = DumpPackManFile(filename.c_str());
+	} else if(player.gearType == GearType::Skates) {
+		//std::array<char, 8> filename;
+		auto skateModel = GetEXLoadSkateModelStart(player);
 
-		if(skateModel != nullptr) {
-			const Gear &gear = Gears[player->extremeGear];
-			sprintf(filename.data(), "%s%d", skateModel, gear.model);
+		if(skateModel) {
+			const Gear &gear = Gears[player.extremeGear];
+			filename = std::format("{}{}", *skateModel, gear.model);
+			//sprintf(filename.data(), "%s%d", skateModel, gear.model);
 
-			file = DumpPackManFile(filename.data(), 0);
+			file = DumpPackManFile(filename.data());
 		} else {
-			file = DumpPackManFile(originalFilename, 0);
+			file = DumpPackManFile(originalFilename);
 		}
 	} else {
-		file = DumpPackManFile(originalFilename, 0);
+		file = DumpPackManFile(originalFilename);
 	}
 
 	SetArchiveBinary(file, index, 0);
 
     if (PlayerIsEggmeister(player)) {
-        SetArchiveBinary(DumpPackManFile(GetEggmeisterTextureArchiveFilename(player).data(), 0), index, 0);
+        SetArchiveBinary(DumpPackManFile(GetEggmeisterTextureArchiveFilename(player).c_str(), 0), index, 0);
     }
 }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuninitialized"
 
+constexpr auto bufferSize = 5;
 /**
  * Dumps a character model for a given player in the CSS, and sets it up to be rendered in the CSS.
  *
  * @param player The player to dump a character model for.
  * @param filename The file that needed to be dumped per vanilla code. This is used because certain character models still follow old naming conventions.
  */
-ASMUsed void SetupCharacterModelCSS(Player *player, char filename[]) {
-	static char CSS_SkinArchiveFilename[4][8];
-    static char CSS_EggmeisterTextures[4][8];
-
-    const auto gearType = GetGearTypeCSSExceptions(player, player->getGearTypeIndependent());
-    const bool hasSeparateBoardModel = PlayerHasSeparateBoardModel(player, gearType);
-
-    const auto &index = player->input->port;
+ASMUsed void SetupCharacterModelCSS(const Player &player, char out[bufferSize]) {
+    const auto &index = player.input->port;
     cssSkinArchive[index].file = nullptr;
     cssEggmeisterTextures[index].file = nullptr;
 
-	if(hasSeparateBoardModel) {
-		// not skates
-
-		const char *exLoadFileName = GetEXLoadCharacterModel(player, gearType);
-		if(exLoadFileName != nullptr) {
-			sprintf(filename, "%s", exLoadFileName);
+	const auto gearType = GetGearTypeCSSExceptions(player, player.getGearTypeIndependent());
+	const bool hasSeparateBoardModel = PlayerHasSeparateBoardModel(player, gearType);
+	std::string filename;
+	if(hasSeparateBoardModel) { // not skates
+		auto exLoadFileName = GetEXLoadCharacterModel(player, gearType);
+		if(exLoadFileName) {
+			filename = *exLoadFileName;
+			//sprintf(filename, "%s", exLoadFileName);
 		} else {
-			sprintf(filename, "P%cC%c", Characters[player->character].model, GearTypeChars[gearType]);
+			filename = std::format("P{}C{}", static_cast<char>(Characters[player.character].model), static_cast<char>(GearTypeChars[std::to_underlying(gearType)]));
+			//sprintf(filename, "P%cC%c", Characters[player.character].model, GearTypeChars[gearType]);
 		}
-	} else if(gearType == Skates) {
-		const char *skateModel = GetEXLoadSkateModelStart(player);
+	} else if(gearType == GearType::Skates) {
+		auto skateModel = GetEXLoadSkateModelStart(player);
 
-		if(skateModel != nullptr) {
-			const Gear &gear = Gears[player->extremeGear];
-			sprintf(filename, "%s%d", skateModel, gear.model);
+		if(skateModel) {
+			const Gear &gear = Gears[player.extremeGear];
+			filename = std::format("{}{}", *skateModel, gear.model);
+			//sprintf(filename, "%s%d", skateModel, gear.model);
 		}
 	}
 
-	if(PlayerSkinSystemData[player->input->port].skinID != 0) {
+	if(!filename.empty()){
+		auto bytesWritten = filename.copy(out, bufferSize);
+		out[bytesWritten] = '\0'; // Ensure the string is null-terminated
+	}
+
+
+	if(PlayerSkinSystemData[player.input->port].skinID != 0) {
+		static std::array<std::string, MaxControllerCount> CSS_SkinArchiveFilename;
+
+		auto &SkinArchiveFilename = CSS_SkinArchiveFilename[index];
 		CSSModel &skinData = cssSkinArchive[index];
-		sprintf(CSS_SkinArchiveFilename[index], "CSP%c", Characters[player->character].model);
-		skinData.count = lbl_0014CD08(CSS_SkinArchiveFilename[index], 1, 1, 0, &skinData.file, &skinData.status, 1, 1, index);
+		SkinArchiveFilename = std::format("CSP{}", static_cast<char>(Characters[player.character].model));
+		//sprintf(CSS_SkinArchiveFilename[index], "CSP%c", Characters[player.character].model);
+		skinData.count = lbl_0014CD08(SkinArchiveFilename.c_str(), 1, 1, 0, &skinData.file, &skinData.status, 1, 1, index);
 	}
 
     if (PlayerIsEggmeister(player)) {
+		static std::array<std::string, MaxControllerCount> CSS_EggmeisterTextures;
+
+		auto &EggmeisterTexture = CSS_EggmeisterTextures[index];
         CSSModel &eggData = cssEggmeisterTextures[index];
-        auto eggmeisterTextureFilename = GetEggmeisterTextureArchiveFilename(player);
-        std::memcpy(CSS_EggmeisterTextures[index], eggmeisterTextureFilename.data(), eggmeisterTextureFilename.size());
-        eggData.count = lbl_0014CD08(CSS_EggmeisterTextures[index], 1, 1, 0, &eggData.file, &eggData.status, 1, 1, index);
+        EggmeisterTexture = GetEggmeisterTextureArchiveFilename(player);
+
+        //std::memcpy(EggmeisterTexture.c_str(), eggmeisterTextureFilename.data(), eggmeisterTextureFilename.size());
+        eggData.count = lbl_0014CD08(EggmeisterTexture.c_str(), 1, 1, 0, &eggData.file, &eggData.status, 1, 1, index);
     }
 }
 #pragma GCC diagnostic pop
@@ -395,14 +423,15 @@ ASMUsed void SetupCharacterModelCSS(Player *player, char filename[]) {
  */
 ASMUsed void ReloadEggmeisterTextures(const bool forceSkip) {
     // check for restart
-    if (RaceExitMethod != 2 || forceSkip) { return; }
-    
+    if (RaceExitMethod != ExitMethod::Retry || forceSkip) { return; }
+
     for (auto &player : getCurrentPlayerList()) {
         // just dump the texture file again if necessary, packman handler will take care of the rest
-        if (PlayerIsEggmeister(&player)) {
-            std::array<char, 8> filename;
-            sprintf(filename.data(), "PET%d", GetEggmeisterTextureArchiveIndex(&player) + 1);
-            SetArchiveBinary(DumpPackManFile(filename.data(), 0), player.index, 0);
+        if (PlayerIsEggmeister(player)) {
+            //std::array<char, 8> filename;
+            //sprintf(filename.data(), "PET%d", GetEggmeisterTextureArchiveIndex(player) + 1);
+        	auto filename = GetEggmeisterTextureArchiveFilename(player);
+            SetArchiveBinary(DumpPackManFile(filename.c_str()), player.index, 0);
         }
     }
 }
@@ -413,10 +442,10 @@ ASMUsed void ReloadEggmeisterTextures(const bool forceSkip) {
  * @param index The player index, whose assets need to be freed.
  */
 void FreeEggmeisterHeap(const u32 index) {
-    for (u32 i = 0; i < 3; i++) {
-        if (EggmeisterHeap[index][i] != nullptr) {
-            free_Hi(EggmeisterHeap[index][i]);
-            EggmeisterHeap[index][i] = nullptr;
+    for (auto &ptr : EggmeisterHeap[index]) {
+        if (ptr != nullptr) {
+            free_Hi(ptr);
+            ptr = nullptr;
         }
     }
 }
@@ -425,7 +454,11 @@ void FreeEggmeisterHeap(const u32 index) {
  * Clears all Eggmeister heap pointers.
  */
 ASMUsed void ClearEggmeisterHeapAll() {
-    TRK_memset(EggmeisterHeap.data(), 0, sizeof(EggmeisterHeap));
+    //memset(EggmeisterHeap.data(), 0, sizeof(EggmeisterHeap));
+	using InnerArrayT = decltype(EggmeisterHeap[0]);
+	std::ranges::for_each(EggmeisterHeap, [](InnerArrayT &arg){
+		std::ranges::fill(arg, nullptr);
+	});
 }
 
 /**
@@ -435,18 +468,17 @@ ASMUsed void ClearEggmeisterHeapAll() {
  */
 ASMUsed void FreeCSSAssets(const u32 index) {
     const CSSModel &eggData = cssEggmeisterTextures[index];
-    const CSSModel &skinData = cssSkinArchive[index];
-    const CSSModel &modelData = cssModel[index];
-
     if (eggData.file != nullptr) {
         // the eggmeister texture archive itself is already freed, just need to free the other files
         FreeEggmeisterHeap(index);
     }
 
+	const CSSModel &skinData = cssSkinArchive[index];
     if (skinData.file != nullptr) {
         CSS_FreeHigh(skinData.count);
     }
 
+	const CSSModel &modelData = cssModel[index];
     if (modelData.file != nullptr) {
         CSS_FreeHigh(modelData.count);
     }
@@ -459,15 +491,15 @@ ASMUsed void FreeCSSAssets(const u32 index) {
  * @param objectDataInfo Matrix list for every bone. This should be derived from the player's matrix list, to ensure the board is animated properly.
  * @param boneVisibilityStatus The animated NodeHide keyframe data.
  */
-void RenderBoardMesh(Player *player, void *objectDataInfo, void *boneVisibilityStatus) {
-	const u32 mirrorFlag = static_cast<const u32>(((player->unkBAC & 0x100) ? 1 : 0) * 0x40);// NOLINT(readability-implicit-bool-conversion)
-	nnHookModelTextures(bss_BoardOnlyTextures[player->index]);
+void RenderBoardMesh(const Player &player, void *objectDataInfo, void *boneVisibilityStatus) {
+	const u32 mirrorFlag = static_cast<const u32>(((player.unkBAC & 0x100) ? 1 : 0) * 0x40);// NOLINT(readability-implicit-bool-conversion)
+	nnSetTextureList(bss_BoardOnlyTextures[player.index]);
 
 	if(static_cast<bool>(mirrorFlag)) {
-		nnDrawObjectExt(bss_BoardOnlyModelData[player->index], objectDataInfo, boneVisibilityStatus, 0x80000000,
+		nnDrawObjectExt(bss_BoardOnlyModelData[player.index], objectDataInfo, boneVisibilityStatus, 0x80000000,
 						mirrorFlag);
 	} else {
-		nnDrawObjectLtd(bss_BoardOnlyModelData[player->index], objectDataInfo, boneVisibilityStatus,
+		nnDrawObjectLtd(bss_BoardOnlyModelData[player.index], objectDataInfo, boneVisibilityStatus,
 						0x80000000, mirrorFlag);
 	}
 }
@@ -479,28 +511,28 @@ void RenderBoardMesh(Player *player, void *objectDataInfo, void *boneVisibilityS
  * @param objectDataInfo Matrix list for every bone. This should be derived from the player's matrix list, to ensure the board is animated properly.
  * @param boneVisibilityStatus The animated NodeHide keyframe data.
  */
-void RenderBoardMeshTimeTrial(Player *player, void *objectDataInfo, void *boneVisibilityStatus) {
-	nnHookModelTextures(bss_BoardOnlyTextures[player->index]);
+void RenderBoardMeshTimeTrial(const Player &player, void *objectDataInfo, void *boneVisibilityStatus) {
+	nnSetTextureList(bss_BoardOnlyTextures[player.index]);
 
-	nnDrawObjectExt(bss_BoardOnlyModelData[player->index], objectDataInfo, boneVisibilityStatus, 0x80000000,
+	nnDrawObjectExt(bss_BoardOnlyModelData[player.index], objectDataInfo, boneVisibilityStatus, 0x80000000,
 					0x02800400);
 }
 
 ASMUsed void
-RenderBoardModelTimeTrial(Player *player, void *objectDataInfo, void *boneVisibilityStatus, void *weightVertPtr,
+RenderBoardModelTimeTrial(const Player &player, void *objectDataInfo, void *boneVisibilityStatus, void *weightVertPtr,
 						  void *otherBoneData) {
-	if(IsSeparateBoardModelActive[player->index]) {
-		func_8004EBCC(weightVertPtr, bss_BoardOnlyModelData[player->index], lbl_1000DF64[player->index]);
+	if(IsSeparateBoardModelActive[player.index]) {
+		func_8004EBCC(weightVertPtr, bss_BoardOnlyModelData[player.index], gpsaUnitMtxPal_Player[player.index]);
 		lbl_8004F4BC(*static_cast<u32 *>(weightVertPtr), otherBoneData);
 
 		RenderBoardMeshTimeTrial(player, objectDataInfo, boneVisibilityStatus);
 	}
 }
 
-ASMUsed void RenderBoardModel(Player *player, void *objectDataInfo, void *boneVisibilityStatus, u32 *weightVertPtr,
+ASMUsed void RenderBoardModel(const Player &player, void *objectDataInfo, void *boneVisibilityStatus, u32 *weightVertPtr,
 							  void *otherBoneData) {
-	if(IsSeparateBoardModelActive[player->index]) {
-		func_8004EBCC(weightVertPtr, bss_BoardOnlyModelData[player->index], lbl_1000DF64[player->index]);
+	if(IsSeparateBoardModelActive[player.index]) {
+		func_8004EBCC(weightVertPtr, bss_BoardOnlyModelData[player.index], gpsaUnitMtxPal_Player[player.index]);
 		lbl_8004F4BC(*weightVertPtr, otherBoneData);
 
 		RenderBoardMesh(player, objectDataInfo, boneVisibilityStatus);
@@ -508,10 +540,10 @@ ASMUsed void RenderBoardModel(Player *player, void *objectDataInfo, void *boneVi
 }
 
 ASMUsed void
-RenderBoardModelMultiplayer(Player *player, void *objectDataInfo, void *boneVisibilityStatus, u32 *weightVertPtr,
+RenderBoardModelMultiplayer(const Player &player, void *objectDataInfo, void *boneVisibilityStatus, u32 *weightVertPtr,
 							void *otherBoneData, u32 *someData) {
-	if(IsSeparateBoardModelActive[player->index]) {
-		func_8004EBCC(weightVertPtr, bss_BoardOnlyModelData[player->index], lbl_1000DF64[player->index]);
+	if(IsSeparateBoardModelActive[player.index]) {
+		func_8004EBCC(weightVertPtr, bss_BoardOnlyModelData[player.index], gpsaUnitMtxPal_Player[player.index]);
 		*someData ^= 2;// fixes vertex weights on other players' screen
 		lbl_8004F4BC(*weightVertPtr, otherBoneData);
 
@@ -519,19 +551,19 @@ RenderBoardModelMultiplayer(Player *player, void *objectDataInfo, void *boneVisi
 	}
 }
 
-ASMUsed void ScaleBoardModel(Player *player, Matrix3x3F *boneMatrices) {
+ASMUsed void ScaleBoardModel(const Player &player, Matrix3x3F *boneMatrices) {
 	// scales certain characters boards appropriately to their model size
 	// index 2 is the extreme gear bone in the matrices
 	//u32 gearType;
-	//if(player->extremeGear < ERider){
+	//if(player.extremeGear < ERider){
 	//	gearType = 0;
-	//}else if(player->extremeGear < Darkness){
+	//}else if(player.extremeGear < Darkness){
 	//	gearType = 2;
 	//}else{
 	//	gearType = 1;
 	//}
 
-	if(player->character == Storm && player->gearType == Bike) {
+	if(player.character == Character::Storm && player.gearType == GearType::Bike) {
 		f32 scale = 1.25F;// NOLINT(readability-magic-numbers)
 		// scale in all axis
 		nnScaleModelBoneCustom(boneMatrices + 2, 0, &scale);

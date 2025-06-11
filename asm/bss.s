@@ -47,38 +47,38 @@ lbl_801B2E98:
 .global lbl_801B2F98
 lbl_801B2F98:
 	.skip 0x148
-.global lbl_801B30E0
-lbl_801B30E0:
+.global DriveInfo
+DriveInfo:
 	.skip 0x50
-.global lbl_801B3130
-lbl_801B3130:
+.global __OSRebootParams
+__OSRebootParams:
 	.skip 0x20
-.global lbl_801B3150
-lbl_801B3150:
+.global __OSErrorTable
+__OSErrorTable:
 	.skip 0x50
-.global lbl_801B31A0
-lbl_801B31A0:
+.global Scb
+Scb:
 	.skip 0x58
-.global lbl_801B31F8
-lbl_801B31F8:
+.global RunQueue
+RunQueue:
 	.skip 0x9F8
-.global lbl_801B3BF0
-lbl_801B3BF0:
+.global DVD_CommandList
+DVD_CommandList:
 	.skip 0x68
-.global lbl_801B3C58
-lbl_801B3C58:
+.global DVD_AlarmForTimeout
+DVD_AlarmForTimeout:
 	.skip 0x28
-.global lbl_801B3C80
-lbl_801B3C80:
+.global DVD_AlarmForBreak
+DVD_AlarmForBreak:
 	.skip 0x40
-.global lbl_801B3CC0
-lbl_801B3CC0:
+.global DVD_BB2
+DVD_BB2:
 	.skip 0x20
 .global lbl_801B3CE0
 lbl_801B3CE0:
 	.skip 0x20
-.global lbl_801B3D00
-lbl_801B3D00:
+.global DVD_DummyCommandBlock
+DVD_DummyCommandBlock:
 	.skip 0x30
 .global lbl_801B3D30
 lbl_801B3D30:
@@ -170,8 +170,8 @@ lbl_801CFD28:
 .global lbl_801CFD68
 lbl_801CFD68:
 	.skip 0x60
-.global lbl_801CFDC8
-lbl_801CFDC8:
+.global gTRKEventQueue
+gTRKEventQueue:
 	.skip 0x28
 .global lbl_801CFDF0
 lbl_801CFDF0:

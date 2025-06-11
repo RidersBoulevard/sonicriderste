@@ -27,29 +27,30 @@
  * @tparam T enum to wrap
  * @remarks Relies on type's operators so ENUM_FLAG_OPERATORS is still needed
  */
-template<typename T>
+template<typename T> requires std::is_scoped_enum_v<T> || std::is_enum_v<T>
 class Flag{
 	friend class reference;
+	static constexpr T zero = T{0};
 	T value;
 
 public:
 	/**
 	 * Checks to see if this flag has any of the listed flags set
 	 * @param flags flags to check for
-	 * @return true if it contains any of the flags
+	 * @return The result of ANDing all of the flags together
 	 */
-	[[nodiscard]] constexpr bool hasAny(const std::convertible_to<T> auto &flags) const{
-		return (value & static_cast<T>(flags)) != T(0);
+	[[nodiscard]] constexpr Flag hasAny(const std::convertible_to<T> auto &flags) const{
+		return value & static_cast<T>(flags);
 	}
-	[[nodiscard]] constexpr bool hasAny(const std::convertible_to<T> auto& ...flags) const{
-		T otherFlags = static_cast<T>((0 | ... | flags));
+	[[nodiscard]] constexpr Flag hasAny(const std::convertible_to<T> auto& ...flags) const{
+		T otherFlags = static_cast<T>((zero | ... | flags));
 		return hasAny(otherFlags);
 	}
-	[[nodiscard]] constexpr bool hasAny(const Flag<T> &flags) const{
+	[[nodiscard]] constexpr Flag hasAny(const Flag<T> &flags) const{
 		return hasAny(flags.value);
 	}
 	template<typename O> requires std::convertible_to<O, T>
-	[[nodiscard]] constexpr bool hasAny(const Flag<O> &flags) const{
+	[[nodiscard]] constexpr Flag hasAny(const Flag<O> &flags) const{
 		return hasAny(static_cast<T>(flags.value));
 	}
 
@@ -59,10 +60,10 @@ public:
 	 * @return true if it contains all of the flags
 	 */
 	[[nodiscard]] constexpr bool hasAll(const std::convertible_to<T> auto &flags) const{
-		return (value & static_cast<T>(flags)) == static_cast<T>(flags);
+		return hasAny(flags) == static_cast<T>(flags);
 	}
 	[[nodiscard]] constexpr bool hasAll(const std::convertible_to<T> auto& ...flags) const{
-		T otherFlags = static_cast<T>((0 | ... | flags));
+		T otherFlags = static_cast<T>((zero | ... | flags));
 		return hasAll(otherFlags);
 	}
 	[[nodiscard]] constexpr bool hasAll(const Flag<T> &flags) const{
@@ -119,6 +120,7 @@ public:
 	[[nodiscard]] constexpr Flag<T> operator>> (const std::convertible_to<T> auto &other) const{ return static_cast<T>(value >> static_cast<T>(other)); }
 	constexpr operator T&() { return value; }
 	constexpr operator T() const { return value; }
+	constexpr operator bool() const { return value != zero;}
 	constexpr Flag(T val) : value(val){}; // NOLINT(google-explicit-constructor)
 	[[deprecated("Please use static_cast instead of implicitly casting")]]
 	consteval Flag(int val) requires (!std::is_same_v<T, int>) : Flag(static_cast<T>(val)){}; // NOLINT(google-explicit-constructor)
@@ -138,7 +140,7 @@ public:
 		T bitReferenced;
 
 		constexpr reference(Flag<T> &_flag, T bit) : flag(_flag), bitReferenced(bit){}
-		constexpr Flag<T> toBit(bool boolean){
+		constexpr Flag<T> toBit(const bool boolean){
 			Flag<T> newFlag = static_cast<T>(boolean ? 1 : 0);
 			newFlag <<= bitReferenced;
 			return newFlag;

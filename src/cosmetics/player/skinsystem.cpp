@@ -13,10 +13,10 @@ std::array<SkinSystemData, MaxPlayerCount> PlayerSkinSystemData;
  * @return The type of control the player pressed. Returns ::NoneSkinSystemType if no designated button was pressed.
  */
 SkinSystemTypes CheckSkinSystemControls(const Player &player) {
-	if(player.input->toggleFaceButtons.hasAny(YButton)) {
+	if(player.input->toggleFaceButtons.hasAny(Buttons::Y)) {
 		return SkinSystemTypeForwards;
 	}
-	if(player.input->toggleFaceButtons.hasAny(XButton)) {
+	if(player.input->toggleFaceButtons.hasAny(Buttons::X)) {
 		return SkinSystemTypeBackwards;
 	}
 	return NoneSkinSystemType;
@@ -129,7 +129,7 @@ ASMUsed u32 FetchCurrentTextureArchiveIndex(const Player &player) {
  * @note Only use this function when you are certain a player has a skin applied.
  */
 ASMUsed void* FetchCurrentSkinTextures(const Player &player) {
-    u8 controllerPort = player.input->port;
+    const auto &controllerPort = player.input->port;
     const SkinSystemInfo *info = &PlayerSkinSystemInfo[PlayerSkinSystemData[controllerPort].skinID];
     return CharacterSkinTextures[player.character][info->textureArchiveIndex];
 }
@@ -147,5 +147,6 @@ ASMUsed void UpdateSkinSystemData(const Player &player) {
  * Clears PlayerSkinSystemData whenever necessary.
  */
 ASMUsed void ClearSkinSystemData() {
-    TRK_memset(PlayerSkinSystemData.data(), 0, sizeof(PlayerSkinSystemData));
+    //memset(PlayerSkinSystemData.data(), 0, sizeof(PlayerSkinSystemData));
+	std::ranges::fill(PlayerSkinSystemData, SkinSystemData{});
 }

@@ -3,6 +3,6 @@
 void* tex_HotswapTextures;
 
 ASMUsed void MainMenuFileHandler() {
-    tex_HotswapTextures = DumpFile("POT", 1);
+    tex_HotswapTextures = DumpFile("POT");
     // LoadDATFileDynamic("MSFX.DAT");
 }

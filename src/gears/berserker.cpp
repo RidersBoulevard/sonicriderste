@@ -44,20 +44,20 @@ void Player_BerserkerStatResetTornado(Player *player) {
 
 		for(u32 i = 0; i < 3; i++) {
 			player->gearStats[i].boostCost = player->gearptr->levelStats[i].boostCost;
-			if(player->characterArchetype != BoostArchetype) {
+			if(player->characterArchetype != CharacterArchetype::Boost) {
 				player->gearStats[i].boostSpeed = player->gearptr->levelStats[i].boostSpeed;
 			}
 
 			player->gearStats[i].topSpeed -= multiplier * pSpeed(3.0f);// +3 top speed
 		}
 
-		if(player->characterArchetype == BoostArchetype) {
+		if(player->characterArchetype == CharacterArchetype::Boost) {
 			player->gearStats[0].boostSpeed = pSpeed(203.0f);
 			player->gearStats[1].boostSpeed = pSpeed(234.0f);
 			player->gearStats[2].boostSpeed = pSpeed(255.0f);
 		}
 
-		if(player->characterArchetype == BoostArchetype) {
+		if(player->characterArchetype == CharacterArchetype::Boost) {
 			player->gearStats[0].boostSpeed = pSpeed(203.0f);
 			player->gearStats[1].boostSpeed = pSpeed(234.0f);
 			player->gearStats[2].boostSpeed = pSpeed(255.0f);

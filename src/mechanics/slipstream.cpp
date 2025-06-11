@@ -43,7 +43,7 @@ void lbl_Slipstream(Player *player) { // NOLINT(readability-function-cognitive-c
 	const u32 gamemode = CurrentGameMode;
 	if(gamemode == FreeRace || gamemode == WorldGrandPrix || gamemode == StoryMode) {
 		player->slipstream = FALSE;
-		if(player->placement == 0 || player->state != Cruise || player->statusEffectFlags.hasAny(BallAndChainStatus)) { return; }
+		if(player->placement == 0 || player->state != PlayerState::Cruise || player->statusEffectFlags.hasAny(PlayerStatus::BallAndChainStatus)) { return; }
 
 		for(auto &player2: players) {
 			if(player->index == player2.index) { continue; }
@@ -81,7 +81,7 @@ void lbl_Slipstream(Player *player) { // NOLINT(readability-function-cognitive-c
 			if(angle > 0.3F || alignment > 0.35F) { continue; } // NOLINT(readability-magic-numbers)
 			player->slipstream = TRUE;
 
-			if(player->character == Emerl) {
+			if(player->character == Character::Emerl) {
 				GizoidReplicationInfo *grInfo = &PlayerGizoidReplication[player->index];
 				if(grInfo->slipstreamPlayer != nullptr) {
 					if(player2.placement < grInfo->slipstreamPlayer->placement) {
@@ -95,7 +95,7 @@ void lbl_Slipstream(Player *player) { // NOLINT(readability-function-cognitive-c
 			lbl_SlipstreamParticles(player->index);
 
 			if(player->speed == 0.0F) { continue; }// if player's speed is 0
-			if(!player->movementFlags.hasAny(drifting) && player->movementFlags.hasAny(braking)) { continue; }
+			if(!player->movementFlags.hasAny(MovementFlags::drifting) && player->movementFlags.hasAny(MovementFlags::braking)) { continue; }
 			// if (player->speed > data[4]) // 200 speed
 			vf32 speedGainAbove200 = 0.00262963F;   // Todo: Are these two supposed to be set by something?
 			vf32 speedGainUnder200 = 0.001314815F;

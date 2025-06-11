@@ -8,10 +8,10 @@ constexpr std::array AdvantageF_BoostSpeeds = {pSpeed(200.0f), pSpeed(210.0f), p
 void Player_AdvantageF(Player *player) {
 	// if(player->movementFlags.hasAny(0x0400)) { return; }
 	// Checks current speed and adjusts boost speed and cost accordingly. Has boost archetype support.
-	if(player->extremeGear != ExtremeGear::AdvantageF || FetchEnabledEXLoadIDs(*player).gearExLoadID == TheProfessionalEXLoad) {
+	if(player->extremeGear != ExtremeGear::AdvantageF || player->gearExload().exLoadID == EXLoad::TheProfessional) {
 		return;
 	}
-	player->specialFlags |= (ringGear | noSpeedLossChargingJump | iceImmunity);
+	player->specialFlags |= (SpecialFlags::ringGear | SpecialFlags::noSpeedLossChargingJump | SpecialFlags::iceImmunity);
 
 	f32 boostSpeed;
 	if(player->rings <= 9) {
@@ -29,25 +29,25 @@ void Player_AdvantageF(Player *player) {
 	} else {//if (player->rings <= 100)
 		boostSpeed = AdvantageF_BoostSpeeds[6];
 	}
-	if(player->characterArchetype == BoostArchetype) {
+	if(player->characterArchetype == CharacterArchetype::Boost) {
 		boostSpeed += BoostArchetypeBoostSpeeds[player->level];
 	}
 
 	player->gearptr->levelStats[player->level].boostSpeed = boostSpeed;
-	if (player->movementFlags & boosting) return;
+	if (player->movementFlags.hasAny(MovementFlags::boosting)) { return; }
 
 	player->gearStats[player->level].boostSpeed = boostSpeed;
 }
 
 void Player_TheProfessional(Player *player) {
-	if(FetchEnabledEXLoadIDs(*player).gearExLoadID != TheProfessionalEXLoad) { return; }
+	if(player->gearExload().exLoadID != EXLoad::TheProfessional) { return; }
 
-	player->specialFlags &= ~fiftyPercentAir;
+	player->specialFlags &= ~SpecialFlags::fiftyPercentAir;
 	player->typeAttributes = Type::None;
-	if(player->state == StartLine) {
+	if(player->state == PlayerState::StartLine) {
 		player->currentAir = player->gearStats[player->level].maxAir;
 	}
-	player->specialFlags |= (alwaysOnIce | noSpeedLossChargingJump | legendEffect);
+	player->specialFlags |= (SpecialFlags::alwaysOnIce | SpecialFlags::noSpeedLossChargingJump | SpecialFlags::legendEffect);
 	player->gearStats[0].airDrain = 0x00000010;
 	player->gearStats[1].airDrain = 0x00000010;
 	player->gearStats[2].airDrain = 0x00000010;

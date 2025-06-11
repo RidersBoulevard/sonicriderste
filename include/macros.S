@@ -14,6 +14,7 @@ BSS section:
 	.bss:	0x00000000	0x80125E00	0x8021CFA4
 Entry Point: 0x80003154
 */
+#include "shared-definitions.h"
 
 /* https://sourceware.org/binutils/docs/as/Symbol-Names.html under "Local Labels" */
 /* local label definitions */

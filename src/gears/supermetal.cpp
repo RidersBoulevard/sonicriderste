@@ -8,35 +8,35 @@ ASMDefined void lbl_Player_BoostEndFunction(Player *);
 
 constexpr GearLevelStats SuperMetal_SuperStats = {
         100000,    // max air
-        0x10,      // air drain
+        0x14,      // air drain
         200,       // drift cost
-        0x61A8,    // boost cost
+        0x7530,    // boost cost
         0x61A8,    // tornado cost
-        pSpeed(0), // drift dash speed, unused
-        pSpeed(250)// boost speed
+        pSpeed(100), // drift dash speed
+        pSpeed(245)// boost speed
 };
 
 constexpr GearLevelStats SuperMetal_NonSuperStats = {
         100000,    // max air
-        0x10,      // air drain
+        0x14,      // air drain
         200,       // drift cost
-        0x61A8,    // boost cost
+        0x7530,    // boost cost
         0x61A8,    // tornado cost
-        pSpeed(0), // drift dash speed, unused
+        pSpeed(100), // drift dash speed
         pSpeed(235)// boost speed
 };
 
 inline void SuperMetal_UpdatePlayerStats(Player &player, const GearLevelStats &stats, f32 topSpeed) {
 	player.gearStats[0].updateGearLevelStats(stats);
 	player.gearStats[0].topSpeed = topSpeed;
-	if(player.state == Cruise) { player.speedCap = topSpeed; }
+	if(player.state == PlayerState::Cruise) { player.speedCap = topSpeed; }
 }
 
 inline void SuperMetal_PlayTransformationSound(const Player &player){
 	if(!player.aiControl) { PlayAudioFromDAT(Sound::SFX::SuperTransformation); }// super transformation sfx
 	bool scheck = false;
 	for(const auto &curPlayer: getCurrentPlayerList()) {
-		if(curPlayer.character == Sonic) {
+		if(curPlayer.character == Character::Sonic) {
 			scheck = true;
 			break;
 		}
@@ -52,31 +52,31 @@ inline void SuperMetal_PlayTransformationSound(const Player &player){
 
 void Player_SuperMetalTransformation(Player &player) {
 	if(player.playerType) { return; }
-	if(!isSuperCharacter(player, MetalSonic)) { return; }
-	if(player.flags.hasAny(InAPit)) { return; }// if in a pit
+	if(!isSuperCharacter(player, Character::MetalSonic)) { return; }
+	if(player.flags.hasAny(PlayerFlags::InAPit)) { return; }// if in a pit
 
 	if(player.rings >= 50 && player.superFormState == 0) {
 		// transform
 		player.superFormState = 1;
-		player.specialFlags ^= (berserkerEffect);
-		player.typeAttributes ^= (Type::Fly);
-		constexpr RGBA SuperNeoMetalHUDColor = 0xFFC400FF;
+		// player.specialFlags ^= SpecialFlags::berserkerEffect;
+		player.typeAttributes ^= Type::Fly;
+		constexpr RGBA32 SuperNeoMetalHUDColor = 0xFFC400FF;
 		SuperNeoMetalHUDColors[player.index] = SuperNeoMetalHUDColor;
-		SuperMetal_UpdatePlayerStats(player, SuperMetal_SuperStats, pSpeed(245));
+		SuperMetal_UpdatePlayerStats(player, SuperMetal_SuperStats, pSpeed(230));
 		SuperMetal_PlayTransformationSound(player);
-		if(player.movementFlags.hasAny(boosting)) { lbl_Player_BoostEndFunction(&player); }
+		if(player.movementFlags.hasAny(MovementFlags::boosting)) { lbl_Player_BoostEndFunction(&player); }
 	}
 	if(player.rings == 0 && player.superFormState != 0) {
 		// untransform
 		player.superFormState = 0;
 		player.SuperMetalFrameCounter = 0;
-		player.specialFlags ^= (berserkerEffect);
-		player.typeAttributes ^= (Type::Fly);
-		constexpr RGBA NeoMetalHUDColor = 0x1239B8FF;
+		// player.specialFlags ^= SpecialFlags::berserkerEffect;
+		player.typeAttributes ^= Type::Fly;
+		constexpr RGBA32 NeoMetalHUDColor = 0x1239B8FF;
 		SuperNeoMetalHUDColors[player.index] = NeoMetalHUDColor;
-		SuperMetal_UpdatePlayerStats(player, SuperMetal_NonSuperStats, pSpeed(200));
+		SuperMetal_UpdatePlayerStats(player, SuperMetal_NonSuperStats, pSpeed(190));
 	}
-	if((player.state >= Cruise && player.state <= Jump) || player.state == Run) {// todo: check if this is correct
+	if((player.state >= PlayerState::Cruise && player.state <= PlayerState::Jump) || player.state == PlayerState::Run) {// todo: check if this is correct
 		if(player.superFormState != 0) {
 			if(player.SuperMetalFrameCounter % 6 == 0) {
 				player.rings -= 1;

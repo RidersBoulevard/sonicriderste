@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
+set(CMAKE_HOST_WIN32 0) # Tells dkp to build anyway
+
 project(SonicRidersTE CXX ASM)
 
 set(CXX_STANDARD 23)
@@ -12,6 +14,7 @@ set(WARNING_FLAGS
 		-Wctor-dtor-privacy # Warn when all constructors and destructors are private.
 		-Wdisabled-optimization # Warn when an optimization pass is disabled.
 		-Wformat=2  # Warn about printf/scanf/strftime/strfmon format string anomalies.
+		-Wformat-truncation
 		-Winit-self # Warn about variables which are initialized to themselves.
 		-Wlogical-op    # Warn when a logical operator is suspiciously always evaluating to true or false.
 		#-Wmissing-declarations # Warn about global functions without previous declarations.
@@ -22,6 +25,7 @@ set(WARNING_FLAGS
 		-Wredundant-decls   # Warn about multiple declarations of the same object.
 		-Wshadow    # Warn when one variable shadows another # Might disable this one
 		-Wsign-conversion   # Warn for implicit type conversions between signed and unsigned integers.
+		-Wconversion
 		-Wsign-promo    # Warn when overload promotes from unsigned to signed.
 		-Wstrict-null-sentinel  # Warn about uncasted NULL used as sentinel.
 		-Wstrict-overflow=5 # Warn about optimizations that assume that signed overflow is undefined.
@@ -30,6 +34,7 @@ set(WARNING_FLAGS
 		-Wzero-as-null-pointer-constant # Warn when a literal '0' is used as null pointer.
 		-Wuseless-cast  # Warn about useless casts.
 		-Wpadded # Warn when padding is required to align structure members.
+		-Wdouble-promotion
 
 		-Wno-unknown-pragmas # Disables warning about unkown pragmas since both clion and clang-tidy use their own
 		) # May need to add or remove some warnings from this list depending on if they actually apply to our system or not
@@ -56,7 +61,7 @@ set(DOL_SOURCES     # main
 		asm/_Main/rodata.S
 		asm/_Main/data.S
 		asm/_Main/bss.S
-		src/tedata.cpp
+		# src/data/tedata.cpp
 		src/lib/operators.cpp
 		src/handlers/files/filehandler_loadingscreen.cpp
 		src/mechanics/slipstream.cpp
@@ -168,9 +173,19 @@ set(DOL_SOURCES     # main
 		src/handlers/menu/randomstage.hpp
 		src/cosmetics/player/skinsystem.cpp
 		# src/lib/sound.cpp
-		src/lib/thread.cpp src/lib/thread.hpp
+		src/lib/thread.cpp
 		src/handlers/player/specialflagtweaks.cpp
-        src/handlers/files/load_deduplicated.cpp) # main
+        src/handlers/menu/loadingscreentips.cpp
+		src/handlers/files/load_deduplicated.cpp
+		src/riders/player.cpp
+		src/gears/omnipotence.cpp
+		src/gears/tweaks/newgearselect.cpp
+		src/tweaks/stage/ringspawntimer.cpp
+		src/gears/advantagep.cpp
+		src/tweaks/player/attackrange.cpp
+		src/cosmetics/player/afterburner_effect.cpp
+		src/cosmetics/player/dreamtrail.cpp
+		src/cosmetics/hud/airbar.cpp) # main
 
 set(STANDALONE_HEADERS # This is only here to make sure that headers actually include the things it needs, by "compiling" them standalone.
 		include/compare_many.hpp
@@ -190,7 +205,35 @@ set(STANDALONE_HEADERS # This is only here to make sure that headers actually in
 		include/riders/gamemode.hpp
 		include/riders/object.hpp
 		include/riders/hud.hpp
-        include/endian.hpp)
+		include/ninjanext.hpp
+		include/endian.hpp
+)
+
+set(READONLY_DATA_FILES # Contains any files meant to store constant data
+		src/data/trick_strings/characters/blaze.cpp
+		src/data/trick_strings/characters/chaos.cpp
+		src/data/trick_strings/characters/emerl.cpp
+		src/data/trick_strings/characters/metal_sonic.cpp
+		src/data/trick_strings/characters/silver.cpp
+		src/data/trick_strings/characters/tikal.cpp
+		src/data/trick_strings/characters/sonic.cpp
+		src/data/trick_strings/characters/e10r.cpp
+		src/data/trick_strings/characters/tails.cpp
+		src/data/trick_strings/characters/knuckles.cpp
+		src/data/trick_strings/characters/amy.cpp
+		src/data/trick_strings/characters/jet.cpp
+		src/data/trick_strings/characters/storm.cpp
+		src/data/trick_strings/characters/wave.cpp
+		src/data/trick_strings/characters/eggman.cpp
+		src/data/trick_strings/characters/cream.cpp
+		src/data/trick_strings/characters/rouge.cpp
+		src/data/trick_strings/characters/shadow.cpp
+		src/data/trick_strings/characters/supersonic.cpp
+		src/data/trick_strings/characters/nights.cpp
+		src/data/trick_strings/characters/aiai.cpp
+		src/data/trick_strings/characters/ulala.cpp
+		src/data/trick_strings/characters/e10g.cpp
+)
 
 #====================================================================================
 # Extra plumbing stuff. Hopefully nothing in here will need to be changed
@@ -223,7 +266,7 @@ set(CMAKE_CXX_STANDARD ${CXX_STANDARD})
 set(CMAKE_CXX_STANDARD_REQUIRED ON)     # Enforces the standard we set instead of silently using an older standard if not available
 set(CMAKE_CXX_EXTENSIONS ON)            # Enables the use of compiler-specific extensions
 
-add_executable(main ${DOL_SOURCES} ${STANDALONE_HEADERS})
+add_executable(main ${STANDALONE_HEADERS} ${DOL_SOURCES} ${READONLY_DATA_FILES})
 
 #unset(CMAKE_CXX_STANDARD_LIBRARIES)
 #set(CMAKE_CXX_STANDARD_LIBRARIES "")
@@ -234,11 +277,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_INIT}")
 set(CMAKE_CXX_FLAGS_DEBUG "-g3 -Ofast -DDEBUG -save-temps -fverbose-asm")
 set(CMAKE_CXX_FLAGS_RELEASE "-g0 -Ofast -DNDEBUG")
 
+# Turns on STL asserts. Normally failing an assert would print a nice error to the console... but we don't have a console
+# So this results in seemingly random crashes. Once we make a better error handler, we should keep this on to help catch invisible bugs
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_ASSERTIONS")
+
 set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS_INIT}")
 set(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 set(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 
-target_compile_options(main PUBLIC ${WARNING_FLAGS} -memb)
+target_compile_options(main PUBLIC ${WARNING_FLAGS}
+		-memb -fno-threadsafe-statics -fno-rtti -fno-asynchronous-unwind-tables -fno-common
+		-ffunction-sections -fdata-sections -mmultiple -mregnames -mno-longcall
+)
 
 get_filename_component(ASMINCLUDE asm ABSOLUTE)
 get_filename_component(DOLINCLUDE dolinclude ABSOLUTE) # For any binary files included directly into the dol
@@ -261,7 +311,7 @@ endif ()
 get_filename_component(STATICLCF static.lcf ABSOLUTE)
 get_filename_component(PARSEMAPPY tools/parse_map.py ABSOLUTE)
 
-target_link_options(main PRIVATE -T ${STATICLCF} -Wl,-Map=main.map,-d,--wrap=malloc)
+target_link_options(main PRIVATE -T ${STATICLCF} -Wl,-Map=main.map,--gc-sections,-d,--wrap=malloc,--wrap=atexit,--wrap=abort)
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "${debug_build_type}")
 	target_link_libraries(main PUBLIC db)

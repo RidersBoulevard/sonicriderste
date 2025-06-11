@@ -3,7 +3,7 @@
 #include "lib/stdlib.hpp"
 
 ASMUsed void RandomStageObj1Handler(StageSelectObject2* courseSelectObj1) {
-    if (!gsActivePad.toggleButtons.hasAny(RButton)) { return; }
+    if (!gsActivePad.toggleButtons.hasAny(Buttons::R)) { return; }
 
     const u32 randomStage = lbl_RNG_Number(16);
     u32 selectedSquare;
@@ -42,7 +42,7 @@ ASMUsed void RandomStageObj1Handler(StageSelectObject2* courseSelectObj1) {
 }
 
 ASMUsed void RandomStageObjHandler(ObjectNode & courseSelectObj) {
-    if (!gsActivePad.toggleButtons.hasAny(RButton)) { return; }
+    if (!gsActivePad.toggleButtons.hasAny(Buttons::R)) { return; }
 
     PlayAudioFromDAT(Sound::VSFX::MenuConfirm);
 

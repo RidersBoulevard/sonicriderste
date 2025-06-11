@@ -1,6 +1,7 @@
 #include "customobjects.hpp"
 #include "riders/gamemode.hpp"
 #include "riders/stage.hpp"
+#include "riders/player.hpp"
 
 #include <cstring>
 
@@ -10,14 +11,14 @@ void *CopyGameObjectStruct(const GameObject *object, void *dest) {
 }
 
 USED void CustomGameObjectSpawner() {
-	void *startOfGameObjects = lbl_10008200[4];
+	void *startOfGameObjects = gu32ObjMtxPalMaxSize[4];
 	void *gameObjectStructStart = static_cast<u32 *>(startOfGameObjects) + 0x2;
 	const u32 objectAmount = *static_cast<u32 *>(startOfGameObjects);
 	void *gameObjectStructEnd = static_cast<u32 *>(gameObjectStructStart) + objectAmount * (sizeof(GameObject) / 4);
 
 	if(CurrentGameMode != TimeTrial && CurrentGameMode != FreeRace && CurrentGameMode != WorldGrandPrix) { return; }
 
-	if(RaceExitMethod == 2) { return; }// if player hit the retry button instead of quit button
+	if(RaceExitMethod == ExitMethod::Retry) { return; }// if player hit the retry button instead of quit button
 
 	switch(CurrentStage) {
 		case SegaCarnival: {
@@ -73,29 +74,46 @@ USED void CustomGameObjectSpawner() {
 	}
 }
 
-USED bool GameObjectDespawner(ObjectInfo *objectInfo, u32 object_id) {
+ASMUsed bool GameObjectDespawner(ObjectInfo *objectInfo, u32 object_id) {
 	// returns true if object should be despawned, returns false if not
 
 	if(objectInfo->objectType == ItemBox && CurrentStage != MetalCity) {
 		if(objectInfo->itemID == HundredRings || objectInfo->itemID == MaxAir)
-			return TRUE;
+			return true;
+	}
+
+	if ((objectInfo->objectType == NightChaseCar) && (CurrentStage == NightChase)) {
+		// Check for total power types and then spawn a variable amount of cars
+		u32 totalPowerTypes = 0;
+		for (const auto &player : getCurrentPlayerList()) {
+			if (player.typeAttributes.hasAny(Type::Power)) ++totalPowerTypes;
+		}
+		if (object_id >= (0x29 + (totalPowerTypes * 0x7))) return true;
+		return false;
 	}
 
 	switch(CurrentStage) {
 		case IceFactory:
 			if(object_id >= 0x135 && object_id <= 0x136 && objectInfo->objectType == DashPanel)
-				return TRUE;
+				return true;
 
 			break;
 
 		case SandRuins:
 			if(object_id >= 0x11F && object_id <= 0x121 && objectInfo->objectType == DashPanel)
-				return TRUE;
+				return true;
 
 			break;
+
+        case SegaCarnival:
+            if (object_id >= 0x3D && object_id <= 0x3F && objectInfo->objectType == PowerObject)
+                return true;
+
+            break;
+
 		default:
 			break;
 	}
 
-	return FALSE;
+	return false;
 }

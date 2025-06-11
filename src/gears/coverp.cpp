@@ -24,24 +24,24 @@ void Player_CreateCoverPParticles(Player *player) {
 	particles->unk18 = 0.0F;
 	particles->y = 0.3F;
 	particles->unk14 = 0.8F;
-	particles->unk68 = gpsTexList_Particle;
-	particles->unk60 = &lbl_001D8F58;
+	particles->texList = gpsTexList_Particle;
+	particles->particleParams = &lbl_001D8F58;
 	particles->unk73 = static_cast<u8>(~0);
-	particles->unk6C = nullptr;
+	particles->baseModelMatrix = nullptr;
 	particles->unk74 = 0;
 	particles->unk48 = &player->x;
 }
 
 void Player_CoverP(Player *player) {
-	const EnabledEXLoads exLoads = FetchEnabledEXLoadIDs(*player);
 
 	if(player->extremeGear != ExtremeGear::CoverP) { return; }
 	player->level = 1;
 	// player->gearStats[player->level].topSpeed = player->gearStats[0].topSpeed;
 	f32 originalWeight = CharacterWeights[player->character] + 0.4f;
 	// TODO: change below to when we fix exload unloading
-	if(exLoads.characterExLoadID == RealaEXLoad || exLoads.characterExLoadID == GonGonEXLoad) {
-		originalWeight = EXLoadWeights[exLoads.characterExLoadID] + 0.4f;
+	const auto &exLoads = player->characterExload();
+	if(exLoads.exLoadID != EXLoad::None && exLoads.weight() != -1.0f) {
+		originalWeight = exLoads.weight() + 0.4f;
 	}
 
 	// player->gearStats[0].airDrain = 10;
@@ -49,13 +49,14 @@ void Player_CoverP(Player *player) {
 	// player->gearStats[0].driftCost = 0xA6;
 	// player->gearStats[0].tornadoCost = 0x61A8* 0.80f;
 
-	if(player->state == StartLine) {
+	if(player->state == PlayerState::StartLine) {
 		player->coverP_weightState = 3;
 		return;
 	}
 
 	u8 weightState;
-	if(player->input->toggleFaceButtons.hasAny(DPadLeft)) {
+	if(player->state == PlayerState::AttackedByPlayer) return;
+	if(player->input->toggleFaceButtons.hasAny(Buttons::DPadLeft)) {
 		weightState = 1;
 		f32 calculatedWeight;
 		switch(Player_Coverp_ChangeWeight(player, weightState)) {
@@ -74,7 +75,7 @@ void Player_CoverP(Player *player) {
 		player->coverP_weightState = weightState;
 		Player_CreateCoverPParticles(player);
 		PlayAudioFromDAT(Sound::SFX::CovFModeSwitch);
-	} else if(player->input->toggleFaceButtons.hasAny(DPadUp)) {
+	} else if(player->input->toggleFaceButtons.hasAny(Buttons::DPadUp)) {
 		weightState = 3;
 		switch(Player_Coverp_ChangeWeight(player, weightState)) {
 			default:
@@ -91,7 +92,7 @@ void Player_CoverP(Player *player) {
 		Player_CreateCoverPParticles(player);
 		PlayAudioFromDAT(Sound::SFX::CovFModeSwitch);
 
-	} else if(player->input->toggleFaceButtons.hasAny(DPadRight)) {
+	} else if(player->input->toggleFaceButtons.hasAny(Buttons::DPadRight)) {
 		weightState = 2;
 		f32 calculatedWeight;
 		switch(Player_Coverp_ChangeWeight(player, weightState)) {

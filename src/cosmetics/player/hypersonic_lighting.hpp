@@ -2,24 +2,34 @@
 
 #include "riders/player.hpp"
 
-ASMDefined void *lbl_1000DFE4; // pointer to character model data
+ASMDefined void *gpsaObject_Player; // pointer to character model data
 
 void HyperSonic_RainbowLighting(Player *player);
-
-struct Lighting {
-fillerData<0x14> filler;
-	f32 red1;
-	f32 green1;
-	f32 blue1;
-	f32 red2;
-	f32 green2;
-	f32 blue2;
-};
 
 struct RGBModule {
 	f32 R;
 	f32 G;
 	f32 B;
+
+	constexpr auto operator<=>(const RGBModule &) const = default;
+	constexpr RGBModule operator +(const RGBModule &rhs) const {
+		return {R + rhs.R, G + rhs.G, B + rhs.B};
+	}
+	constexpr RGBModule& operator +(const RGBModule &rhs) {
+		R += rhs.R;
+		G += rhs.G;
+		B += rhs.B;
+		return *this;
+	}
+	constexpr RGBModule& operator +=(const RGBModule &rhs) {
+		*this = *this + rhs;
+		return *this;
+	}
+};
+
+struct Lighting {
+	fillerData<0x14> filler;
+	std::array<RGBModule, 2> rgb_modules;
 };
 
 struct HyperSonic_ColorState {

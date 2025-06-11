@@ -1,6 +1,6 @@
 #pragma once
 
-constexpr std::array<std::optional<u8>, TotalCharacterAmount> GettingAttackedVoice{
+constexpr std::array<std::optional<u8>, Character::Total> GettingAttackedVoice{
 		0x04,			// Sonic
 		0x04,			// Tails
 		0x04,			// Knuckles

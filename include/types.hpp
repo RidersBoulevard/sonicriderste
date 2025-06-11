@@ -9,6 +9,7 @@
 
 #include <concepts>
 #include <array>
+#include <utility>
 
 // Use regular types for regular uses and constants
 using s8 = signed char;
@@ -61,3 +62,14 @@ using m2darray = std::array<std::array<T, Y>, X>;
 // Adds a simple way to define an array of bytes that are only used as padding for a struct
 template<std::size_t size, typename T = std::byte>
 using fillerData = std::array<T, size>;
+
+// Unused for now, untested
+template<typename T>
+concept scoped_enum = std::is_scoped_enum_v<T>;
+
+template<scoped_enum T, std::size_t size>
+class enumeratedArray : public std::array<T, size>{
+	constexpr T& operator[](T enumVal){
+		return operator[](std::to_underlying(enumVal));
+	}
+};

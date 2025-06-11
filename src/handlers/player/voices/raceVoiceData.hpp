@@ -10,7 +10,7 @@ constexpr RaceStartVoiceFunc defaultRaceStartVoice = [](const Player &) -> u8 {
 	return voiceID;
 };
 
-constexpr std::array<RaceStartVoiceFunc, TotalCharacterAmount> raceStartLines{
+constexpr std::array<RaceStartVoiceFunc, Character::Total> raceStartLines{
 		defaultRaceStartVoice<7>,		// Sonic
 		defaultRaceStartVoice<9>,		// Tails
 		defaultRaceStartVoice<8>,		// Knuckles
@@ -57,7 +57,7 @@ constexpr std::array<RaceStartVoiceFunc, EXLoadCount> exLoadRaceStartLines{
 		defaultRaceStartVoice<10>,		// Gongon
 };
 
-using RaceEndVoiceFunc = u8 (*)(const Player &, bool win);
+using RaceEndVoiceFunc = u8 (* const)(const Player &, bool win);
 
 constexpr RaceEndVoiceFunc noRaceEndVoice = nullptr;
 
@@ -66,7 +66,7 @@ constexpr RaceEndVoiceFunc defaultRaceEndVoice = [](const Player &, bool win) ->
 	return win ? winID : loseID;
 };
 
-constexpr std::array<RaceEndVoiceFunc, TotalCharacterAmount> raceEndLines{
+constexpr std::array<RaceEndVoiceFunc, Character::Total> raceEndLines{
 		defaultRaceEndVoice<8>,			// Sonic
 		defaultRaceEndVoice<10>,		// Tails
 		defaultRaceEndVoice<9>,			// Knuckles

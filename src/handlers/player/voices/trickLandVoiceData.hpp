@@ -1,6 +1,6 @@
 #pragma once
 
-constexpr std::array<TrickLandVoiceLineList, TotalCharacterAmount> TrickLandVoiceTable {{
+constexpr std::array<TrickLandVoiceLineList, Character::Total> TrickLandVoiceTable {{
 		{.cRank = 0x01, .aRank = 0x02},								// Sonic
 		{.cRank = 0x01, .aRank = 0x02},								// Tails
 		{.cRank = 0x01, .aRank = 0x02},								// Knuckles

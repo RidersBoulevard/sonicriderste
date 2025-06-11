@@ -24,7 +24,7 @@ constexpr std::array<f32, 17> data_C241155C = {
 ASMUsed void Player_GrindRailFastFall(Player *player) {
     u32 stage = CurrentStage;
     f32 extraGravity;
-    if (player->state == Fall && player->previousState == RailGrind)
+    if (player->state == PlayerState::Fall && player->previousState == PlayerState::RailGrind)
     {
         extraGravity = data_C241155C[stage];
         if (stage == GreenCave)
@@ -33,7 +33,7 @@ ASMUsed void Player_GrindRailFastFall(Player *player) {
             {
                 extraGravity += 0.05f;
             }
-        }
+        } else if (stage == DarkDesert && player->railID == 0x1) extraGravity += 0.05f;
 
         player->gravity += extraGravity;
     }

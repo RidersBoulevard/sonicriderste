@@ -2,7 +2,7 @@
 
 #include "containers/rgba.hpp"
 
-extern RGBA AllCharacterHUDColors[];
+extern RGBA32 AllCharacterHUDColors[];
 
 const void* CustomCodehandler_Retrieve(u32 input);
 

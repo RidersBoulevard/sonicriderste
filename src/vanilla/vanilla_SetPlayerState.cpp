@@ -362,8 +362,8 @@ void func_SetPlayerActionType(Player *player, u32 state) {
 			temp_r10->unk18 = (s32) mcparticle->unk88;
 			temp_r10->unk48 = &gcosNnSystemVecZeroFast;
 			temp_r10->unk60 = mcparticle;
-			temp_r10->unk68 = temp_r30;
-			temp_r10->unk6C = (void *) &player->unkC4;
+			temp_r10->texList = temp_r30;
+			temp_r10->baseModelMatrix = (void *) &player->unkC4;
 			temp_r10->unk73 = -1;
 			temp_r10->unk74 = 0;
 			player->unkBAC = (s32) (player->unkBAC | 0x4000);

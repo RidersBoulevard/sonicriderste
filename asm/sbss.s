@@ -127,107 +127,107 @@ lbl_8021BC14:
 .global lbl_8021BC30
 lbl_8021BC30:
 	.skip 0x8
-.global lbl_8021BC38
-lbl_8021BC38:
+.global OS_BootInfo
+OS_BootInfo:
 	.skip 0x4
-.global lbl_8021BC3C
-lbl_8021BC3C:
+.global BI2DebugFlag
+BI2DebugFlag:
 	.skip 0x4
-.global lbl_8021BC40
-lbl_8021BC40:
+.global BI2DebugFlagHolder
+BI2DebugFlagHolder:
 	.skip 0x4
-.global lbl_8021BC44
-lbl_8021BC44:
+.global __OSIsGcam
+__OSIsGcam:
 	.skip 0x4
-.global lbl_8021BC48
-lbl_8021BC48:
+.global ZeroF
+ZeroF:
 	.skip 0x8
-.global lbl_8021BC50
-lbl_8021BC50:
+.global ZeroPS
+ZeroPS:
 	.skip 0x8
-.global lbl_8021BC58
-lbl_8021BC58:
+.global AreWeInitialized
+AreWeInitialized:
 	.skip 0x4
-.global lbl_8021BC5C
-lbl_8021BC5C:
+.global OSExceptionTable
+OSExceptionTable:
 	.skip 0x4
-.global lbl_8021BC60
-lbl_8021BC60:
+.global __OSInIPL
+__OSInIPL:
 	.skip 0x8
-.global lbl_8021BC68
-lbl_8021BC68:
+.global __OSStartTime
+__OSStartTime:
 	.skip 0x4
-.global lbl_8021BC6C
-lbl_8021BC6C:
+.global __OSStartTimeplus0x4
+__OSStartTimeplus0x4:
 	.skip 0x4
-.global lbl_8021BC70
-lbl_8021BC70:
+.global AlarmQueue
+AlarmQueue:
 	.skip 0x8
-.global lbl_8021BC78
-lbl_8021BC78:
+.global HeapArray
+HeapArray:
 	.skip 0x4
-.global lbl_8021BC7C
-lbl_8021BC7C:
+.global NumHeaps
+NumHeaps:
 	.skip 0x4
-.global lbl_8021BC80
-lbl_8021BC80:
+.global ArenaStart
+ArenaStart:
 	.skip 0x4
-.global lbl_8021BC84
-lbl_8021BC84:
+.global ArenaEnd
+ArenaEnd:
 	.skip 0x4
-.global lbl_8021BC88
-lbl_8021BC88:
+.global __OSArenaHi
+__OSArenaHi:
 	.skip 0x8
-.global lbl_8021BC90
-lbl_8021BC90:
+.global DOLPHINSDK_Prepared
+DOLPHINSDK_Prepared:
 	.skip 0x4
-.global lbl_8021BC94
-lbl_8021BC94:
+.global apploaderPosition
+apploaderPosition:
 	.skip 0x4
-.global lbl_8021BC98
-lbl_8021BC98:
+.global FontDataAnsi
+FontDataAnsi:
 	.skip 0x4
-.global lbl_8021BC9C
-lbl_8021BC9C:
+.global FontDataSjis
+FontDataSjis:
 	.skip 0x4
-.global lbl_8021BCA0
-lbl_8021BCA0:
+.global ParseString
+ParseString:
 	.skip 0x8
-.global lbl_8021BCA8
-lbl_8021BCA8:
+.global InterruptHandlerTable
+InterruptHandlerTable:
 	.skip 0x4
-.global lbl_8021BCAC
-lbl_8021BCAC:
+.global __OSLastInterruptSrr0
+__OSLastInterruptSrr0:
 	.skip 0x4
-.global lbl_8021BCB0
-lbl_8021BCB0:
+.global __OSLastInterrupt
+__OSLastInterrupt:
 	.skip 0x8
-.global lbl_8021BCB8
-lbl_8021BCB8:
+.global __OSLastInterruptTime
+__OSLastInterruptTime:
 	.skip 0x4
-.global lbl_8021BCBC
-lbl_8021BCBC:
+.global __OSLastInterruptTimeplus0x4
+__OSLastInterruptTimeplus0x4:
 	.skip 0x4
-.global lbl_8021BCC0
-lbl_8021BCC0:
+.global SaveStart
+SaveStart:
 	.skip 0x4
-.global lbl_8021BCC4
-lbl_8021BCC4:
+.global SaveEnd
+SaveEnd:
 	.skip 0x4
-.global lbl_8021BCC8
-lbl_8021BCC8:
+.global ResetFunctionQueue
+ResetFunctionQueue:
 	.skip 0x8
-.global lbl_8021BCD0
-lbl_8021BCD0:
+.global bootThisDol
+bootThisDol:
 	.skip 0x8
-.global lbl_8021BCD8
-lbl_8021BCD8:
+.global ResetCallback
+ResetCallback:
 	.skip 0x4
-.global lbl_8021BCDC
-lbl_8021BCDC:
+.global __Down
+__Down:
 	.skip 0x4
-.global lbl_8021BCE0
-lbl_8021BCE0:
+.global __LastState
+__LastState:
 	.skip 0x8
 .global lbl_8021BCE8
 lbl_8021BCE8:
@@ -235,110 +235,110 @@ lbl_8021BCE8:
 .global lbl_8021BCEC
 lbl_8021BCEC:
 	.skip 0x4
-.global lbl_8021BCF0
-lbl_8021BCF0:
+.global __HoldDown
+__HoldDown:
 	.skip 0x4
-.global lbl_8021BCF4
-lbl_8021BCF4:
+.global __HoldDownplus0x4
+__HoldDownplus0x4:
 	.skip 0x4
-.global lbl_8021BCF8
-lbl_8021BCF8:
+.global RunQueueBits
+RunQueueBits:
 	.skip 0x4
-.global lbl_8021BCFC
-lbl_8021BCFC:
+.global RunQueueHint
+RunQueueHint:
 	.skip 0x4
-.global lbl_8021BD00
-lbl_8021BD00:
+.global DOLPHINSDK_Reschedule
+DOLPHINSDK_Reschedule:
 	.skip 0x8
 .global lbl_8021BD08
 lbl_8021BD08:
 	.skip 0x8
-.global lbl_8021BD10
-lbl_8021BD10:
+.global __DBInterface
+__DBInterface:
 	.skip 0x4
-.global lbl_8021BD14
-lbl_8021BD14:
+.global DBVerbose
+DBVerbose:
 	.skip 0x4
-.global lbl_8021BD18
-lbl_8021BD18:
+.global DVD_StopAtNextInt
+DVD_StopAtNextInt:
 	.skip 0x4
-.global lbl_8021BD1C
-lbl_8021BD1C:
+.global DVD_LastLength
+DVD_LastLength:
 	.skip 0x4
-.global lbl_8021BD20
-lbl_8021BD20:
+.global DVD_Callback
+DVD_Callback:
 	.skip 0x4
-.global lbl_8021BD24
-lbl_8021BD24:
+.global DVD_ResetCoverCallback
+DVD_ResetCoverCallback:
 	.skip 0x4
-.global lbl_8021BD28
-lbl_8021BD28:
+.global DVD_LastResetEnd
+DVD_LastResetEnd:
 	.skip 0x4
-.global lbl_8021BD2C
-lbl_8021BD2C:
+.global DVD_LastResetEndplus0x4
+DVD_LastResetEndplus0x4:
 	.skip 0x4
-.global lbl_8021BD30
-lbl_8021BD30:
+.global DVD_ResetOccurred
+DVD_ResetOccurred:
 	.skip 0x4
-.global lbl_8021BD34
-lbl_8021BD34:
+.global DVD_WaitingCoverClose
+DVD_WaitingCoverClose:
 	.skip 0x4
-.global lbl_8021BD38
-lbl_8021BD38:
+.global DVD_Breaking
+DVD_Breaking:
 	.skip 0x4
-.global lbl_8021BD3C
-lbl_8021BD3C:
+.global DVD_WorkAroundType
+DVD_WorkAroundType:
 	.skip 0x4
-.global lbl_8021BD40
-lbl_8021BD40:
+.global DVD_WorkAroundSeekLocation
+DVD_WorkAroundSeekLocation:
 	.skip 0x8
-.global lbl_8021BD48
-lbl_8021BD48:
+.global DVD_LastReadFinished
+DVD_LastReadFinished:
 	.skip 0x4
-.global lbl_8021BD4C
-lbl_8021BD4C:
+.global DVD_LastReadFinishedplus0x4
+DVD_LastReadFinishedplus0x4:
 	.skip 0x4
-.global lbl_8021BD50
-lbl_8021BD50:
+.global DVD_LastReadIssued
+DVD_LastReadIssued:
 	.skip 0x4
-.global lbl_8021BD54
-lbl_8021BD54:
+.global DVD_LastReadIssuedplus0x4
+DVD_LastReadIssuedplus0x4:
 	.skip 0x4
-.global lbl_8021BD58
-lbl_8021BD58:
+.global DVD_LastCommandWasRead
+DVD_LastCommandWasRead:
 	.skip 0x4
-.global lbl_8021BD5C
-lbl_8021BD5C:
+.global DVD_NextCommandNumber
+DVD_NextCommandNumber:
 	.skip 0x4
-.global lbl_8021BD60
-lbl_8021BD60:
+.global DVD_BootInfo
+DVD_BootInfo:
 	.skip 0x4
-.global lbl_8021BD64
-lbl_8021BD64:
+.global DVD_FstStart
+DVD_FstStart:
 	.skip 0x4
-.global lbl_8021BD68
-lbl_8021BD68:
+.global DVD_FstStringStart
+DVD_FstStringStart:
 	.skip 0x4
-.global lbl_8021BD6C
-lbl_8021BD6C:
+.global DVD_MaxEntryNum
+DVD_MaxEntryNum:
 	.skip 0x4
-.global lbl_8021BD70
-lbl_8021BD70:
+.global DVD_currentDirectory
+DVD_currentDirectory:
 	.skip 0x4
-.global lbl_8021BD74
-lbl_8021BD74:
+.global __DVDLongFileNameFlag
+__DVDLongFileNameFlag:
 	.skip 0x4
-.global lbl_8021BD78
-lbl_8021BD78:
+.global __DVDThreadQueue
+__DVDThreadQueue:
 	.skip 0x8
-.global lbl_8021BD80
-lbl_8021BD80:
+.global DVD_executing
+DVD_executing:
 	.skip 0x4
-.global lbl_8021BD84
-lbl_8021BD84:
+.global DVD_IDShouldBe
+DVD_IDShouldBe:
 	.skip 0x4
-.global lbl_8021BD88
-lbl_8021BD88:
+.global DVD_bootInfo
+DVD_bootInfo:
 	.skip 0x4
 .global lbl_8021BD8C
 lbl_8021BD8C:
@@ -349,8 +349,8 @@ lbl_8021BD90:
 .global lbl_8021BD94
 lbl_8021BD94:
 	.skip 0x4
-.global lbl_8021BD98
-lbl_8021BD98:
+.global DVD_FatalErrorFlag
+DVD_FatalErrorFlag:
 	.skip 0x4
 .global lbl_8021BD9C
 lbl_8021BD9C:
@@ -367,26 +367,26 @@ lbl_8021BDA8:
 .global lbl_8021BDAC
 lbl_8021BDAC:
 	.skip 0x4
-.global lbl_8021BDB0
-lbl_8021BDB0:
+.global DVD_LastError
+DVD_LastError:
 	.skip 0x4
-.global lbl_8021BDB4
-lbl_8021BDB4:
+.global DVD_NumInternalRetry
+DVD_NumInternalRetry:
 	.skip 0x4
 .global lbl_8021BDB8
 lbl_8021BDB8:
 	.skip 0x4
-.global lbl_8021BDBC
-lbl_8021BDBC:
+.global DVD_FirstTimeInBootrom
+DVD_FirstTimeInBootrom:
 	.skip 0x4
-.global lbl_8021BDC0
-lbl_8021BDC0:
+.global DVD_MotorState
+DVD_MotorState:
 	.skip 0x4
-.global lbl_8021BDC4
-lbl_8021BDC4:
+.global DVDInitialized
+DVDInitialized:
 	.skip 0x4
-.global lbl_8021BDC8
-lbl_8021BDC8:
+.global DVD_LastState
+DVD_LastState:
 	.skip 0x8
 .global lbl_8021BDD0
 lbl_8021BDD0:
@@ -412,11 +412,11 @@ lbl_8021BDF0:
 .global lbl_8021BDF4
 lbl_8021BDF4:
 	.skip 0x8
-.global lbl_8021BDFC
-lbl_8021BDFC:
+.global VI_PreCB
+VI_PreCB:
 	.skip 0x4
-.global lbl_8021BE00
-lbl_8021BE00:
+.global VI_PostCB
+VI_PostCB:
 	.skip 0x4
 .global lbl_8021BE04
 lbl_8021BE04:
@@ -499,8 +499,8 @@ lbl_8021BE70:
 .global lbl_8021BE74
 lbl_8021BE74:
 	.skip 0x4
-.global lbl_8021BE78
-lbl_8021BE78:
+.global __PADSpec
+__PADSpec:
 	.skip 0x8
 .global lbl_8021BE80
 lbl_8021BE80:

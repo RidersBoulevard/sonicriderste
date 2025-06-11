@@ -4,6 +4,8 @@
 #include "riders/object.hpp"
 #include "riders/player.hpp"
 #include "riders/stage.hpp"
+#include "gears/blastGaugeGears.hpp"
+#include "handlers/player/specialflagtweaks.hpp"
 
 // this structure for object1 will be specifically used for this code
 #pragma GCC diagnostic push
@@ -71,9 +73,18 @@ static void func_TornadoSlingshot(ObjectNode *object) {
 			const f32 angle = forward.calculateAngle(directionToTornado);
 			// angle at which you're "looking" at the tornado and won't slingshot
 			if(angle < 0.7f) {
+				// if (player.state != StartLine && player.state != Stun && !player.statusEffectFlags.hasAny(InvincibilityStatus)) {
+				if (Player_ZIgnoreTornado(&player) == false 
+					&& !player.statusEffectFlags.hasAny(PlayerStatus::InvincibilityStatus)) {
+					Player* tornadoPlayer = &players[object1->playerIndex];
+					if (isSuperCharacter(*tornadoPlayer, Character::Shadow)) {
+						BlastGaugeInfo *bgInfo = &PlayerBlastGaugeInfo[object1->playerIndex];
+						bgInfo->currentGauge += (player.gearStats[player.level].tornadoCost * 3.33);
+					}
+				}
 				continue;
 			}
-			if(player.state == Stun) {
+			if(player.state == PlayerState::Stun) {
 				continue;
 			}
 			player.speed += pSpeed(60) + MI::scaleUsingCurrentMI(player, pSpeed(60));
@@ -207,12 +218,19 @@ ASMUsed void func_StageChanges(ObjectNode *currentObject) {
 			break;
 		}
 		case SandRuins: {
-			if(object_id >= 0x1A1 && object_id <= 0x1A4) {
+			if((object_id >= 0x1A1 && object_id <= 0x1A4)
+				|| (object_id >= 0x17F && object_id <= 0x182)) {
 				lbl_update_item(currentObject, TenRings);
 			}
 			switch(object_id) {
+				case 0x189:
+					lbl_update_item(currentObject, TwentyRings);
+					break;
+				case 0x18A:
+					lbl_update_item(currentObject, TenRings);
+					break;
 				case 0x18C:
-					lbl_update_item(currentObject, ThirtyAir);
+					lbl_update_item(currentObject, FiftyAir);
 					break;
 				case 0x18D:
 					lbl_update_item(currentObject, FiftyAir);

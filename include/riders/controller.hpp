@@ -7,24 +7,24 @@
 #include "flags.hpp"
 #include "globalDefs.hpp"
 
-enum Buttons : u32{
-	NothingHeld 				= 0,
-	AButton 					= 1<<0,
-	BButton 					= 1<<1,
-	XButton 					= 1<<2,
-	YButton 					= 1<<3,
-	DPadUp 						= 1<<4,
-	DPadDown 					= 1<<5,
-	DPadLeft 					= 1<<6,
-	DPadRight 					= 1<<7,
-	StartButton 				= 1<<8,
-	LButton 					= 1<<9,
-	RButton 					= 1<<10,
-	ZButton 					= 1<<11,
-	LStickUp 					= 1<<12,
-	LStickDown 					= 1<<13,
-	LStickLeft 					= 1<<14,
-	LStickRight 				= 1<<15,
+enum class Buttons : u32{
+	Nothing 			= 0,
+	A 					= 1<<0,
+	B 					= 1<<1,
+	X 					= 1<<2,
+	Y 					= 1<<3,
+	DPadUp 				= 1<<4,
+	DPadDown 			= 1<<5,
+	DPadLeft 			= 1<<6,
+	DPadRight 			= 1<<7,
+	Start 				= 1<<8,
+	L 					= 1<<9,
+	R 					= 1<<10,
+	Z 					= 1<<11,
+	LStickUp 			= 1<<12,
+	LStickDown 			= 1<<13,
+	LStickLeft 			= 1<<14,
+	LStickRight 		= 1<<15,
 };
 ENUM_FLAG_OPERATORS(Buttons) // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, readability-identifier-length, *-type-traits)
 

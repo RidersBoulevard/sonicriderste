@@ -1,5 +1,6 @@
-#include "cosmetics/player/exloads.hpp"
 #include "filehandler_dat.hpp"
+#include "cosmetics/player/exloads.hpp"
+#include "riders/player.hpp"
 #include "lib/sound.hpp"
 #include "lib/stdlib.hpp"
 
@@ -8,17 +9,11 @@ struct DATFileBSS {
 	std::array<u32, 0x20> ints2;
 };
 
-enum class Language : s32 {
-	Japanese = 0,
-	English = 1,
-};
-
-ASMDefined s8 lbl_1001A6E4;
-ASMDefined DATFileBSS lbl_10026620;
+//ASMDefined s8 lbl_1001A6E4;
+//ASMDefined DATFileBSS lbl_10026620;
 ASMDefined fillerData<0x100> lbl_801B2D98;
-ASMDefined Language GameLanguage;
 
-constexpr std::array<const char *, TotalCharacterAmount> EN_CharacterVoiceFiles = {{
+constexpr std::array<const char *, std::to_underlying(Character::Total)> EN_CharacterVoiceFiles = {{
 		"10SONIC.DAT",
 		"10TAILS.DAT",
 		"10KNUCK.DAT",
@@ -44,7 +39,7 @@ constexpr std::array<const char *, TotalCharacterAmount> EN_CharacterVoiceFiles 
 		"10TIKAL.DAT",
 }};
 
-constexpr std::array<const char *, TotalCharacterAmount> JP_CharacterVoiceFiles = {{
+constexpr std::array<const char *, std::to_underlying(Character::Total)> JP_CharacterVoiceFiles = {{
 		"10JSONIC.DAT",
 		"10JTAILS.DAT",
 		"10JKNUCK.DAT",
@@ -72,7 +67,7 @@ constexpr std::array<const char *, TotalCharacterAmount> JP_CharacterVoiceFiles 
 
 // custom data
 
-constexpr std::array E10Dats = {
+constexpr std::array<const char *, 2> E10Dats = {
 		"10EB2.DAT",
 		"10ER2.DAT",
 };
@@ -82,40 +77,39 @@ constexpr std::array E10Dats = {
  *
  * @param player The player we are wanting to load the dat file for. Needed for exloads and checking the character
  * @param language The language we want to load for. Defaults to whatever the game language is. Needs testing for if this works without bugs
- * @return
+ * @return The Filename of the selected dat file
  */
 const char *selectDatFile(Player &player, Language language = GameLanguage) {
 	player.characterVoiceID = static_cast<Sound::ID::CharacterSoundIDs>(0); // Make sure we clear out the old value just in case the value is somehow never set
-	const auto enabledExloads = FetchEnabledEXLoadIDs(player);
-	if(enabledExloads.isExloadEnabled()) {
-		switch(enabledExloads.characterExLoadID) {
-			case GonGonEXLoad:
+	if(player.hasExload()) {
+		switch(player.characterExload().exLoadID) {
+			case EXLoad::GonGon:
 				player.characterVoiceID = Sound::ID::GonGon;
 				return "10GONGO.DAT";
-			case HatsuneMikuEXLoad:
+			case EXLoad::HatsuneMiku:
 				player.characterVoiceID = Sound::ID::Miku;
 				return "10MIKU.DAT";
-			case RealaEXLoad:
+			case EXLoad::Reala:
 				player.characterVoiceID = Sound::ID::Reala;
 				return "10REALA.DAT";
-			case NeoMetalEXLoad:
+			case EXLoad::NeoMetal:
 				player.characterVoiceID = Sound::ID::NeoMetalSonic;
 				return "10NEO.DAT";
 			default: break;
 		}
-		switch(enabledExloads.gearExLoadID) {
-			case HyperSonicEXLoad:
+		switch(player.gearExload().exLoadID) {
+			case EXLoad::HyperSonic:
 				player.characterVoiceID = Sound::ID::HyperSonic;
 				return "10HS.DAT";
 			default: break;
 		}
 	}
-	if(isSuperCharacter(player, MetalSonic)) {
+	if(isSuperCharacter(player, Character::MetalSonic)) {
 		player.characterVoiceID = Sound::ID::NeoMetalSonic;
 		return "10NEO.DAT";
 	}
 	const auto &selectedCharacter = player.character;
-	if(selectedCharacter == E10R) {
+	if(selectedCharacter == Character::E10R) {
 		player.characterVoiceID = Sound::ID::E10R;
 		return E10Dats[0];
 	}
@@ -127,17 +121,14 @@ const char *selectDatFile(Player &player, Language language = GameLanguage) {
 		player.characterVoiceID = CharacterVoiceIDs[selectedCharacter];
 		return characterDatFile[selectedCharacter];
 	}
-	[[unlikely]] {
-		player.characterVoiceID = Sound::ID::Sonic;
-		return characterDatFile[Sonic];// Default to sonic if not a valid character
-	}
+	std::unreachable();
 }
 
 ASMUsed void LoadCharacterDATFile() {
-	TRK_memset(&lbl_801B2D98, 0x7F, 0xFF);
-	//std::fill(lbl_801B2D98.begin(), lbl_801B2D98.end(), 0x7F);
+	//memset(&lbl_801B2D98, 0x7F, 0xFF);
+	std::fill(lbl_801B2D98.begin(), lbl_801B2D98.end()-1, std::byte{0x7F});
 	for(auto &currentPlayer: getCurrentPlayerList()) {
-		if(currentPlayer.character < TotalCharacterAmount) {
+		if(currentPlayer.character < Character::Total) {
 			LoadDATFileDynamic(selectDatFile(currentPlayer));
 		}
 	}

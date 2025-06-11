@@ -36,37 +36,36 @@ ASMUsed bool Player_ZIgnoreTornado(Player *player) {
 	// f32 maxWeight = 2.05f; // eggman heavy bike
 	f32 weightDiff;
 	f32 airMultiplier;
-	EnabledEXLoads exLoads;
-	FetchEnabledEXLoadIDs(player, exLoads);
 
 	if(!DebugMenu_CheckOption(DebugMenuOptions::TornadoIgnore)) {
 		return isTornadoIgnored;
 	}
 
-	bool isHighBoosting = player->gearStats[player->level].boostSpeed > ZIgnore_AverageBoostSpeeds[player->level] && player->movementFlags.hasAny(boosting);
-	if(player->characterArchetype == BoostArchetype) {
-		isHighBoosting = player->gearStats[player->level].boostSpeed > (ZIgnore_AverageBoostSpeeds[player->level] + BoostArchetypeBoostSpeeds[player->level]) && player->movementFlags.hasAny(boosting);
+	bool isHighBoosting = player->gearStats[player->level].boostSpeed > ZIgnore_AverageBoostSpeeds[player->level] && player->movementFlags.hasAny(MovementFlags::boosting);
+	if(player->characterArchetype == CharacterArchetype::Boost) {
+		isHighBoosting = player->gearStats[player->level].boostSpeed > (ZIgnore_AverageBoostSpeeds[player->level] + BoostArchetypeBoostSpeeds[player->level]) && player->movementFlags.hasAny(MovementFlags::boosting);
 	}
 
-	const auto zInput = player->input->holdFaceButtons.hasAny(ZButton);
+	const auto zInput = player->input->holdFaceButtons.hasAny(Buttons::Z);
 	const u8 &yInput = player->y_toggle;
 	const u32 ignoreCount = static_cast<u8>(zInput) + yInput;
 
 	if(ignoreCount != 0 && ignoreCount != 2) {
 		if(player->tornadoIgnore_invincibilityTimer <= 0) {
-			if(player->specialFlags.hasAny(ringGear)) {
-				isHighBoosting = player->gearStats[0].boostSpeed > ZIgnore_AverageBoostSpeeds[2] && player->movementFlags.hasAny(boosting);
-				if(player->characterArchetype == BoostArchetype) {
-					isHighBoosting = player->gearStats[0].boostSpeed > (ZIgnore_AverageBoostSpeeds[2] + BoostArchetypeBoostSpeeds[2]) && player->movementFlags.hasAny(boosting);
+			if(player->specialFlags.hasAny(SpecialFlags::ringGear)) {
+				u8 ignoreLevel = (player->extremeGear == ExtremeGear::HangOn) ? player->level : 2;
+				isHighBoosting = player->gearStats[player->level].boostSpeed > ZIgnore_AverageBoostSpeeds[ignoreLevel] && player->movementFlags.hasAny(MovementFlags::boosting);
+				if(player->characterArchetype == CharacterArchetype::Boost) {
+					isHighBoosting = player->gearStats[player->level].boostSpeed > (ZIgnore_AverageBoostSpeeds[ignoreLevel] + BoostArchetypeBoostSpeeds[ignoreLevel]) && player->movementFlags.hasAny(MovementFlags::boosting);
 				}
 
 				const bool acceleratorCheck = player->extremeGear == ExtremeGear::Accelerator;
-				const s32 oneRing = player->gearStats[0].maxAir / 100;
+				const s32 oneRing = (player->extremeGear == ExtremeGear::HangOn) ? player->gearStats[player->level].maxAir / 100 : player->gearStats[0].maxAir / 100;
 
 				s32 ringCost = ZIgnore::BaseRingCost;
 
 				// weightDiff = (CharacterWeights[player->character] + player->gearptr->weight) - baseWeight;
-				//if(exLoads.characterExLoadID == RealaEXLoad || //exLoads.characterExLoadID == GonGonEXLoad || // exLoads.characterExLoadID == HatsuneMikuEXLoad) {
+				//if(exLoads.characterExLoadID == Reala || //exLoads.characterExLoadID == GonGon || // exLoads.characterExLoadID == HatsuneMiku) {
 				// 	weightDiff = (EXLoadWeights[exLoads.characterExLoadID] + player->gearptr->weight) - baseWeight;
 				// }
 
@@ -77,7 +76,6 @@ ASMUsed bool Player_ZIgnoreTornado(Player *player) {
 				//	airMultiplier = baseWeight + weightDiff;// inherently already scales down to 20% less cuz cream light board is 0.8f
 				//	airMultiplier *= -1.0f;
 				//}
-
 				if(isHighBoosting) {
 					ringCost += ZIgnore::HighBoostingExtraCost;
 					//airMultiplier *= 3;
@@ -103,7 +101,7 @@ ASMUsed bool Player_ZIgnoreTornado(Player *player) {
 				}
 			} else {
 				// weightDiff = (CharacterWeights[player->character] + player->gearptr->weight) - baseWeight;
-				//if(exLoads.characterExLoadID == RealaEXLoad || //exLoads.characterExLoadID == GonGonEXLoad || // exLoads.characterExLoadID == HatsuneMikuEXLoad) {
+				//if(exLoads.characterExLoadID == Reala || //exLoads.characterExLoadID == GonGon || // exLoads.characterExLoadID == HatsuneMiku) {
 				// 	weightDiff = (EXLoadWeights[exLoads.characterExLoadID] + player->gearptr->weight) - baseWeight;
 				// }
 
@@ -130,9 +128,9 @@ ASMUsed bool Player_ZIgnoreTornado(Player *player) {
 				player->tornadoIgnore_invincibilityTimer = 30;
 				if(!(isHighBoosting)) {
 					lbl_Player_BoostEndFunction(player);
-					Player_DecreaseMI(player, 0.85f);
+					Player_DecreaseMI(player, 0.65f);
 				} else {
-					Player_DecreaseMI(player, 0.9f);
+					Player_DecreaseMI(player, 0.65f);
 				}
 
 				PlayAudioFromDAT(Sound::SFX::TornadoIgnore);// play tornado ignore sfx
@@ -144,9 +142,9 @@ ASMUsed bool Player_ZIgnoreTornado(Player *player) {
 			player->tornadoIgnore_invincibilityTimer = 30;
 			if(!(isHighBoosting)) {
 				lbl_Player_BoostEndFunction(player);
-				Player_DecreaseMI(player, 0.85f);
+				Player_DecreaseMI(player, 0.65f);
 			} else {
-				Player_DecreaseMI(player, 0.9f);
+				Player_DecreaseMI(player, 0.65f);
 			}
 		}
 	}

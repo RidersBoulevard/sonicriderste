@@ -30,7 +30,7 @@ ASMDefined void Player_JumpChargeParticlesTask();
 ASMUsed void Player_JumpChargeParticlesVisibility() {
 	auto &obj = *gpsCurrentTask;
 	const Player &player = players[obj.player_index];
-	if (player.extremeGear != ExtremeGear::AdvantageS && player.state == Run) {
+	if (player.extremeGear != ExtremeGear::AdvantageS && player.state == PlayerState::Run) {
 		return;
 	}
 	Player_JumpChargeParticlesTask();

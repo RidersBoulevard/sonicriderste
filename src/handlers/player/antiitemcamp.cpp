@@ -6,23 +6,17 @@
 #include "riders/object.hpp"
 
 ASMUsed u32 AntiItemCampHandler(Player *player, u32 item) {
-	EnabledEXLoads exLoads;
-	FetchEnabledEXLoadIDs(player, exLoads);
     if (CurrentGameMode != TimeTrial) {
-        if (player->state == StartLine) {
+        if (player->state == PlayerState::StartLine) {
             item = SpeedShoes;
         } else {
             if ((player->extremeGear == ExtremeGear::SuperHangOn && player->gearSpecificFlags[SuperHangOn::Level4]) && player->last_itemBox_random) {
                 item = SpeedShoes;
             }
 
-            if (player->extremeGear == ExtremeGear::HangOn && player->last_itemBox_random && item == SpeedShoes
-                && exLoads.gearExLoadID != HangOnATEXLoad) {
-                // experimental, replaces speed shoes with ten ring box instead
-                item = TenRings; 
-            }
+        	const auto &exloadID = player->gearExload().exLoadID;
 
-            if (exLoads.gearExLoadID == TheBeastEXLoad && player->state == Run && (item == ThirtyAir || item == FiftyAir || item == HundredAir))
+            if (exloadID == EXLoad::TheBeast && player->state == PlayerState::Run && (item == ThirtyAir || item == FiftyAir || item == HundredAir))
             {
                switch (lbl_RNG_Number(3)) {
                     case 1:
@@ -53,6 +47,21 @@ ASMUsed u32 AntiItemCampHandler(Player *player, u32 item) {
             //     ATInfo->itemUsed = 0;
             //     return item;
             // }
+
+            // Fix for new speed shoe RNG, items will go OOB if the chance is zero so this covers that case
+            if (item > FiveRings) {
+                switch (lbl_RNG_Number(1)) {
+                    case 0:
+                        item = TenRings;
+                        break;
+                    case 1:
+                        item = ThirtyAir;
+                        break;
+                    default:
+                        item = FiveRings;
+                        break; 
+                }
+            }
              
 
             if (player->last_itemID_lap != player->currentLap) {

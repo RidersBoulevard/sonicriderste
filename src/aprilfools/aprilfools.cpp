@@ -18,7 +18,7 @@ ASMUsed void AprilFools_EnableMotionBlur() {
 ASMUsed void AprilFools_EnablePoopyCSSGradient() {
 	if(!Date::GetCurrentDate().CheckAprilFools()) { return; }
     void *cssBackground = lbl_10087EC4.graphicalData->objects[0x15]->objects[0x8];
-    RGBA *gradient = static_cast<RGBA*>(cssBackground) + 0x20 / 4;
+	RGBA32 *gradient = static_cast<RGBA32*>(cssBackground) + 0x20 / 4;
     gradient[0] = 0x77FF00FF;
     gradient[1] = 0x77FF00FF;
     gradient[2] = 0x784000FF;

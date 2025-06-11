@@ -8,7 +8,7 @@ ASMUsed f32 Player_TurbulenceTrickSpeed(Player *player) {
         newTrickSpeed = player->speed + pSpeed(100);
     }
 
-    if (player->characterArchetype == TricksterArchetype) 
+    if (player->characterArchetype == CharacterArchetype::Trickster) 
     	newTrickSpeed += pSpeed(50);
 
     return newTrickSpeed;

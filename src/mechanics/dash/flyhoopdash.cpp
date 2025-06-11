@@ -13,11 +13,10 @@ ASMUsed void Player_SetFlyHoopProperties(Player *player) {
 }
 
 void Player_FlyHoopDashHandler(Player *player) {
-	const EnabledEXLoads exLoads = FetchEnabledEXLoadIDs(*player);
 	PlayerFlyHoopDashProperties *properties = &playerFlyHoopDashProperties[player->index];
 
 	// player->state == StartLine is redundant here, should this be `&&`?
-	if(player->state == StartLine || player->state != Fly) {
+	if(player->state == PlayerState::StartLine || player->state != PlayerState::Fly) {
 		properties->duration = 0;
 		properties->gainDelay = 0.0f;
 		properties->hasUsed = FALSE;
@@ -35,7 +34,7 @@ void Player_FlyHoopDashHandler(Player *player) {
 	// 			if(player->specialFlags & ringGear){
 	// 				if(player->character == SuperSonic
 	// 				   && player->shortcutAirGainMultiplier > 0
-	// 				   && exLoads.gearExLoadID != HyperSonicEXLoad){
+	// 				   && exLoads.gearExLoadID != HyperSonic){
 	// 					player->shortcutAirGainMultiplier -= FlyHoopDashInitialCosts[player->level];
 	// 					if(player->shortcutAirGainMultiplier < 0) player->shortcutAirGainMultiplier = 0;
 	// 				}else{
@@ -51,7 +50,7 @@ void Player_FlyHoopDashHandler(Player *player) {
 	// 				f32 newMI;
 	// 				if(player->character == SuperSonic
 	// 				   && player->shortcutAirGainMultiplier > 0
-	// 				   && exLoads.gearExLoadID != HyperSonicEXLoad){
+	// 				   && exLoads.gearExLoadID != HyperSonic){
 	// 					newMI = player->magneticImpulse_timer; // essentially does nothing with blast gauge
 	// 				}else{
 	// 					newMI = player->magneticImpulse_timer - 3.0f;
@@ -90,7 +89,7 @@ void Player_FlyHoopDashHandler(Player *player) {
 }
 
 ASMUsed void Player_FlyHoopDashAttack(Player *attackingPlayer, Player *attackedPlayer) {
-	if(!attackedPlayer->specialFlags.hasAny(ringGear) && attackedPlayer->state == Fly && attackingPlayer->state == Fly && attackingPlayer->flyHoopDash != 0) {
+	if(!attackedPlayer->specialFlags.hasAny(SpecialFlags::ringGear) && attackedPlayer->state == PlayerState::Fly && attackingPlayer->state == PlayerState::Fly && attackingPlayer->flyHoopDash != 0) {
 		Player_RingLossVisualsSFX(attackedPlayer);
 		RingLoss_OnAttack(attackedPlayer);
 		attackedPlayer->changeInAir_gain -= 30000;

@@ -50,7 +50,7 @@ constexpr GameObject eggFactory_flyhoop3 =
 		 170, 1, 0};                  // other properties
 
 constexpr GameObject nightChase_car1 =
-		{Car, 0x4, 0x4F, 0x1DCF, 0x2,
+		{MetalCityCar, 0x4, 0x4F, 0x1DCF, 0x2,
 		 -125.595f, -66.9674f, -411.637f,// coordinates
 		 -1.05286f, 171.856f, 0.00003f,  // rotation
 		 0, 0, 0};                       // other properties
@@ -151,6 +151,6 @@ constexpr GameObject digitalDimension_itembox2 =
 		 0, 0, 0,                          // rotation
 		 0, 0, 0};                         // other properties
 
-ASMDefined void *lbl_10008200[];
+ASMDefined void *gu32ObjMtxPalMaxSize[];
 ASMUsed void CustomGameObjectSpawner();
 ASMUsed bool GameObjectDespawner(ObjectInfo *objectInfo, u32 object_id);

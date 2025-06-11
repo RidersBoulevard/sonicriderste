@@ -21,9 +21,13 @@ enum GameModes : u32 {
 	CutsceneMode = 1000
 };
 
+enum class ExitMethod : u32{
+	Retry = 2,
+};
+
 ASMDefined const volatile GameModes CurrentGameMode;
 ASMDefined const volatile u32 geGame_ModeDetail; ///< Variable that determines sort of the gamemode's "state" in a weird way.
-ASMDefined const volatile u32 RaceExitMethod;
+ASMDefined const volatile ExitMethod RaceExitMethod; // aka gu32EndOfGameFlag
 
 [[nodiscard]] inline bool isInGame() {
 	const auto currentGameMode = CurrentGameMode;

@@ -2,7 +2,7 @@
 
 using AVLP = AttackingVoiceLinePair;
 // Todo: Do... something... about this mess
-constexpr std::array<AttackingVoiceLineList, TotalCharacterAmount> AttackingVoiceTable {{
+constexpr std::array<AttackingVoiceLineList, Character::Total> AttackingVoiceTable {{
 		{// Sonic
 				.lvl1 = AVLP(0x6,	{0x1b}),
 				.lvl2 = AVLP(		{0x1a, 0x6}),

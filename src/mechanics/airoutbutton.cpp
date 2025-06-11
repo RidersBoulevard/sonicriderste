@@ -16,13 +16,13 @@ inline void CheatCodeAdvanceState(CheatCodeInput *cheatCodeInfo) {
 }
 
 void CheatCodeDetermineStartingButton(Player *player, CheatCodeInput *cheatCodeInfo) {
-	if(cheatCodeInfo->startingButton != CHEATCODE_NONEBUTTONSTART) return;
+	if(cheatCodeInfo->startingButton != CHEATCODE_NONEBUTTONSTART) { return; }
 
 	u8 startingButton = CHEATCODE_NONEBUTTONSTART;
 
-	if(player->input->toggleFaceButtons & LButton) {
+	if(player->input->toggleFaceButtons.hasAny(Buttons::L)) {
 		startingButton = CHEATCODE_LBUTTONSTART;
-	} else if(player->input->toggleFaceButtons & RButton) {
+	} else if(player->input->toggleFaceButtons.hasAny(Buttons::R)) {
 		startingButton = CHEATCODE_RBUTTONSTART;
 	}
 
@@ -85,24 +85,23 @@ void Player_AirOutButton(Player *player) {
 
 void Player_AirOutButton(Player *player) {
 	// L or R + Z + C stick up
-    BlastGaugeInfo *bgInfo = &PlayerBlastGaugeInfo[player->index];
-    HyperSonicInfo *hsInfo = &PlayerHyperSonicInfo[player->index];
 	if(!DebugMenu_CheckOption(DebugMenuOptions::ExtremeDetach)) { return; }
-	if(player->flags.hasAny(InAPit) ||
-	   player->state == QTE ||
-	   player->state == RailGrind ||
-	   player->state == Fly) {
+	if(player->flags.hasAny(PlayerFlags::InAPit) ||
+	   player->state == PlayerState::QTE ||
+	   player->state == PlayerState::RailGrind ||
+	   player->state == PlayerState::Fly) {
 		return;
 	}
+    HyperSonicInfo *hsInfo = &PlayerHyperSonicInfo[player->index];
 	if(player->extremeGear == ExtremeGear::AdvantageS ||
 	   player->extremeGear == ExtremeGear::Beginner ||
-       (player->character == SuperSonic && FetchEnabledEXLoadIDs(*player).gearExLoadID == HyperSonicEXLoad 
+       (player->character == Character::SuperSonic && player->gearExload().exLoadID == EXLoad::HyperSonic
        && hsInfo->hyperdriveEnabled)) {
 		return;
 	}
 
 	const auto &holdButtons = player->input->holdFaceButtons;
-	if(holdButtons.hasAny(LButton, RButton) && holdButtons.hasAny(ZButton) && player->input->rightStickVertical > 80) {
+	if(holdButtons.hasAny(Buttons::L, Buttons::R) && holdButtons.hasAny(Buttons::Z) && player->input->rightStickVertical > 80) {
 		player->currentAir = 0;
 	}
 }

@@ -1,21 +1,30 @@
 #include "character_archetype.hpp"
 #include "cosmetics/player/exloads.hpp"
+#include "riders/stage.hpp"
 
 USED void Player_CharacterArchetype(Player *player) {
-    CharacterArchetypes archetype = AllCharacterArchetypes[player->character];
+    if (CurrentStage == BabylonGarden || CurrentStage == SkyRoad) {
+        // If the turbulence on these stages try to access this, deny it and return none
+        // The old behavior interpreted this "player" to be sonic and always returned late booster,
+        // So that is replicated here.
+        if (player->index == InGamePlayerCount) {
+            player->characterArchetype = CharacterArchetype::LateBooster;
+            return;
+        }
+    }
 
-    const EnabledEXLoads exLoads = FetchEnabledEXLoadIDs(*player);
+    CharacterArchetype archetype = AllCharacterArchetypes[player->character];
 
-    if (exLoads.characterExLoadID != NoneEXLoad) {
-        CharacterArchetypes const newArchetype = EXLoadArchetypes[exLoads.characterExLoadID];
-        if (newArchetype != NoEXLoadArchetype) {
+    if (player->hasCharacterExload()) {
+        const CharacterArchetype newArchetype = player->characterExload().archetype();
+        if (newArchetype != CharacterArchetype::NoEXLoad) {
             archetype = newArchetype;
         }
     }
 
-    if (isSuperCharacter(*player, MetalSonic)) {
-        player->characterArchetype = NoneArchetype;
-    } else {
-        player->characterArchetype = archetype;
+    if (isSuperCharacter(*player, Character::MetalSonic)) {
+        archetype = CharacterArchetype::None;
     }
+
+    player->characterArchetype = archetype;
 }

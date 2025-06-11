@@ -3,69 +3,76 @@
 
 std::array<HyperSonic_ColorState, MaxPlayerCount> HyperSonic_ColorState;
 
+static constexpr RGBModule RED{1, 0, 0};
+static constexpr RGBModule BLUE{0, 0, 1};
+static constexpr RGBModule GREEN{0, 1, 0};
+static constexpr RGBModule YELLOW{1, 1, 0};
+static constexpr RGBModule WHITE{1, 1, 1};
+static constexpr RGBModule VIOLET{0.5647058823529412f, 0, 1};
 
-inline RGBModule TransitionColorValues(RGBModule *fromValues, RGBModule *toValues) {
+constexpr RGBModule TransitionColorValues(const RGBModule &fromValues, const RGBModule &toValues) {
 	// calculate differences
+	constexpr auto transitionValue = 0.25F;
 	return RGBModule{
-			(toValues->R - fromValues->R) * 0.25F,
-			(toValues->G - fromValues->G) * 0.25F,
-			(toValues->B - fromValues->B) * 0.25F
+		(toValues.R - fromValues.R) * transitionValue,
+		(toValues.G - fromValues.G) * transitionValue,
+		(toValues.B - fromValues.B) * transitionValue
 	};
 }
 
-
 void HyperSonic_RainbowLighting(Player *player) {
-	void **modeldataptr = &lbl_1000DFE4 + player->index;
-	void *lightingptr = static_cast<u32*>(*modeldataptr) + 5;
-	void **temp2 = static_cast<void **>(lightingptr);
-	void *generallightingptr = static_cast<u32 *>(*temp2) + 7;
-	void **temp = static_cast<void **>(generallightingptr);
-	auto *lighting =  static_cast<Lighting *>(*temp);
-	RGBModule originalValues{}, toValues{}, finalValues;
-	const u8 &index = player->index;
-	const EnabledEXLoads exLoads = FetchEnabledEXLoadIDs(*player);
-
-	if (exLoads.gearExLoadID != HyperSonicEXLoad) { return; }
-
-	if (!player->hyperSonicInit) {
-		lighting->red1 = 0.5647058823529412f;
-		//lighting->red2 = 1;
-		lighting->green1 = 0;
-		//lighting->green2 = 0;
-		lighting->blue1 = 1;
-		//lighting->blue2 = 0;
-		player->hyperSonicInit = 1;
-		HyperSonic_ColorState[index].state = 0;
-		HyperSonic_ColorState[index].transitionFrames = 0;
+	if(player->gearExload().exLoadID != EXLoad::HyperSonic) [[likely]] { // Func is called for all players so most of the time its not hyper sonic
+		return;
+	}
+	if(player->character != Character::SuperSonic) [[unlikely]] { // Todo: band-aid fix. Figure out why eggman's gear exload gets set to hyper
+		return;
 	}
 
-	if (gu32GameCnt % 8 == 0) { // every 8 frames
-		HyperSonic_ColorState[index].state += 1;
-		HyperSonic_ColorState[index].transitionFrames = 0;
-		if (HyperSonic_ColorState[index].state >= 6) {
-			HyperSonic_ColorState[index].state = 0;
+	const u8 &index          = player->index;
+	void **modeldataptr      = &gpsaObject_Player + index;
+	void *lightingptr        = static_cast<u32*>(*modeldataptr) + 5;
+	void **temp2             = static_cast<void**>(lightingptr);
+	void *generallightingptr = static_cast<u32*>(*temp2) + 7;
+	void **temp              = static_cast<void**>(generallightingptr);
+	auto *lighting           = static_cast<Lighting*>(*temp);
+	auto &colorState = HyperSonic_ColorState[index];
+
+	if(player->hyperSonicInit == 0u) {
+		lighting->rgb_modules[0] = VIOLET;
+		//lighting->rgb_modules[1] = RED;
+		//lighting->red1 = 0.5647058823529412f;
+		//lighting->red2 = 1;
+		//lighting->green1 = 0;
+		//lighting->green2 = 0;
+		//lighting->blue1 = 1;
+		//lighting->blue2 = 0;
+		player->hyperSonicInit                        = 1;
+		colorState.state            = 0;
+		colorState.transitionFrames = 0;
+	}
+
+	if(gu32GameCnt % 8 == 0) { // every 8 frames
+		colorState.state += 1;
+		colorState.transitionFrames = 0;
+		if(colorState.state >= 6) {
+			colorState.state = 0;
 		}
 	}
 
-	switch (HyperSonic_ColorState[index].state) {
-		case 0:
-			if (HyperSonic_ColorState[index].transitionFrames >= 4) {
-				break;
-			}
-			HyperSonic_ColorState[index].transitionFrames += 1;
+	if(colorState.transitionFrames >= 4) {
+		return;
+	}
+	colorState.transitionFrames += 1;
 
-			originalValues.R = 0.5647058823529412f;
-			originalValues.G = 0;
-			originalValues.B = 1;
+	switch(colorState.state) {
+		case 0: {
 			// red
-			toValues.R = 1;
-			toValues.G = 0;
-			toValues.B = 0;
-			finalValues = TransitionColorValues(&originalValues, &toValues);
+			constexpr RGBModule finalValues = TransitionColorValues(VIOLET, RED);
 
-			lighting->red1 += finalValues.R;
-			lighting->green1 += finalValues.G;
-			lighting->blue1 += finalValues.B;
+			lighting->rgb_modules[0] += finalValues;
+			//lighting->red1 += finalValues.R;
+			//lighting->green1 += finalValues.G;
+			//lighting->blue1 += finalValues.B;
 
 			//lighting->red1 = 1;
 			//lighting->red2 = 1;
@@ -74,24 +81,15 @@ void HyperSonic_RainbowLighting(Player *player) {
 			//lighting->blue1 = 0;
 			//lighting->blue2 = 0;
 			break;
-		case 1:
-			if (HyperSonic_ColorState[index].transitionFrames >= 4) {
-				break;
-			}
-			HyperSonic_ColorState[index].transitionFrames += 1;
-
-			originalValues.R = 1;
-			originalValues.G = 0;
-			originalValues.B = 0;
+		}
+		case 1: {
 			// blue
-			toValues.R = 0;
-			toValues.G = 0;
-			toValues.B = 1;
-			finalValues = TransitionColorValues(&originalValues, &toValues);
+			constexpr RGBModule finalValues = TransitionColorValues(RED, BLUE);
 
-			lighting->red1 += finalValues.R;
-			lighting->green1 += finalValues.G;
-			lighting->blue1 += finalValues.B;
+			lighting->rgb_modules[0] += finalValues;
+			//lighting->red1 += finalValues.R;
+			//lighting->green1 += finalValues.G;
+			//lighting->blue1 += finalValues.B;
 
 			//lighting->red1 = 0;
 			//lighting->red2 = 0;
@@ -100,24 +98,15 @@ void HyperSonic_RainbowLighting(Player *player) {
 			//lighting->blue1 = 1;
 			//lighting->blue2 = 1;
 			break;
-		case 2:
-			if (HyperSonic_ColorState[index].transitionFrames >= 4) {
-				break;
-			}
-			HyperSonic_ColorState[index].transitionFrames += 1;
-
-			originalValues.R = 0;
-			originalValues.G = 0;
-			originalValues.B = 1;
+		}
+		case 2: {
 			// green
-			toValues.R = 0;
-			toValues.G = 1;
-			toValues.B = 0;
-			finalValues = TransitionColorValues(&originalValues, &toValues);
+			constexpr RGBModule finalValues = TransitionColorValues(BLUE, GREEN);
 
-			lighting->red1 += finalValues.R;
-			lighting->green1 += finalValues.G;
-			lighting->blue1 += finalValues.B;
+			lighting->rgb_modules[0] += finalValues;
+			//lighting->red1 += finalValues.R;
+			//lighting->green1 += finalValues.G;
+			//lighting->blue1 += finalValues.B;
 
 			//lighting->red1 = 0;
 			//lighting->red2 = 0;
@@ -126,24 +115,15 @@ void HyperSonic_RainbowLighting(Player *player) {
 			//lighting->blue1 = 0;
 			//lighting->blue2 = 0;
 			break;
-		case 3:
-			if (HyperSonic_ColorState[index].transitionFrames >= 4) {
-				break;
-			}
-			HyperSonic_ColorState[index].transitionFrames += 1;
-
-			originalValues.R = 0;
-			originalValues.G = 1;
-			originalValues.B = 0;
+		}
+		case 3: {
 			// yellow
-			toValues.R = 1;
-			toValues.G = 1;
-			toValues.B = 0;
-			finalValues = TransitionColorValues(&originalValues, &toValues);
+			constexpr RGBModule finalValues = TransitionColorValues(GREEN, YELLOW);
 
-			lighting->red1 += finalValues.R;
-			lighting->green1 += finalValues.G;
-			lighting->blue1 += finalValues.B;
+			lighting->rgb_modules[0] += finalValues;
+			//lighting->red1 += finalValues.R;
+			//lighting->green1 += finalValues.G;
+			//lighting->blue1 += finalValues.B;
 
 			//lighting->red1 = 1;
 			//lighting->red2 = 1;
@@ -152,24 +132,15 @@ void HyperSonic_RainbowLighting(Player *player) {
 			//lighting->blue1 = 0;
 			//lighting->blue2 = 0;
 			break;
-		case 4:
-			if (HyperSonic_ColorState[index].transitionFrames >= 4) {
-				break;
-			}
-			HyperSonic_ColorState[index].transitionFrames += 1;
-
-			originalValues.R = 1;
-			originalValues.G = 1;
-			originalValues.B = 0;
+		}
+		case 4: {
 			// white
-			toValues.R = 1;
-			toValues.G = 1;
-			toValues.B = 1;
-			finalValues = TransitionColorValues(&originalValues, &toValues);
+			constexpr RGBModule finalValues = TransitionColorValues(YELLOW, WHITE);
 
-			lighting->red1 += finalValues.R;
-			lighting->green1 += finalValues.G;
-			lighting->blue1 += finalValues.B;
+			lighting->rgb_modules[0] += finalValues;
+			//lighting->red1 += finalValues.R;
+			//lighting->green1 += finalValues.G;
+			//lighting->blue1 += finalValues.B;
 
 			//lighting->red1 = 1;
 			//lighting->red2 = 1;
@@ -178,24 +149,15 @@ void HyperSonic_RainbowLighting(Player *player) {
 			//lighting->blue1 = 1;
 			//lighting->blue2 = 1;
 			break;
-		case 5:
-			if (HyperSonic_ColorState[index].transitionFrames >= 4) {
-				break;
-			}
-			HyperSonic_ColorState[index].transitionFrames += 1;
-
-			originalValues.R = 1;
-			originalValues.G = 1;
-			originalValues.B = 1;
+		}
+		case 5: {
 			// violet
-			toValues.R = 0.5647058823529412f;
-			toValues.G = 0;
-			toValues.B = 1;
-			finalValues = TransitionColorValues(&originalValues, &toValues);
+			constexpr RGBModule finalValues = TransitionColorValues(WHITE, VIOLET);
 
-			lighting->red1 += finalValues.R;
-			lighting->green1 += finalValues.G;
-			lighting->blue1 += finalValues.B;
+			lighting->rgb_modules[0] += finalValues;
+			//lighting->red1 += finalValues.R;
+			//lighting->green1 += finalValues.G;
+			//lighting->blue1 += finalValues.B;
 
 			//lighting->red1 = 0.5647058823529412;
 			//lighting->red2 = 0.5647058823529412;
@@ -204,7 +166,7 @@ void HyperSonic_RainbowLighting(Player *player) {
 			//lighting->blue1 = 1;
 			//lighting->blue2 = 1;
 			break;
-		default:
-			break;
+		}
+		default: break;
 	}
 }

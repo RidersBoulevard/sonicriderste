@@ -30,10 +30,10 @@ struct CollisionProperties{
 		OnIce 				= 0x23
 	};
 
-    CollisionType type = None;
-    u16 someOtherProperty = 0;
+	u16 someOtherProperty = 0;
+	CollisionType type = None;
 
-	constexpr explicit CollisionProperties(CollisionType collisionType, u16 otherProperty = 0) : type(collisionType), someOtherProperty(otherProperty){}
+	constexpr explicit CollisionProperties(CollisionType collisionType, u16 otherProperty = 0) : someOtherProperty(otherProperty), type(collisionType){}
 	// boilerplate
 	constexpr CollisionProperties() = default;
 	constexpr CollisionProperties(const CollisionProperties &) = default;

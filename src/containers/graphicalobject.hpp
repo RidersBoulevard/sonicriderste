@@ -53,7 +53,7 @@ struct GraphicalObject {
 
 	Vector3F textureTransform;
 
-	RGBA tint;
+	RGBA32 tint;
 
     u32 unkB0;
     u32 unkB4;

@@ -19,14 +19,18 @@ namespace DebugMenuOptions {
 		DisableHUDFull,
 		InfiniteAir,
 		InfiniteRings,
-		AlwaysMaxMI
+		AlwaysMaxMI,
+		MusicPlaylist, // if this enum is toggled it's vanilla playlist
+        ClutchAsTexture,
+        ClutchAsAirGauge
 	};
-	constexpr auto PAGE1OPTIONCOUNT = 10;
+	constexpr auto PAGE1OPTIONCOUNT = 12;
 	constexpr auto DefaultPage1Options = 1 << MagneticImpulse
 	                                     | 1 << Autopilot
 	                                     | 1 << TornadoIgnore
 	                                     | 1 << TimerActivity_ActiveInSingleplayer
-	                                     | 1 << ExtremeDetach;
+	                                     | 1 << ExtremeDetach
+                                         | 1 << ClutchAsAirGauge;
 }// namespace DebugMenuOptions
 
 struct DebugMenuData {
@@ -77,3 +81,4 @@ ASMUsed void DebugMenu_Handler(ObjectNode *object, AllPlayerInputs *inputs);
 std::optional<u8> DebugMenu_FetchOptionFromOptionSet(std::span<u8> options);
 u32 DebugMenu_FetchTextID(u32 option);
 ASMUsed void DebugMenu_RenderDescription();
+[[nodiscard]] bool DebugMenu_IsVanillaPlaylist();

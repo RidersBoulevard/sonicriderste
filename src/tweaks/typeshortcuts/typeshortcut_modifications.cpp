@@ -4,6 +4,9 @@
 #include "mechanics/magneticimpulse.hpp"
 #include "riders/object.hpp"
 #include "riders/stage.hpp"
+#include "gears/omnipotence.hpp"
+#include "handlers/player/specialflagtweaks.hpp"
+#include "gears/hypersonic.hpp"
 
 constexpr std::array<f32, TotalStageAmount> PowerObjectSpeeds = {
         0,         // test stage
@@ -28,39 +31,39 @@ constexpr std::array<f32, TotalStageAmount> PowerObjectSpeeds = {
 constexpr f32 PowerObjectSpeeds_MaxMISpeed = pSpeed(50.0f);
 
 ASMUsed u32 PowerObjectSpeed(Player *player, ObjectNode *object, ObjectNode *digitalObject, u32 airGain) {
-	EnabledEXLoads exLoads;
-	FetchEnabledEXLoadIDs(player, exLoads);
 	BlastGaugeInfo *bgInfo = &PlayerBlastGaugeInfo[player->index];
+	const auto &exloadID   = player->gearExload().exLoadID;
 
-	if (player->specialFlags.hasAny(ringGear) &&
+	if(player->specialFlags.hasAny(SpecialFlags::ringGear) &&
 	   player->extremeGear != ExtremeGear::Accelerator &&
-	exLoads.gearExLoadID != HyperSonicEXLoad) {
-		f32 startObj = 80.0f;
+	   exloadID != EXLoad::HyperSonic) {
+		f32 startObj         = 80.0f;
 		const auto typeCount = player->getTypeCount();
 
-		if (typeCount == 3) {
+		if(typeCount == 3) {
 			startObj = 60.0f;
-		} else if (typeCount == 2) {
+		} else if(typeCount == 2) {
 			startObj = 80.0f;
 		} else {
 			startObj = 100.0f;
 		}
 
 		f32 modifier = startObj - (static_cast<f32>(player->objectLinkCount) * 10.0f);
-		if (modifier < 0.0f) { modifier = 0.0f; }
+		if(modifier < 0.0f) {
+			modifier = 0.0f;
+		}
 		MI::impulseData[player->index].ringPowerObjTimer += modifier;
 	}
 
 	f32 speedToAdd = PowerObjectSpeeds[CurrentStage];
-	if(player->character == Emerl) {
+	if(player->character == Character::Emerl) {
 		GizoidReplicationInfo *grInfo = &PlayerGizoidReplication[player->index];
 		if(grInfo->isEnabled && InGamePlayerCount >= 2) {
 			const auto typeCount = player->getTypeCount();
-			if (typeCount < 2){
+			if(typeCount < 2) {
 				speedToAdd *= GR_TypeShortcutSpeedMultiplier;
 				speedToAdd += pSpeed(5.0f);
-			}
-			else if (typeCount < 3){
+			} else if(typeCount < 3) {
 				speedToAdd *= GR_TypeShortcutSpeedMultiplierDual;
 				speedToAdd += pSpeed(2.0f);
 			}
@@ -76,87 +79,115 @@ ASMUsed u32 PowerObjectSpeed(Player *player, ObjectNode *object, ObjectNode *dig
 	}
 
 	switch(CurrentStage) {
-		case SkyRoad:
-			airGain *= 3;
-			if(!object) { break; }
+		case SkyRoad: airGain *= 3;
+			if(object == nullptr) {
+				break;
+			}
 			if(object->object_id == 0xEB) {
 				airGain = 30000;
 				newSpeed -= pSpeed(30);
 			}
 			break;
 
-		case SandRuins:
-			airGain *= 2;
+		case SandRuins: airGain *= 2;
 			break;
 
-		case IceFactory:
-			if(object && object->object_id == 0xA) {
+		case IceFactory: if(object && object->object_id == 0xA) {
 				// icicle on last ramp
 				airGain = 30000;
 			}
 			break;
+
+		case NightChase:
+			if(!object) { break; }
+			if(object->object_id >= 0x131 && object->object_id <= 0x137) {break;} // 1st power path
+			if((object->object_id >= 0xBA && object->object_id <= 0xBC) || object->object_id == 0x211) {
+				// 2nd power path stationary cars
+				airGain += (airGain / 4); // +25% air gain
+				break;
+			}
+			airGain *= 2; // only the stray cars and power path entrance should be doubled
+			break;
+
 		default:
 			break;
 	}
 
-	if(isSuperCharacter(*player, Knuckles)) {// super knuckles
-		newSpeed += pSpeed(10);
+	if(isSuperCharacter(*player, Character::Knuckles)) {
+		// super knuckles
+		// newSpeed += pSpeed(10);
 	} else {
 		switch(player->extremeGear) {
-			using namespace ExtremeGear;
-			case CoverS:
-				if(player->characterptr->type != 0x2) {
-					newSpeed += pSpeed(10);
+				using namespace ExtremeGear;
+			case CoverS: if(player->characterptr->type != Character::Type::Power) {
+					newSpeed += pSpeed(11.5);
 				}
 				break;
 
-			case Destroyer:
-				if(player->typeAttributes == Type::Power) {
+			case Destroyer: if(player->typeAttributes == Type::Power) {
 					newSpeed += pSpeed(13);
 				}
 				break;
-			case ChaosEmerald:
-				switch(player->character) {
-					case MetalSonic:
-						newSpeed += pSpeed(3) * static_cast<f32>(player->objectLinkCount);
+			case ChaosEmerald: 
+			switch(player->character) {
+					case Character::MetalSonic: newSpeed += pSpeed(2) * static_cast<f32>(player->objectLinkCount);
 						break;
-					case SuperSonic:
-						if(player->movementFlags.hasAny(boosting)
-						   && bgInfo->currentGauge > 0
-						   && exLoads.gearExLoadID != HyperSonicEXLoad) {
-							newSpeed += pSpeed(10.0f);
+					case Character::SuperSonic: {
+					// if(player->gearExload().exLoadID != EXLoad::DarkSonic) {
+						BlastGaugeInfo* bgInfo = &PlayerBlastGaugeInfo[player->index];
+						HyperSonicInfo *hsInfo = &PlayerHyperSonicInfo[player->index];
+							if (player->gearExload().exLoadID == EXLoad::HyperSonic) {
+								if (hsInfo->hyperdriveEnabled) {bgInfo->currentGauge += 1700;}
+								break;
+							}
+							if (player->movementFlags.hasAny(MovementFlags::boosting)) {
+								if (bgInfo->currentGauge > 0) {newSpeed += pSpeed(10.0f);}
+								s32 newBlastGaugeValue = bgInfo->currentGauge - 10000;
+								bgInfo->currentGauge = clamp(newBlastGaugeValue);
+							}
 						}
 						break;
-					default:
-						break;
+					default: break;
 				}
 				break;
+			case Omnipotence: {
+				OmnipotenceInfo *OMNInfo = &PlayerOMNInfo[player->index];
+				if((OMNInfo->lastShortcutType != 3)) {
+					// if (player->character == E10G) {newSpeed += pSpeed(5.0f);}
+					// else 
+					if (OMNInfo->lastShortcutType != 0) {newSpeed += pSpeed(7.0f);}
+				}
+				break;
+			}
 				// case SuperHangOn:
 				//     {
 				//         HHOInfo *hhoInfo = &PlayerHHOInfo[player->index];
 				//         if (exLoads.gearExLoadID == HyperHangOnEXLoad && player->characterptr->type == 0x2 && hhoInfo->extraType == PowerType && hhoInfo->saturnMegadriveStatus == 2) newSpeed += pSpeed(10.0f);
 				//         break;
 				//     }
-			case TurboStar: {
-				if(exLoads.gearExLoadID == OllieKingGearEXLoad) {
-					newSpeed += (player->speed * 10) / 100;
-				}
-				break;
-			}
-			default:
-				break;
+			default: break;
 		}
-		if (player->characterArchetype == Mechanic)
-		{newSpeed += pSpeed(1.0f);}
+		if(player->characterArchetype == CharacterArchetype::Mechanic) {
+			newSpeed += pSpeed(1.0f);
+		}
 
+		SpecialFlagInfo *spfInfo = &PlayerSpecialFlagInfo[player->index];
 		if(player->getTypeCount() == 3) {
-			speedToAdd *= 0.5f;
+			if(player->characterptr->type == Character::Type::Power && player->extremeGear == ExtremeGear::Omnipotence) {
+				speedToAdd *= 0.75f;
+			} 
+			// else if (player->gearExload().exLoadID == EXLoad::DarkSonic && spfInfo->gearChange >= 3 && player->level == 2) {
+			// // skip
+			// } 
+			else speedToAdd *= 0.5f;
 		}
 	}
 
 	if(MI::impulseData[player->index].magneticImpulse) {
 		newSpeed += MI::calculateMultiplier(
-				player, (player->magneticImpulse_timer / MI::MaximumCap) * PowerObjectSpeeds_MaxMISpeed);
+			player,
+			(player->magneticImpulse_timer / MI::MaximumCap) * PowerObjectSpeeds_MaxMISpeed
+		);
 	}
 
 	player->speed = newSpeed;

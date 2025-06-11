@@ -18301,8 +18301,8 @@ lbl_001E8270:
     .4byte lbl_0015E184
     .4byte lbl_00176E6C
     .4byte 0x00000000
-.global lbl_001E82BC
-lbl_001E82BC:
+.global gpActionDrawControl
+gpActionDrawControl:
     # 0x1E82BC
     .4byte lbl_000C7C54
     .4byte lbl_000C9EF4
@@ -19203,8 +19203,8 @@ lbl_001E8E58:
     .4byte 0xFFFFFFFF
     .4byte 0x3F800000
     .4byte 0x3F800000
-.global lbl_001E8F78
-lbl_001E8F78:
+.global gsScriptFunc
+gsScriptFunc:
     # 0x1E8F78
     .4byte 0x00000000
     .4byte 0x00000000
@@ -19609,17 +19609,17 @@ lbl_001E9440:
     .4byte 0x00000000
     .4byte 0x00000000
 .global str_VOICE_AFS
-str_VOICE_AFS:
-    # 0x1E9658
-    .4byte 0x564F4943
-    .4byte 0x452E4146
-    .4byte 0x53000000
-.global str_VOICE_E_AFS
-str_VOICE_E_AFS:
-    # 0x1E9664
-    .4byte 0x564F4943
-    .4byte 0x455F452E
-    .4byte 0x41465300
+//str_VOICE_AFS:
+//    # 0x1E9658
+//    .4byte 0x564F4943
+//    .4byte 0x452E4146
+//    .4byte 0x53000000
+//.global str_VOICE_E_AFS
+//str_VOICE_E_AFS:
+//    # 0x1E9664
+//    .4byte 0x564F4943
+//    .4byte 0x455F452E
+//    .4byte 0x41465300
 .global lbl_001E9670
 lbl_001E9670:
     # 0x1E9670
@@ -20978,25 +20978,25 @@ Gears:
     .4byte 0x40000000 # air cost multiplier when charging jump
     .4byte 0x000186A0 # level 1 max air
     .4byte 0x00000010 # level 1 passive air drain
-    .4byte 0x00000053 # level 1 drift air cost
+    .4byte 0x0000005B # level 1 drift air cost # 0x00000053, 0x00000062
     .4byte 0x000061A8 # level 1 boost cost
     .4byte 0x000061A8 # level 1 tornado cost
     .4byte 0x3EED097B # level 1 speed gained from a drift dash
-    .4byte 0x3F6D097B # level 1 boost speed
+    .4byte 0x3F671C72 # level 1 boost speed # 0x3F6D097B
     .4byte 0x000249F0 # level 2 max air
     .4byte 0x00000010 # level 2 passive air drain
-    .4byte 0x000000A6 # level 2 drift air cost
+    .4byte 0x000000AD # level 2 drift air cost # 0x000000A6, 0x000000B5
     .4byte 0x00007530 # level 2 boost cost
     .4byte 0x00007530 # level 2 tornado cost
     .4byte 0x3F1A12F7 # level 2 speed gained from a drift dash
-    .4byte 0x3F884BDA # level 2 boost speed
+    .4byte 0x3F8555C5 # level 2 boost speed # 0x3F884BDA
     .4byte 0x00030D40 # level 3 max air
     .4byte 0x00000010 # level 3 passive air drain
-    .4byte 0x000000FA # level 3 drift air cost
+    .4byte 0x00000104 # level 3 drift air cost # 0x000000FA, 0x00000109
     .4byte 0x00009C40 # level 3 boost cost
     .4byte 0x00009C40 # level 3 tornado cost
     .4byte 0x3F31C71C # level 3 speed gained from a drift dash
-    .4byte 0x3F9425ED # level 3 boost speed
+    .4byte 0x3F912F68 # level 3 boost speed # 0x3F9425ED
     .byte 0x05 # shown dash (tempo) stat
     .byte 0x04 # shown limit (efficiency) stat
     .byte 0x04 # shown power (combat) stat
@@ -21095,7 +21095,7 @@ Gears:
     .4byte 0x00000000 # air gain multiplier (tricks)
     .4byte 0x00000000 # air gain multiplier (shortcuts)
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
-    .4byte 0x04020000 # special flags
+    .4byte 0x00820000 # special flags OG: 0x04020000
     .4byte 0x40000000 # air cost multiplier when charging jump
     .4byte 0x000186A0 # level 1 max air
     .4byte 0x00000010 # level 1 passive air drain
@@ -21559,7 +21559,7 @@ Gears:
     .2byte 0x0000 # ring cost in gear shop
     .4byte 0x00000000 # unknown
     .4byte 0x39CA4587 # acceleration
-    .4byte 0x3CBDA12F # top speed (additive)
+    .4byte 0x3D8E5129 # top speed (additive) # OG: 0x3CBDA12F
     .4byte 0xC1A00000 # off road speed
     .4byte 0x00000000 # speed and handling multiplier
     .4byte 0x3D4CCCCD # weight
@@ -21680,7 +21680,7 @@ Gears:
     .2byte 0x05DC # ring cost in gear shop
     .4byte 0x00000000 # unknown
     .4byte 0x39CA600B # acceleration
-    .4byte 0xBD3DA12F # top speed (additive)
+    .4byte 0x3D7684BE # top speed (additive) # 0xBD3DA12F
     .4byte 0xC1200000 # off road speed
     .4byte 0x00000000 # speed and handling multiplier
     .4byte 0x3E4CCCCD # weight
@@ -21708,21 +21708,21 @@ Gears:
     .4byte 0x000061A8 # level 1 boost cost
     .4byte 0x000061A8 # level 1 tornado cost
     .4byte 0x3E6D097B # level 1 speed gained from a drift dash
-    .4byte 0x3F697B42 # level 1 boost speed
+    .4byte 0x3F6D097B # level 1 boost speed 0x3F697B42
     .4byte 0x000249F0 # level 2 max air
     .4byte 0x00000010 # level 2 passive air drain
     .4byte 0x000000FA # level 2 drift air cost
     .4byte 0x00007530 # level 2 boost cost
     .4byte 0x00007530 # level 2 tornado cost
     .4byte 0x3EBDA12F # level 2 speed gained from a drift dash
-    .4byte 0x3F8684BE # level 2 boost speed
+    .4byte 0x3F884BDA # level 2 boost speed 0x3F8684BE
     .4byte 0x00030D40 # level 3 max air
     .4byte 0x00000010 # level 3 passive air drain
     .4byte 0x0000014D # level 3 drift air cost
     .4byte 0x00009C40 # level 3 boost cost
     .4byte 0x00009C40 # level 3 tornado cost
     .4byte 0x3EED097B # level 3 speed gained from a drift dash
-    .4byte 0x3F925ED1 # level 3 boost speed
+    .4byte 0x3F9425ED # level 3 boost speed 0x3F925ED1
     .byte 0x04 # shown dash (tempo) stat
     .byte 0x04 # shown limit (efficiency) stat
     .byte 0x03 # shown power (combat) stat
@@ -21922,8 +21922,8 @@ Gears:
     .2byte 0x01F4 # ring cost in gear shop
     .4byte 0x00000000 # unknown
     .4byte 0x3B6A4587 # acceleration
-    .4byte 0x3E638E6D # top speed (additive)
-    .4byte 0xC1200000 # off road speed
+    .4byte 0x3E638E6D # top speed (additive) 0x3E638E6D, 0x3E3425ED
+    .4byte 0x41200000 # off road speed OG: 0xC1200000
     .4byte 0x00000000 # speed and handling multiplier
     .4byte 0x3E19999A # weight
     .4byte 0x00000000 # extra type attribute
@@ -21942,29 +21942,29 @@ Gears:
     .4byte 0x00000000 # air gain multiplier (tricks)
     .4byte 0x00000000 # air gain multiplier (shortcuts)
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
-    .4byte 0x00094400 # special flags
-    .4byte 0x40400000 # air cost multiplier when charging jump
+    .4byte 0x00094400 # special flags OG: 0x00094400
+    .4byte 0x40400000 # air cost multiplier when charging jump OG: 0x40400000 0xBF800000
     .4byte 0x000F4240 # level 1 max air
     .4byte 0xFFFFFF4C # level 1 passive air drain
-    .4byte 0x000002A3 # level 1 drift air cost
-    .4byte 0x000B71B0 # level 1 boost cost
+    .4byte 0x000002A3 # level 1 drift air cost OG: 0x000002A3 0x000001FA
+    .4byte 0x000B71B0 # level 1 boost cost OG: 0x000B71B0, 0x0007A120
     .4byte 0x000186A0 # level 1 tornado cost
     .4byte 0x3EED097B # level 1 speed gained from a drift dash
-    .4byte 0x4005559B # level 1 boost speed
+    .4byte 0x4005559B # level 1 boost speed OG: 0x4005559B, 0x3FED097B
     .4byte 0x000249F0 # level 2 max air
     .4byte 0x00000010 # level 2 passive air drain
     .4byte 0x000000FA # level 2 drift air cost
     .4byte 0x00007530 # level 2 boost cost
     .4byte 0x00007530 # level 2 tornado cost
     .4byte 0x3EBDA12F # level 2 speed gained from a drift dash
-    .4byte 0x4005559B # level 2 boost speed
+    .4byte 0x4005559B # level 2 boost speed OG: 0x4005559B, 0x3FED097B
     .4byte 0x00030D40 # level 3 max air
     .4byte 0x00000010 # level 3 passive air drain
     .4byte 0x0000014D # level 3 drift air cost
     .4byte 0x00009C40 # level 3 boost cost
     .4byte 0x00009C40 # level 3 tornado cost
     .4byte 0x3EED097B # level 3 speed gained from a drift dash
-    .4byte 0x4005559B # level 3 boost speed
+    .4byte 0x4005559B # level 3 boost speed OG: 0x4005559B, 0x3FED097B
     .byte 0x02 # shown dash (tempo) stat
     .byte 0x03 # shown limit (efficiency) stat
     .byte 0x03 # shown power (combat) stat
@@ -22547,7 +22547,7 @@ Gears:
     .4byte 0x00000000 # air gain multiplier (tricks)
     .4byte 0x00000000 # air gain multiplier (shortcuts)
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
-    .4byte 0x040411C6 # special flags
+    .4byte 0x008411C6 # special flags
     .4byte 0x40000000 # air cost multiplier when charging jump
     .4byte 0x000186A0 # level 1 max air
     .4byte 0x00000008 # level 1 passive air drain
@@ -22793,21 +22793,21 @@ Gears:
     .4byte 0x40000000 # air cost multiplier when charging jump
     .4byte 0x000186A0 # level 1 max air
     .4byte 0x00000010 # level 1 passive air drain
-    .4byte 0x000000A6 # level 1 drift air cost
+    .4byte 0x000000A6 # level 1 drift air cost OG: 0x000000A6
     .4byte 0x000061A8 # level 1 boost cost
     .4byte 0x000061A8 # level 1 tornado cost
     .4byte 0x3E6D097B # level 1 speed gained from a drift dash
     .4byte 0x3F78E38E # level 1 boost speed
     .4byte 0x000249F0 # level 2 max air
     .4byte 0x00000010 # level 2 passive air drain
-    .4byte 0x000000FA # level 2 drift air cost
+    .4byte 0x000000FA # level 2 drift air cost OG: 0x000000FA
     .4byte 0x00007530 # level 2 boost cost
     .4byte 0x00007530 # level 2 tornado cost
     .4byte 0x3EBDA12F # level 2 speed gained from a drift dash
     .4byte 0x3F8E38E4 # level 2 boost speed
     .4byte 0x00030D40 # level 3 max air
     .4byte 0x00000010 # level 3 passive air drain
-    .4byte 0x0000014D # level 3 drift air cost
+    .4byte 0x0000014D # level 3 drift air cost OG: 0x0000014D
     .4byte 0x00009C40 # level 3 boost cost
     .4byte 0x00009C40 # level 3 tornado cost
     .4byte 0x3EED097B # level 3 speed gained from a drift dash
@@ -22915,7 +22915,7 @@ Gears:
     .4byte 0x0001ADB0 # level 1 max air
     .4byte 0x00000010 # level 1 passive air drain
     .4byte 0x0000000A # level 1 drift air cost
-    .4byte 0x00002AF8 # level 1 boost cost
+    .4byte 0x00004074 # level 1 boost cost 0x00002AF8
     .4byte 0x00001388 # level 1 tornado cost
     .4byte 0x3EED097B # level 1 speed gained from a drift dash
     .4byte 0x3F9A161E # level 1 boost speed
@@ -23027,33 +23027,33 @@ Gears:
     .4byte 0x00000000 # unknown
     .4byte 0x00000000 # unknown
     .4byte 0x00000000 # unknown
-    .4byte 0xFFFFFFF6 # how long it takes to generate a drift dash
-    .4byte 0xBE4CCCCD # air gain multiplier (tricks) # OLD: 0xBEAAAAAB, second: 0xBE051EB8
-    .4byte 0xBE4CCCCD # air gain multiplier (shortcuts) # OLD: 0xBEAAAAAB,  second: 0xBE051EB8
+    .4byte 0x00000000 # how long it takes to generate a drift dash # OG: 0xFFFFFFF6
+    .4byte 0xBE800000 # air gain multiplier (tricks) # OLD: 0xBEAAAAAB, second: 0xBE051EB8, third: 0xBE4CCCCD, 0xBE800000
+    .4byte 0xBE800000 # air gain multiplier (shortcuts) # OLD: 0xBEAAAAAB, second: 0xBE051EB8, third: 0xBE4CCCCD, 0xBE800000
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
     .4byte 0x00000000 # special flags
     .4byte 0x40000000 # air cost multiplier when charging jump
     .4byte 0x000186A0 # level 1 max air
     .4byte 0xFFFFFFC4 # level 1 passive air drain
     .4byte 0x000000BA # level 1 drift air cost
-    .4byte 0x0000FDE8 # level 1 boost cost
+    .4byte 0x0000BE6E # level 1 boost cost # 0x0000FDE8 0x00007EF4 0x0000BE6E 0x0000B1BC
     .4byte 0x00004E20 # level 1 tornado cost, OG: 0x000061A8
     .4byte 0x3E6D097B # level 1 speed gained from a drift dash
-    .4byte 0x3F884BDA # level 1 boost speed
+    .4byte 0x3F884BDA # level 1 boost speed # 0x3F884BDA 0x3F856481 0x3F825ED1
     .4byte 0x000249F0 # level 2 max air
     .4byte 0xFFFFFF94 # level 2 passive air drain
     .4byte 0x0000010E # level 2 drift air cost
-    .4byte 0x00017CDC # level 2 boost cost
+    .4byte 0x00011DA5 # level 2 boost cost # 0x00017CDC 0x0000BE6E 0x00011DA5 0x00010A9A
     .4byte 0x00005DC0 # level 2 tornado cost, OG: 0x00007530
     .4byte 0x3EBDA12F # level 2 speed gained from a drift dash
-    .4byte 0x3F912F68 # level 2 boost speed
+    .4byte 0x3F912F68 # level 2 boost speed # 0x3F912F68 0x3F971D3F 0x3F9425ED
     .4byte 0x00030D40 # level 3 max air
     .4byte 0xFFFFFF64 # level 3 passive air drain
     .4byte 0x00000161 # level 3 drift air cost
-    .4byte 0x0001FBD0 # level 3 boost cost
+    .4byte 0x00017CDC # level 3 boost cost # 0x0001FBD0 0x0000FDE8 0x00017CDC 0x00016378
     .4byte 0x00007D00 # level 3 tornado cost, OG: 00009C40
     .4byte 0x3EED097B # level 3 speed gained from a drift dash
-    .4byte 0x3F9A12F7 # level 3 boost speed
+    .4byte 0x3F9A12F7 # level 3 boost speed # 0x3F9A12F7 0x3FA2F685 0x3FA00000
     .byte 0x05 # shown dash (tempo) stat
     .byte 0x05 # shown limit (efficiency) stat
     .byte 0x03 # shown power (combat) stat
@@ -23126,7 +23126,7 @@ Gears:
     .4byte 0x3DA3D70A
     .4byte 0x00280100
     .4byte 0x02010000
-    .4byte 0xFFF7FFFF # Gambler
+    .4byte 0xFFFFFFFF # Gambler
     .byte 0x00 # gear type
     .byte 0x14 # model id
     .2byte 0x0FA0 # ring cost in gear shop
@@ -23152,7 +23152,7 @@ Gears:
     .4byte 0x00000000 # air gain multiplier (tricks)
     .4byte 0x00000000 # air gain multiplier (shortcuts)
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
-    .4byte 0x00002200 # special flags
+    .4byte 0x00080200 # special flags OG: 0x00002200
     .4byte 0x40000000 # air cost multiplier when charging jump
     .4byte 0x000186A0 # level 1 max air
     .4byte 0x00000010 # level 1 passive air drain
@@ -23522,7 +23522,7 @@ Gears:
     .4byte 0x00000032 # level 1 drift air cost
     .4byte 0x00004E20 # level 1 boost cost
     .4byte 0x00001388 # level 1 tornado cost
-    .4byte 0x3EBDA12F # level 1 speed gained from a drift dash
+    .4byte 0x3EBDA12F # level 1 speed gained from a drift dash # 0x3E6D097B
     .4byte 0x3FA8E38E # level 1 boost speed
     .4byte 0x000249F0 # level 2 max air
     .4byte 0x00000010 # level 2 passive air drain
@@ -23636,7 +23636,7 @@ Gears:
     .4byte 0x00000000 # air gain multiplier (tricks)
     .4byte 0x00000000 # air gain multiplier (shortcuts)
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
-    .4byte 0x04001000 # special flags
+    .4byte 0x00801000 # special flags
     .4byte 0x40000000 # air cost multiplier when charging jump
     .4byte 0x000186A0 # level 1 max air
     .4byte 0x00000010 # level 1 passive air drain
@@ -23857,7 +23857,7 @@ Gears:
     .byte 0x29 # model id
     .2byte 0x03E8 # ring cost in gear shop
     .4byte 0x00000000 # unknown
-    .4byte 0xB9CA4587 # acceleration
+    .4byte 0x00000000 # acceleration # OG: 0xB9CA4587
     .4byte 0xBD3DA12F # top speed (additive)
     .4byte 0xC1200000 # off road speed
     .4byte 0x00000000 # speed and handling multiplier
@@ -24099,11 +24099,11 @@ Gears:
     .byte 0x2B # model id
     .2byte 0x0DAC # ring cost in gear shop
     .4byte 0x00000000 # unknown
-    .4byte 0xB9CA4587 # acceleration
+    .4byte 0x00000000 # acceleration
     .4byte 0x3CBE0247 # top speed (additive)
-    .4byte 0x00000000 # off road speed
+    .4byte 0x41A00000 # off road speed # OG: 0x00000000
     .4byte 0x00000000 # speed and handling multiplier
-    .4byte 0x3EE66666 # weight
+    .4byte 0x3EE66666 # weight # OG: 0x3EE66666
     .4byte 0x00000004 # extra type attribute
     .4byte 0x00000000 # speed loss by turning (?)
     .4byte 0x00000000 # handling speed based? (also affects flight handling)
@@ -24123,26 +24123,26 @@ Gears:
     .4byte 0x00000000 # special flags
     .4byte 0x40000000 # air cost multiplier when charging jump
     .4byte 0x000186A0 # level 1 max air
-    .4byte 0x00000015 # level 1 passive air drain
+    .4byte 0x00000010 # level 1 passive air drain
     .4byte 0x000000A6 # level 1 drift air cost
     .4byte 0x000061A8 # level 1 boost cost
     .4byte 0x000061A8 # level 1 tornado cost
     .4byte 0x3E6D097B # level 1 speed gained from a drift dash
-    .4byte 0x3F697B42 # level 1 boost speed
+    .4byte 0x3F6F95CF # level 1 boost speed # 0x3F697B42 0x3F6D097B
     .4byte 0x000249F0 # level 2 max air
-    .4byte 0x00000015 # level 2 passive air drain
+    .4byte 0x00000010 # level 2 passive air drain
     .4byte 0x000000FA # level 2 drift air cost
     .4byte 0x00007530 # level 2 boost cost
     .4byte 0x00007530 # level 2 tornado cost
     .4byte 0x3EBDA12F # level 2 speed gained from a drift dash
-    .4byte 0x3F8684BE # level 2 boost speed
+    .4byte 0x3F899204 # level 2 boost speed # 0x3F8684BE 0x3F884BDA
     .4byte 0x00030D40 # level 3 max air
-    .4byte 0x00000015 # level 3 passive air drain
+    .4byte 0x00000010 # level 3 passive air drain
     .4byte 0x0000014D # level 3 drift air cost
     .4byte 0x00009C40 # level 3 boost cost
     .4byte 0x00009C40 # level 3 tornado cost
     .4byte 0x3EED097B # level 3 speed gained from a drift dash
-    .4byte 0x3F925ED1 # level 3 boost speed
+    .4byte 0x3F956C17 # level 3 boost speed # 0x3F925ED1 0x3F9425ED
     .byte 0x04 # shown dash (tempo) stat
     .byte 0x04 # shown limit (efficiency) stat
     .byte 0x03 # shown power (combat) stat
@@ -24226,7 +24226,7 @@ Gears:
     .4byte 0x00000000 # speed and handling multiplier
     .4byte 0x3EE66666 # weight
     .4byte 0x00000007 # extra type attribute
-    .4byte 0xBDCCCCCD # speed loss by turning (?)
+    .4byte 0x00000000 # speed loss by turning (?) # OG: 0xBDCCCCCD
     .4byte 0x00000000 # handling speed based? (also affects flight handling)
     .4byte 0x00000000 # back axel handling (?)
     .4byte 0x00000000 # front axel handling (?)
@@ -24249,21 +24249,21 @@ Gears:
     .4byte 0x000061A8 # level 1 boost cost
     .4byte 0x000061A8 # level 1 tornado cost
     .4byte 0x3E6D097B # level 1 speed gained from a drift dash
-    .4byte 0x3F671C86 # level 1 boost speed
+    .4byte 0x3F697B42 # level 1 boost speed 0x3F671C86
     .4byte 0x000249F0 # level 2 max air
     .4byte 0x00000010 # level 2 passive air drain
     .4byte 0x000000FA # level 2 drift air cost
     .4byte 0x00007530 # level 2 boost cost
     .4byte 0x00007530 # level 2 tornado cost
     .4byte 0x3EBDA12F # level 2 speed gained from a drift dash
-    .4byte 0x3F8555C5 # level 2 boost speed
+    .4byte 0x3F8684BE # level 2 boost speed 0x3F8555C5
     .4byte 0x00030D40 # level 3 max air
     .4byte 0x00000010 # level 3 passive air drain
     .4byte 0x0000014D # level 3 drift air cost
     .4byte 0x00009C40 # level 3 boost cost
     .4byte 0x00009C40 # level 3 tornado cost
     .4byte 0x3EED097B # level 3 speed gained from a drift dash
-    .4byte 0x3F912FC2 # level 3 boost speed
+    .4byte 0x3F925ED1 # level 3 boost speed 0x3F912FC2
     .byte 0x03 # shown dash (tempo) stat
     .byte 0x04 # shown limit (efficiency) stat
     .byte 0x03 # shown power (combat) stat
@@ -24726,28 +24726,28 @@ Gears:
     .4byte 0x00000000 # air gain multiplier (shortcuts)
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
     .4byte 0x40014500 # special flags # Temp change, OG: 0x4000C500
-    .4byte 0x40000000 # air cost multiplier when charging jump
-    .4byte 0x000186A0 # level 1 max air
+    .4byte 0x3F800000 # air cost multiplier when charging jump
+    .4byte 0x0001ADB0 # level 1 max air # 0x000186A0
     .4byte 0x00000008 # level 1 passive air drain
     .4byte 0x00000026 # level 1 drift air cost
     .4byte 0x0000157C # level 1 boost cost
     .4byte 0x00001130 # level 1 tornado cost
     .4byte 0x3E6D097B # level 1 speed gained from a drift dash
-    .4byte 0x3F8E38E4 # level 1 boost speed
+    .4byte 0x3F884BDA # level 1 boost speed # 0x3F884BDA 0x3F8E38E4
     .4byte 0x000249F0 # level 2 max air
     .4byte 0x00000010 # level 2 passive air drain
     .4byte 0x000000FA # level 2 drift air cost
     .4byte 0x00007530 # level 2 boost cost
     .4byte 0x00007530 # level 2 tornado cost
     .4byte 0x3EBDA12F # level 2 speed gained from a drift dash
-    .4byte 0x3F884BDA # level 2 boost speed
+    .4byte 0x3F9425ED # level 2 boost speed
     .4byte 0x00030D40 # level 3 max air
     .4byte 0x00000010 # level 3 passive air drain
     .4byte 0x0000014D # level 3 drift air cost
     .4byte 0x00009C40 # level 3 boost cost
     .4byte 0x00009C40 # level 3 tornado cost
     .4byte 0x3EED097B # level 3 speed gained from a drift dash
-    .4byte 0x3F9425ED # level 3 boost speed
+    .4byte 0x3F9D097B # level 3 boost speed
     .byte 0x04 # shown dash (tempo) stat
     .byte 0x04 # shown limit (efficiency) stat
     .byte 0x05 # shown power (combat) stat
@@ -24851,21 +24851,21 @@ Gears:
     .4byte 0x000249F0 # level 1 max air
     .4byte 0x00000001 # level 1 passive air drain
     .4byte 0x00000053 # level 1 drift air cost
-    .4byte 0x00006D60 # level 1 boost cost
+    .4byte 0x00007850 # level 1 boost cost # 0x00006D60
     .4byte 0x00004E20 # level 1 tornado cost
     .4byte 0x3E6D097B # level 1 speed gained from a drift dash
     .4byte 0x3F825ED1 # level 1 boost speed
     .4byte 0x0002E630 # level 2 max air
     .4byte 0x00000002 # level 2 passive air drain
     .4byte 0x000000A6 # level 2 drift air cost
-    .4byte 0x000080E8 # level 2 boost cost
+    .4byte 0x00008DCC # level 2 boost cost # 0x000080E8
     .4byte 0x00006D60 # level 2 tornado cost
     .4byte 0x3EBDA12F # level 2 speed gained from a drift dash
     .4byte 0x3F9425ED # level 2 boost speed
     .4byte 0x00038270 # level 3 max air
     .4byte 0x00000003 # level 3 passive air drain
     .4byte 0x000000FA # level 3 drift air cost
-    .4byte 0x0000A7F8 # level 3 boost cost
+    .4byte 0x0000B8C4 # level 3 boost cost # 0x0000A7F8
     .4byte 0x000080E8 # level 3 tornado cost
     .4byte 0x3EED097B # level 3 speed gained from a drift dash
     .4byte 0x3F9D09C0 # level 3 boost speed
@@ -24948,7 +24948,7 @@ Gears:
     .4byte 0x00000000 # unknown
     .4byte 0x00000000 # acceleration
     .4byte 0x00000000 # top speed (additive)
-    .4byte 0xC1200000 # off road speed
+    .4byte 0x00000000 # off road speed 0xC1200000
     .4byte 0x00000000 # speed and handling multiplier
     .4byte 0xBEB33333 # weight
     .4byte 0x00000000 # extra type attribute
@@ -25067,9 +25067,9 @@ Gears:
     .byte 0x47 # model id
     .2byte 0x07D0 # ring cost in gear shop
     .4byte 0x00000000 # unknown
-    .4byte 0xB9CA4587 # acceleration
+    .4byte 0x00000000 # acceleration # 0xB9CA4587
     .4byte 0x00000000 # top speed (additive)
-    .4byte 0xC1200000 # off road speed
+    .4byte 0x00000000 # off road speed 0xC1200000
     .4byte 0x00000000 # speed and handling multiplier
     .4byte 0xBE99999A # weight
     .4byte 0x00000001 # extra type attribute
@@ -25084,7 +25084,7 @@ Gears:
     .4byte 0x00000000 # unknown
     .4byte 0x00000000 # unknown
     .4byte 0x00000000 # unknown
-    .4byte 0x00000000 # how long it takes to generate a drift dash
+    .4byte 0xFFFFFFF6 # how long it takes to generate a drift dash # OG: 0x00000000
     .4byte 0x00000000 # air gain multiplier (tricks)
     .4byte 0x00000000 # air gain multiplier (shortcuts) OG: 0xBE800000
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
@@ -25096,21 +25096,21 @@ Gears:
     .4byte 0x000061A8 # level 1 boost cost
     .4byte 0x000061A8 # level 1 tornado cost
     .4byte 0x3E6D097B # level 1 speed gained from a drift dash
-    .4byte 0x3F697B42 # level 1 boost speed
+    .4byte 0x3F6D097B # level 1 boost speed 0x3F697B42
     .4byte 0x000249F0 # level 2 max air
     .4byte 0x00000010 # level 2 passive air drain
     .4byte 0x000000FA # level 2 drift air cost
     .4byte 0x00007530 # level 2 boost cost
     .4byte 0x00007530 # level 2 tornado cost
     .4byte 0x3EBDA12F # level 2 speed gained from a drift dash
-    .4byte 0x3F8684BE # level 2 boost speed
+    .4byte 0x3F884BDA # level 2 boost speed 0x3F8684BE
     .4byte 0x00030D40 # level 3 max air
     .4byte 0x00000010 # level 3 passive air drain
     .4byte 0x0000014D # level 3 drift air cost
     .4byte 0x00009C40 # level 3 boost cost
     .4byte 0x00009C40 # level 3 tornado cost
     .4byte 0x3EED097B # level 3 speed gained from a drift dash
-    .4byte 0x3F925ED1 # level 3 boost speed
+    .4byte 0x3F9425ED # level 3 boost speed 0x3F925ED1
     .byte 0x04 # shown dash (tempo) stat
     .byte 0x04 # shown limit (efficiency) stat
     .byte 0x03 # shown power (combat) stat
@@ -25206,8 +25206,8 @@ Gears:
     .4byte 0x00000000 # unknown
     .4byte 0x00000000 # unknown
     .4byte 0x00000000 # how long it takes to generate a drift dash
-    .4byte 0x3DCCCCCD # air gain multiplier (tricks) OG: 0x3E4CCCCD
-    .4byte 0x3DCCCCCD # air gain multiplier (shortcuts) OG: 0x3E4CCCCD
+    .4byte 0x3E19999A # air gain multiplier (tricks) OG: 0x3E4CCCCD, 0x3DCCCCCD
+    .4byte 0x3E19999A # air gain multiplier (shortcuts) OG: 0x3E4CCCCD, 0x3DCCCCCD
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
     .4byte 0x00000000 # special flags
     .4byte 0x00000000 # air cost multiplier when charging jump
@@ -25310,7 +25310,7 @@ Gears:
     .2byte 0x03E8 # ring cost in gear shop
     .4byte 0x00000000 # unknown
     .4byte 0x3ACA4587 # acceleration
-    .4byte 0x3E638E39 # top speed (additive) # Top speed now 210, OG line: 0xBD3DA12F
+    .4byte 0x3E3425ED # top speed (additive) # Top speed now 210, OG line: 0xBD3DA12F 0x3E638E39
     .4byte 0xC1A00000 # off road speed
     .4byte 0x00000000 # speed and handling multiplier
     .4byte 0xBECCCCCD # weight
@@ -25330,7 +25330,7 @@ Gears:
     .4byte 0x00000000 # air gain multiplier (tricks)
     .4byte 0x00000000 # air gain multiplier (shortcuts)
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
-    .4byte 0x00010400 # special flags # Temp change, OG: 0x00000000
+    .4byte 0x00090400 # special flags # Temp change, OG: 0x00000000
     .4byte 0x40000000 # air cost multiplier when charging jump
     .4byte 0x000186A0 # level 1 max air
     .4byte 0x00000010 # level 1 passive air drain
@@ -25425,7 +25425,7 @@ Gears:
     .4byte 0xBDA3D70A
     .4byte 0x00280100
     .4byte 0x02020000
-    .4byte 0xFFF7FFFF # Advantage-P
+    .4byte 0xFFFFFFFF # Advantage-P OG: 0xFFF7FFFF
     .byte 0x01 # gear type
     .byte 0x4A # model id
     .2byte 0x03E8 # ring cost in gear shop
@@ -25448,32 +25448,32 @@ Gears:
     .4byte 0x00000000 # unknown
     .4byte 0x00000000 # unknown
     .4byte 0x00000000 # how long it takes to generate a drift dash
-    .4byte 0x3E19999A # air gain multiplier (tricks)
+    .4byte 0xBEE66666 # air gain multiplier (tricks) OG: 0x3E19999A
     .4byte 0x00000000 # air gain multiplier (shortcuts)
     .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
-    .4byte 0x00002000 # special flags
+    .4byte 0x00000000 # special flags OG: 0x00002000
     .4byte 0x40000000 # air cost multiplier when charging jump
     .4byte 0x000186A0 # level 1 max air
     .4byte 0x00000010 # level 1 passive air drain
     .4byte 0x00000074 # level 1 drift air cost
-    .4byte 0x000061A8 # level 1 boost cost OG: 0x000055F0
+    .4byte 0x000055F0 # level 1 boost cost OG: 0x000055F0, 0x000061A8
     .4byte 0x000061A8 # level 1 tornado cost
     .4byte 0x3E6D097B # level 1 speed gained from a drift dash
-    .4byte 0x3F78E38E # level 1 boost speed
+    .4byte 0x3F697B42 # level 1 boost speed OG: 0x3F78E38E
     .4byte 0x000249F0 # level 2 max air
     .4byte 0x00000010 # level 2 passive air drain
     .4byte 0x000000C8 # level 2 drift air cost
-    .4byte 0x00007530 # level 2 boost cost OG: 0x00006978
+    .4byte 0x00006978 # level 2 boost cost OG: 0x00006978, 0x00007530
     .4byte 0x00007530 # level 2 tornado cost
     .4byte 0x3EBDA12F # level 2 speed gained from a drift dash
-    .4byte 0x3F8E38E4 # level 2 boost speed
+    .4byte 0x3F8684BE # level 2 boost speed OG: 0x3F8E38E4
     .4byte 0x00030D40 # level 3 max air
     .4byte 0x00000010 # level 3 passive air drain
     .4byte 0x0000011B # level 3 drift air cost
-    .4byte 0x00009C40 # level 3 boost cost OG: 0x00009088
+    .4byte 0x00009088 # level 3 boost cost OG: 0x00009088, 0x00009C40
     .4byte 0x00009C40 # level 3 tornado cost
     .4byte 0x3EED097B # level 3 speed gained from a drift dash
-    .4byte 0x3F9A12F7 # level 3 boost speed
+    .4byte 0x3F925ED1 # level 3 boost speed OG: 0x3F9A12F7
     .byte 0x05 # shown dash (tempo) stat
     .byte 0x03 # shown limit (efficiency) stat
     .byte 0x04 # shown power (combat) stat
@@ -25667,6 +25667,127 @@ Gears:
     .4byte 0xBDA3D70A
     .4byte 0x00280100
     .4byte 0x02020000
+    .4byte 0xFFFFFFFF # GunGear
+    .byte 0x00 # gear type
+    .byte 0x19 # model id
+    .2byte 0x012C # ring cost in gear shop
+    .4byte 0x00000000 # unknown
+    .4byte 0xB9CA4587 # acceleration
+    .4byte 0xBCBDA12F # top speed (additive)
+    .4byte 0xC1200000 # off road speed
+    .4byte 0x00000000 # speed and handling multiplier
+    .4byte 0x3E19999A # weight
+    .4byte 0x00000000 # extra type attribute
+    .4byte 0x00000000 # speed loss by turning (?)
+    .4byte 0x00000000 # handling speed based? (also affects flight handling)
+    .4byte 0x00000000 # back axel handling (?)
+    .4byte 0x00000000 # front axel handling (?)
+    .4byte 0x00000000 # drifting radius
+    .4byte 0x00000000 # Drift Rotation (How much your momentum follows you during a drift)
+    .4byte 0x00000000 # initial drift rotation back axel (?)
+    .4byte 0x00000000 # initial drift rotation front axel (?)
+    .4byte 0x00000000 # unknown
+    .4byte 0x00000000 # unknown
+    .4byte 0x00000000 # unknown
+    .4byte 0x00000000 # how long it takes to generate a drift dash
+    .4byte 0x00000000 # air gain multiplier (tricks)
+    .4byte 0x00000000 # air gain multiplier (shortcuts)
+    .4byte 0x00000000 # air gain multiplier (control stick event/QTE)
+    .4byte 0x00000080 # special flags
+    .4byte 0x40000000 # air cost multiplier when charging jump
+    .4byte 0x000186A0 # level 1 max air
+    .4byte 0x00000010 # level 1 passive air drain
+    .4byte 0x0000009C # level 1 drift air cost
+    .4byte 0x0000C350 # level 1 boost cost
+    .4byte 0x000061A8 # level 1 tornado cost
+    .4byte 0x3EA5ED09 # level 1 speed gained from a drift dash
+    .4byte 0x3F8B425F # level 1 boost speed
+    .4byte 0x000249F0 # level 2 max air
+    .4byte 0x00000010 # level 2 passive air drain
+    .4byte 0x000000F0 # level 2 drift air cost
+    .4byte 0x000124F8 # level 2 boost cost
+    .4byte 0x000061A8 # level 2 tornado cost 0x00007530
+    .4byte 0x3EED097B # level 2 speed gained from a drift dash
+    .4byte 0x3F9D097B # level 2 boost speed
+    .4byte 0x00030D40 # level 3 max air
+    .4byte 0x00000010 # level 3 passive air drain
+    .4byte 0x00000143 # level 3 drift air cost
+    .4byte 0x000186A0 # level 3 boost cost
+    .4byte 0x00009C40 # level 3 tornado cost
+    .4byte 0x3F0E38E4 # level 3 speed gained from a drift dash
+    .4byte 0x3FA8E38E # level 3 boost speed
+    .byte 0x07 # shown dash (tempo) stat
+    .byte 0x03 # shown limit (efficiency) stat
+    .byte 0x03 # shown power (combat) stat
+    .byte 0x02 # shown cornering (weight) stat
+    .4byte 0x42F00000
+    .4byte 0x42C80000
+    .4byte 0x3F000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0xBD4CCCCD
+    .4byte 0xBF266666
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x02000000
+    .4byte 0x02000000
+    .4byte 0x00000000
+    .4byte 0x000A0001
+    .4byte 0x00010000
+    .4byte 0x3F000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0xBD4CCCCD
+    .4byte 0xBF266666
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x00000000
+    .4byte 0x02000000
+    .4byte 0x02000000
+    .4byte 0x3DA3D70A
+    .4byte 0x00280100
+    .4byte 0x02010000
 .global gsParFullParam_MagicCarpet
 gsParFullParam_MagicCarpet:
     # 0x1EEC90
@@ -26645,7 +26766,7 @@ lbl_001EF800:
     .4byte 0x00000000
     .4byte 0x00000000
     .4byte 0x00000000
-    .4byte 0x3F4CCCCD
+    .4byte 0x3F4CCCCD // sega carnival power object data
     .4byte 0x00000000
     .4byte 0xC0400000
     .4byte 0x00000000
@@ -26661,11 +26782,11 @@ lbl_001EF800:
     .4byte 0x00000000
     .4byte 0xBFE66666
     .4byte 0x00000000
-    .4byte 0x3F19999A
+    .single 0.6 // dustbox range
     .4byte 0x00000000
     .4byte 0x00000000
     .4byte 0x00000000
-    .4byte 0x3F333333
+    .single 0.6 // woodbox range (default 0.7)
     .4byte 0x00000000
     .4byte 0x00000000
     .4byte 0x00000000
@@ -29305,6 +29426,10 @@ lbl_001F2014:
     .4byte 0x001C7F01
     .4byte lbl_0011759C
     .4byte 0x001C7F02
+    // New Test Button For Tutorial Mode
+    //.4byte lbl_0011759C
+    //.4byte 0x001C7F03
+    // ------------
     .4byte lbl_00116E24
     .4byte 0x00267F01
     .4byte lbl_00117500
@@ -29500,6 +29625,7 @@ lbl_001F2254:
     .4byte lbl_00115460
     .4byte lbl_001154D0
     .4byte lbl_00115A88
+    //.4byte lbl_LoadTutorialGamemodeCase // for tutorial gamemode
 .global lbl_001F227C
 lbl_001F227C:
     # 0x1F227C
@@ -40920,1698 +41046,62 @@ lbl_001FC330:
     .4byte 0x0D0B0C09
     .4byte 0x0A0C0707
     .4byte 0x07060606
-.global lbl_001FC33C
-lbl_001FC33C:
-    # 0x1FC33C
-    .4byte 0x13FC16FC
-    .4byte 0x08FC12FC
-    .4byte 0x13FC04FC
-    .4byte 0x11FCFF00
-.global lbl_001FC34C
-lbl_001FC34C:
-    # 0x1FC34C
-    .4byte 0x01FC0BFE
-    .4byte 0x14FC0408
-    .4byte 0x12FC0AFC
-    .4byte 0x18FCFF00
-.global lbl_001FC35C
-lbl_001FC35C:
-    # 0x1FC35C
-    .4byte 0x03FC0EFC
-    .4byte 0x14FC01FC
-    .4byte 0x0BFE0408
-    .4byte 0x0CFC0EFC
-    .4byte 0x14FC12FC
-    .4byte 0x04FCFF00
-.global lbl_001FC374
-lbl_001FC374:
-    # 0x1FC374
-    .4byte 0x01FC0BFE
-    .4byte 0x14FC0408
-    .4byte 0x12FC02FC
-    .4byte 0x0EFC11FC
-    .4byte 0x0FFC08FC
-    .4byte 0x0EFC0DFC
-    .4byte 0xFF000000
-.global lbl_001FC390
-lbl_001FC390:
-    # 0x1FC390
-    .4byte 0x12FC0FFC
-    .4byte 0x04FC04FC
-    .4byte 0x030800FC
-    .4byte 0x02FC13FC
-    .4byte 0x08FC0EFC
-    .4byte 0x0DFCFF00
-.global lbl_001FC3A8
-lbl_001FC3A8:
-    # 0x1FC3A8
-    .4byte 0x0CFC0EFC
-    .4byte 0x15FC0408
-    .4byte 0x00FC0BFE
-    .4byte 0x0EFC0DFC
-    .4byte 0x06FCFF00
-.global lbl_001FC3BC
-lbl_001FC3BC:
-    # 0x1FC3BC
-    .4byte 0x12FC0FFC
-    .4byte 0x04FC04FC
-    .4byte 0x030813FC
-    .4byte 0x14FC11FC
-    .4byte 0x0DFCFF00
-.global lbl_001FC3D0
-lbl_001FC3D0:
-    # 0x1FC3D0
-    .4byte 0x12FC0AFC
-    .4byte 0x180816FC
-    .4byte 0x00FC15FC
-    .4byte 0x04FCFF00
-.global lbl_001FC3E0
-lbl_001FC3E0:
-    # 0x1FC3E0
-    .4byte 0x00FC08FC
-    .4byte 0x110813FC
-    .4byte 0x0EFC11FC
-    .4byte 0x0DFC00FC
-    .4byte 0x03FC0EFC
-    .4byte 0xFF000000
-.global lbl_001FC3F8
-lbl_001FC3F8:
-    # 0x1FC3F8
-    .4byte 0x12FC0FFC
-    .4byte 0x04FC04FC
-    .4byte 0x030813FC
-    .4byte 0x18FC0FFC
-    .4byte 0x07FC0EFC
-    .4byte 0x0EFC0DFC
-    .4byte 0xFF000000
-.global lbl_001FC414
-lbl_001FC414:
-    # 0x1FC414
-    .4byte 0x12FC0FFC
-    .4byte 0x04FC04FC
-    .4byte 0x030807FC
-    .4byte 0x14FC11FC
-    .4byte 0x11FC08FC
-    .4byte 0x02FC00FC
-    .4byte 0x0DFC04FC
-    .4byte 0xFF000000
-.global lbl_001FC434
-lbl_001FC434:
-    # 0x1FC434
-    .4byte lbl_001FC3D0
-    .4byte lbl_001FC3E0
-    .4byte lbl_001FC3F8
-    .4byte lbl_001FC414
-    .4byte lbl_001FC390
-    .4byte lbl_001FC3A8
-    .4byte lbl_001FC3BC
-    .4byte lbl_001FC3BC
-    .4byte lbl_001FC33C
-    .4byte lbl_001FC34C
-    .4byte lbl_001FC35C
-    .4byte lbl_001FC374
-.global lbl_001FC464
-lbl_001FC464:
-    # 0x1FC464
-    .4byte 0x080B0D0F
-    .4byte 0x0C0A0A0A
-    .4byte 0x08080C0D
-.global lbl_001FC470
-lbl_001FC470:
-    # 0x1FC470
-    .4byte 0x18FC04FC
-    .4byte 0x0BFE0BFE
-    .4byte 0x0EFC1608
-    .4byte 0x12FC0FFC
-    .4byte 0x08FC11FC
-    .4byte 0x00FC0BFE
-    .4byte 0xFF000000
-.global lbl_001FC48C
-lbl_001FC48C:
-    # 0x1FC48C
-    .4byte 0x13FC07FC
-    .4byte 0x14FC0DFC
-    .4byte 0x03FC04FC
-    .4byte 0x110816FC
-    .4byte 0x00FC15FC
-    .4byte 0x04FCFF00
-.global lbl_001FC4A4
-lbl_001FC4A4:
-    # 0x1FC4A4
-    .4byte 0x12FC00FC
-    .4byte 0x0DFC0308
-    .4byte 0x12FC13FC
-    .4byte 0x0EFC11FC
-    .4byte 0x0CFCFF00
-.global lbl_001FC4B8
-lbl_001FC4B8:
-    # 0x1FC4B8
-    .4byte 0x0CFC00FC
-    .4byte 0x06FC0DFC
-    .4byte 0x04FC1308
-    .4byte 0x12FC13FC
-    .4byte 0x0EFC11FC
-    .4byte 0x0CFCFF00
-.global lbl_001FC4D0
-lbl_001FC4D0:
-    # 0x1FC4D0
-    .4byte 0x12FC02FC
-    .4byte 0x08FC04FC
-    .4byte 0x0DFC02FC
-    .4byte 0x04FCFF00
-.global lbl_001FC4E0
-lbl_001FC4E0:
-    # 0x1FC4E0
-    .4byte 0x08FC0DFC
-    .4byte 0x13FC04FC
-    .4byte 0x0BFE0BFE
-    .4byte 0x04FC02FC
-    .4byte 0x13FC14FC
-    .4byte 0x00FC0BFE
-    .4byte 0xFF000000
-.global lbl_001FC4FC
-lbl_001FC4FC:
-    # 0x1FC4FC
-    .4byte 0x08FC0DFC
-    .4byte 0x15FC04FC
-    .4byte 0x0DFC13FC
-    .4byte 0x08FC0EFC
-    .4byte 0x0DFCFF00
-.global lbl_001FC510
-lbl_001FC510:
-    # 0x1FC510
-    .4byte 0x12FC0FFC
-    .4byte 0x08FC11FC
-    .4byte 0x00FC0B08
-    .4byte 0x06FC00FC
-    .4byte 0x0BFE00FC
-    .4byte 0x17FC18FC
-    .4byte 0xFF000000
-.global lbl_001FC52C
-lbl_001FC52C:
-    # 0x1FC52C
-    .4byte 0x13FC07FC
-    .4byte 0x14FC0DFC
-    .4byte 0x03FC04FC
-    .4byte 0x110812FC
-    .4byte 0x13FC0EFC
-    .4byte 0x11FC0CFC
-    .4byte 0xFF000000
-.global lbl_001FC548
-lbl_001FC548:
-    # 0x1FC548
-    .4byte 0x12FC00FC
-    .4byte 0x0DFC0308
-    .4byte 0x03FC14FC
-    .4byte 0x0DFC04FC
-    .4byte 0xFF000000
-.global lbl_001FC55C
-lbl_001FC55C:
-    # 0x1FC55C
-    .4byte 0x0CFC00FC
-    .4byte 0x06FC0DFC
-    .4byte 0x04FC1308
-    .4byte 0x02FC08FC
-    .4byte 0x11FC02FC
-    .4byte 0x14FC08FC
-    .4byte 0x13FCFF00
-.global lbl_001FC578
-lbl_001FC578:
-    # 0x1FC578
-    .4byte lbl_001FC510
-    .4byte lbl_001FC52C
-    .4byte lbl_001FC548
-    .4byte lbl_001FC55C
-    .4byte lbl_001FC4D0
-    .4byte lbl_001FC4E0
-    .4byte lbl_001FC4FC
-    .4byte lbl_001FC4FC
-    .4byte lbl_001FC470
-    .4byte lbl_001FC48C
-    .4byte lbl_001FC4A4
-    .4byte lbl_001FC4B8
-.global lbl_001FC5A8
-lbl_001FC5A8:
-    # 0x1FC5A8
-    .4byte 0x0D0D090E
-    .4byte 0x080D0A0A
-    .4byte 0x0D0C0A0C
-.global lbl_001FC5B4
-lbl_001FC5B4:
-    # 0x1FC5B4
-    .4byte 0x11FC0EFC
-    .4byte 0x02FC0A08
-    .4byte 0x02FC11FC
-    .4byte 0x00FC12FC
-    .4byte 0x07FCFF00
-.global lbl_001FC5C8
-lbl_001FC5C8:
-    # 0x1FC5C8
-    .4byte 0x0CFC04FC
-    .4byte 0x13FC04FC
-    .4byte 0x0EFC1108
-    .4byte 0x08FC0CFC
-    .4byte 0x0FFC00FC
-    .4byte 0x02FC13FC
-    .4byte 0xFF000000
-.global lbl_001FC5E4
-lbl_001FC5E4:
-    # 0x1FC5E4
-    .4byte 0x05FC08FC
-    .4byte 0x11FC0408
-    .4byte 0x12FC13FC
-    .4byte 0x11FC08FC
-    .4byte 0x0AFC04FC
-    .4byte 0xFF000000
-.global lbl_001FC5FC
-lbl_001FC5FC:
-    # 0x1FC5FC
-    .4byte 0x04FC00FC
-    .4byte 0x11FC13FC
-    .4byte 0x07FC10FC
-    .4byte 0x14FC00FC
-    .4byte 0x0AFC0408
-    .4byte 0x16FC04FC
-    .4byte 0x00FC0FFC
-    .4byte 0x0EFC0DFC
-    .4byte 0xFF000000
-.global lbl_001FC620
-lbl_001FC620:
-    # 0x1FC620
-    .4byte 0x11FC0EFC
-    .4byte 0x02FC0A08
-    .4byte 0x02FC0BFE
-    .4byte 0x08FC0CFC
-    .4byte 0x01FC04FC
-    .4byte 0x11FCFF00
-.global lbl_001FC638
-lbl_001FC638:
-    # 0x1FC638
-    .4byte 0x01FC14FC
-    .4byte 0x11FC11FC
-    .4byte 0x0EFC1608
-    .4byte 0x08FC0CFC
-    .4byte 0x0FFC00FC
-    .4byte 0x02FC13FC
-    .4byte 0xFF000000
-.global lbl_001FC654
-lbl_001FC654:
-    # 0x1FC654
-    .4byte 0x05FC08FC
-    .4byte 0x11FC0408
-    .4byte 0x12FC0EFC
-    .4byte 0x14FC0BFE
-    .4byte 0xFF000000
-.global lbl_001FC668
-lbl_001FC668:
-    # 0x1FC668
-    .4byte 0x11FC0EFC
-    .4byte 0x02FC0A08
-    .4byte 0x02FC11FC
-    .4byte 0x18FC12FC
-    .4byte 0x13FC00FC
-    .4byte 0x0BFEFF00
-.global lbl_001FC680
-lbl_001FC680:
-    # 0x1FC680
-    .4byte 0x08FC0CFC
-    .4byte 0x0FFC00FC
-    .4byte 0x02FC1308
-    .4byte 0x02FC11FC
-    .4byte 0x00FC13FC
-    .4byte 0x04FC11FC
-    .4byte 0xFF000000
-.global lbl_001FC69C
-lbl_001FC69C:
-    # 0x1FC69C
-    .4byte 0x05FC08FC
-    .4byte 0x11FC0408
-    .4byte 0x0FFC0EFC
-    .4byte 0x16FC04FC
-    .4byte 0x11FCFF00
-.global lbl_001FC6B0
-lbl_001FC6B0:
-    # 0x1FC6B0
-    .4byte 0x05FC08FC
-    .4byte 0x11FC0408
-    .4byte 0x01FC14FC
-    .4byte 0x11FC11FC
-    .4byte 0x0EFC16FC
-    .4byte 0xFF000000
-.global lbl_001FC6C8
-lbl_001FC6C8:
-    # 0x1FC6C8
-    .4byte lbl_001FC668
-    .4byte lbl_001FC680
-    .4byte lbl_001FC69C
-    .4byte lbl_001FC6B0
-    .4byte lbl_001FC620
-    .4byte lbl_001FC638
-    .4byte lbl_001FC654
-    .4byte lbl_001FC654
-    .4byte lbl_001FC5B4
-    .4byte lbl_001FC5C8
-    .4byte lbl_001FC5E4
-    .4byte lbl_001FC5FC
-.global lbl_001FC6F8
-lbl_001FC6F8:
-    # 0x1FC6F8
-    .4byte 0x0C0D0A0B
-    .4byte 0x0C0D0909
-    .4byte 0x0A0D0B11
-.global lbl_001FC704
-lbl_001FC704:
-    # 0x1FC704
-    .4byte 0x07FC04FC
-    .4byte 0x00FC11FC
-    .4byte 0x13FC05FC
-    .4byte 0x14FC0BFE
-    .4byte 0xFF000000
-.global lbl_001FC718
-lbl_001FC718:
-    # 0x1FC718
-    .4byte 0x13FC16FC
-    .4byte 0x08FC0DFC
-    .4byte 0x0AFC0BFE
-    .4byte 0x04FCFF00
-.global lbl_001FC728
-lbl_001FC728:
-    # 0x1FC728
-    .4byte 0x0CFC04FC
-    .4byte 0x11FC02FC
-    .4byte 0x07FC04FC
-    .4byte 0x0DFCFF00
-.global lbl_001FC738
-lbl_001FC738:
-    # 0x1FC738
-    .4byte 0x03FC11FC
-    .4byte 0x04FC00FC
-    .4byte 0x0C0807FC
-    .4byte 0x04FC00FC
-    .4byte 0x11FC13FC
-    .4byte 0xFF000000
-.global lbl_001FC750
-lbl_001FC750:
-    # 0x1FC750
-    .4byte 0x12FC0DFC
-    .4byte 0x0EFC1608
-    .4byte 0x0FFC04FC
-    .4byte 0x00FC12FC
-    .4byte 0xFF000000
-.global lbl_001FC764
-lbl_001FC764:
-    # 0x1FC764
-    .4byte 0x0FFC04FC
-    .4byte 0x00FC02FC
-    .4byte 0x07FCFF00
-.global lbl_001FC770
-lbl_001FC770:
-    # 0x1FC770
-    .4byte 0x16FC0EFC
-    .4byte 0x0DFC03FC
-    .4byte 0x04FC11FC
-    .4byte 0xFF000000
-.global lbl_001FC780
-lbl_001FC780:
-    # 0x1FC780
-    .4byte 0x07FC04FC
-    .4byte 0x00FC11FC
-    .4byte 0x130801FC
-    .4byte 0x11FC04FC
-    .4byte 0x00FC0AFC
-    .4byte 0xFF000000
-.global lbl_001FC798
-lbl_001FC798:
-    # 0x1FC798
-    .4byte 0x0BFE0EFC
-    .4byte 0x15FC0408
-    .4byte 0x00FC05FC
-    .4byte 0x05FC04FC
-    .4byte 0x02FC13FC
-    .4byte 0x08FC0EFC
-    .4byte 0x0DFCFF00
-.global lbl_001FC7B4
-lbl_001FC7B4:
-    # 0x1FC7B4
-    .4byte 0x03FC11FC
-    .4byte 0x04FC00FC
-    .4byte 0x0C0816FC
-    .4byte 0x0EFC11FC
-    .4byte 0x0BFE03FC
-    .4byte 0xFF000000
-.global lbl_001FC7CC
-lbl_001FC7CC:
-    # 0x1FC7CC
-    .4byte 0x03FC11FC
-    .4byte 0x04FC00FC
-    .4byte 0x0C080BFE
-    .4byte 0x00FC0DFC
-    .4byte 0x03FCFF00
-.global lbl_001FC7E0
-lbl_001FC7E0:
-    # 0x1FC7E0
-    .4byte lbl_001FC780
-    .4byte lbl_001FC798
-    .4byte lbl_001FC7B4
-    .4byte lbl_001FC7CC
-    .4byte lbl_001FC750
-    .4byte lbl_001FC764
-    .4byte lbl_001FC770
-    .4byte lbl_001FC770
-    .4byte lbl_001FC704
-    .4byte lbl_001FC718
-    .4byte lbl_001FC728
-    .4byte lbl_001FC738
-.global lbl_001FC810
-lbl_001FC810:
-    # 0x1FC810
-    .4byte 0x0B0E0B0A
-    .4byte 0x09060707
-    .4byte 0x0908080B
-.global lbl_001FC81C
-lbl_001FC81C:
-    # 0x1FC81C
-    .4byte 0x16FC08FC
-    .4byte 0x0DFC06FC
-    .4byte 0xFF000000
-.global lbl_001FC828
-lbl_001FC828:
-    # 0x1FC828
-    .4byte 0x15FC08FC
-    .4byte 0x02FC13FC
-    .4byte 0x0EFC11FC
-    .4byte 0x18FCFF00
-.global lbl_001FC838
-lbl_001FC838:
-    # 0x1FC838
-    .4byte 0x02FC0BFE
-    .4byte 0x00FC16FC
-    .4byte 0xFF000000
-.global lbl_001FC844
-lbl_001FC844:
-    # 0x1FC844
-    .4byte 0x07FC00FC
-    .4byte 0x16FC0A08
-    .4byte 0x13FC00FC
-    .4byte 0x08FC0BFE
-    .4byte 0xFF000000
-.global lbl_001FC858
-lbl_001FC858:
-    # 0x1FC858
-    .4byte 0x03FC08FC
-    .4byte 0x06FC0DFC
-    .4byte 0x08FC05FC
-    .4byte 0x08FC04FC
-    .4byte 0x03FCFF00
-.global lbl_001FC86C
-lbl_001FC86C:
-    # 0x1FC86C
-    .4byte 0x0DFC0EFC
-    .4byte 0x01FC0BFE
-    .4byte 0x04FCFF00
-.global lbl_001FC878
-lbl_001FC878:
-    # 0x1FC878
-    .4byte 0x06FC0BFE
-    .4byte 0x0EFC11FC
-    .4byte 0x18FCFF00
-.global lbl_001FC884
-lbl_001FC884:
-    # 0x1FC884
-    .4byte 0x16FC08FC
-    .4byte 0x0DFC0608
-    .4byte 0x01FC04FC
-    .4byte 0x00FC13FC
-    .4byte 0xFF000000
-.global lbl_001FC898
-lbl_001FC898:
-    # 0x1FC898
-    .4byte 0x16FC08FC
-    .4byte 0x0DFC0308
-    .4byte 0x01FC0BFE
-    .4byte 0x0EFC16FC
-    .4byte 0xFF000000
-.global lbl_001FC8AC
-lbl_001FC8AC:
-    # 0x1FC8AC
-    .4byte 0x12FC0FFC
-    .4byte 0x04FC04FC
-    .4byte 0x030802FC
-    .4byte 0x0BFE00FC
-    .4byte 0x16FCFF00
-.global lbl_001FC8C0
-lbl_001FC8C0:
-    # 0x1FC8C0
-    .4byte 0x13FC00FC
-    .4byte 0x08FC0B08
-    .4byte 0x16FC08FC
-    .4byte 0x0DFC03FC
-    .4byte 0xFF000000
-.global lbl_001FC8D4
-lbl_001FC8D4:
-    # 0x1FC8D4
-    .4byte lbl_001FC884
-    .4byte lbl_001FC898
-    .4byte lbl_001FC8AC
-    .4byte lbl_001FC8C0
-    .4byte lbl_001FC858
-    .4byte lbl_001FC86C
-    .4byte lbl_001FC878
-    .4byte lbl_001FC878
-    .4byte lbl_001FC81C
-    .4byte lbl_001FC828
-    .4byte lbl_001FC838
-    .4byte lbl_001FC844
-.global lbl_001FC904
-lbl_001FC904:
-    # 0x1FC904
-    .4byte 0x09090A09
-    .4byte 0x0A060606
-    .4byte 0x05080509
-.global lbl_001FC910
-lbl_001FC910:
-    # 0x1FC910
-    .4byte 0x12FC13FC
-    .4byte 0x11FC0EFC
-    .4byte 0x0DFC06FC
-    .4byte 0xFF000000
-.global lbl_001FC920
-lbl_001FC920:
-    # 0x1FC920
-    .4byte 0x03FC11FC
-    .4byte 0x0EFC0F08
-    .4byte 0x07FC00FC
-    .4byte 0x0CFC0CFC
-    .4byte 0x04FC11FC
-    .4byte 0xFF000000
-.global lbl_001FC938
-lbl_001FC938:
-    # 0x1FC938
-    .4byte 0x01FC08FC
-    .4byte 0x060805FC
-    .4byte 0x0BFE18FC
-    .4byte 0xFF000000
-.global lbl_001FC948
-lbl_001FC948:
-    # 0x1FC948
-    .4byte 0x12FC0AFC
-    .4byte 0x180805FC
-    .4byte 0x08FC06FC
-    .4byte 0x07FC13FC
-    .4byte 0x04FC11FC
-    .4byte 0xFF000000
-.global lbl_001FC960
-lbl_001FC960:
-    # 0x1FC960
-    .4byte 0x01FC08FC
-    .4byte 0x11FC0308
-    .4byte 0x02FC00FC
-    .4byte 0x0BFE0BFE
-    .4byte 0xFF000000
-.global lbl_001FC974
-lbl_001FC974:
-    # 0x1FC974
-    .4byte 0x0FFC0EFC
-    .4byte 0x16FC04FC
-    .4byte 0x110803FC
-    .4byte 0x08FC15FC
-    .4byte 0x04FCFF00
-.global lbl_001FC988
-lbl_001FC988:
-    # 0x1FC988
-    .4byte 0x01FC08FC
-    .4byte 0x11FC0308
-    .4byte 0x01FC00FC
-    .4byte 0x13FC07FC
-    .4byte 0xFF000000
-.global lbl_001FC99C
-lbl_001FC99C:
-    # 0x1FC99C
-    .4byte 0x01FC08FC
-    .4byte 0x11FC0308
-    .4byte 0x11FC0EFC
-    .4byte 0x00FC03FC
-    .4byte 0xFF000000
-.global lbl_001FC9B0
-lbl_001FC9B0:
-    # 0x1FC9B0
-    .4byte 0x01FC08FC
-    .4byte 0x11FC0308
-    .4byte 0x16FC00FC
-    .4byte 0x13FC02FC
-    .4byte 0x07FCFF00
-.global lbl_001FC9C4
-lbl_001FC9C4:
-    # 0x1FC9C4
-    .4byte 0x01FC08FC
-    .4byte 0x06FC01FC
-    .4byte 0x08FC11FC
-    .4byte 0x0308FF00
-.global lbl_001FC9D4
-lbl_001FC9D4:
-    # 0x1FC9D4
-    .4byte 0x12FC0AFC
-    .4byte 0x18FC01FC
-    .4byte 0x08FC11FC
-    .4byte 0x0308FF00
-.global lbl_001FC9E4
-lbl_001FC9E4:
-    # 0x1FC9E4
-    .4byte lbl_001FC99C
-    .4byte lbl_001FC9B0
-    .4byte lbl_001FC9C4
-    .4byte lbl_001FC9D4
-    .4byte lbl_001FC960
-    .4byte lbl_001FC974
-    .4byte lbl_001FC988
-    .4byte lbl_001FC988
-    .4byte lbl_001FC910
-    .4byte lbl_001FC920
-    .4byte lbl_001FC938
-    .4byte lbl_001FC948
-.global lbl_001FCA14
-lbl_001FCA14:
-    # 0x1FCA14
-    .4byte 0x090A0808
-    .4byte 0x090A0909
-    .4byte 0x070B070B
-.global lbl_001FCA20
-lbl_001FCA20:
-    # 0x1FCA20
-    .4byte 0x03FC0EFC
-    .4byte 0x14FC01FC
-    .4byte 0x0BFE0408
-    .4byte 0x12FC16FC
-    .4byte 0x00FC0BFE
-    .4byte 0x0BFE0EFC
-    .4byte 0x16FCFF00
-.global lbl_001FCA3C
-lbl_001FCA3C:
-    # 0x1FCA3C
-    .4byte 0x12FC0AFC
-    .4byte 0x180816FC
-    .4byte 0x00FC0BFE
-    .4byte 0x0AFCFF00
-.global lbl_001FCA4C
-lbl_001FCA4C:
-    # 0x1FCA4C
-    .4byte 0x12FC0AFC
-    .4byte 0x180805FC
-    .4byte 0x0BFE18FC
-    .4byte 0xFF000000
-.global lbl_001FCA5C
-lbl_001FCA5C:
-    # 0x1FCA5C
-    .4byte 0x07FC14FC
-    .4byte 0x0CFC0CFC
-    .4byte 0x08FC0DFC
-    .4byte 0x060801FC
-    .4byte 0x08FC11FC
-    .4byte 0x03FCFF00
-.global lbl_001FCA74
-lbl_001FCA74:
-    # 0x1FCA74
-    .4byte 0x01FC14FC
-    .4byte 0x12FC1808
-    .4byte 0x01FC0EFC
-    .4byte 0x03FC18FC
-    .4byte 0xFF000000
-.global lbl_001FCA88
-lbl_001FCA88:
-    # 0x1FCA88
-    .4byte 0x12FC16FC
-    .4byte 0x00FC0BFE
-    .4byte 0x0BFE0EFC
-    .4byte 0x16080DFC
-    .4byte 0x04FC12FC
-    .4byte 0x13FCFF00
-.global lbl_001FCAA0
-lbl_001FCAA0:
-    # 0x1FCAA0
-    .4byte 0x12FC16FC
-    .4byte 0x00FC0BFE
-    .4byte 0x0BFE0EFC
-    .4byte 0x160802FC
-    .4byte 0x14FC13FC
-    .4byte 0x13FC04FC
-    .4byte 0x11FCFF00
-.global lbl_001FCABC
-lbl_001FCABC:
-    # 0x1FCABC
-    .4byte 0x12FC16FC
-    .4byte 0x00FC0BFE
-    .4byte 0x0BFE0EFC
-    .4byte 0x160803FC
-    .4byte 0x08FC15FC
-    .4byte 0x04FCFF00
-.global lbl_001FCAD4
-lbl_001FCAD4:
-    # 0x1FCAD4
-    .4byte 0x13FC04FC
-    .4byte 0x02FC07FC
-    .4byte 0x0DFC08FC
-    .4byte 0x02FC00FC
-    .4byte 0x0B0816FC
-    .4byte 0x00FC0BFE
-    .4byte 0x0AFCFF00
-.global lbl_001FCAF0
-lbl_001FCAF0:
-    # 0x1FCAF0
-    .4byte 0x12FC0AFC
-    .4byte 0x180803FC
-    .4byte 0x08FC15FC
-    .4byte 0x04FCFF00
-.global lbl_001FCB00
-lbl_001FCB00:
-    # 0x1FCB00
-    .4byte 0x01FC08FC
-    .4byte 0x11FC0308
-    .4byte 0x12FC0EFC
-    .4byte 0x0DFC06FC
-    .4byte 0xFF000000
-.global lbl_001FCB14
-lbl_001FCB14:
-    # 0x1FCB14
-    .4byte lbl_001FCABC
-    .4byte lbl_001FCAD4
-    .4byte lbl_001FCAF0
-    .4byte lbl_001FCB00
-    .4byte lbl_001FCA74
-    .4byte lbl_001FCA88
-    .4byte lbl_001FCAA0
-    .4byte lbl_001FCAA0
-    .4byte lbl_001FCA20
-    .4byte lbl_001FCA3C
-    .4byte lbl_001FCA4C
-    .4byte lbl_001FCA5C
-.global lbl_001FCB44
-lbl_001FCB44:
-    # 0x1FCB44
-    .4byte 0x0C0E0809
-    .4byte 0x090C0E0E
-    .4byte 0x0E08070C
-.global lbl_001FCB50
-lbl_001FCB50:
-    # 0x1FCB50
-    .4byte 0x04FC06FC
-    .4byte 0x06080DFC
-    .4byte 0x00FC02FC
-    .4byte 0xFF000000
-.global lbl_001FCB60
-lbl_001FCB60:
-    # 0x1FCB60
-    .4byte 0x04FC06FC
-    .4byte 0x06080FFC
-    .4byte 0x04FC11FC
-    .4byte 0x05FC04FC
-    .4byte 0x02FC13FC
-    .4byte 0xFF000000
-.global lbl_001FCB78
-lbl_001FCB78:
-    # 0x1FCB78
-    .4byte 0x04FC06FC
-    .4byte 0x060812FC
-    .4byte 0x0CFC00FC
-    .4byte 0x11FC13FC
-    .4byte 0xFF000000
-.global lbl_001FCB8C
-lbl_001FCB8C:
-    # 0x1FCB8C
-    .4byte lbl_001FCB50
-    .4byte lbl_001FCB60
-    .4byte lbl_001FCB78
-    .4byte lbl_001FCB78
-    .4byte lbl_001FCB50
-    .4byte lbl_001FCB60
-    .4byte lbl_001FCB78
-    .4byte lbl_001FCB78
-    .4byte lbl_001FCB50
-    .4byte lbl_001FCB60
-    .4byte lbl_001FCB78
-    .4byte lbl_001FCB78
-.global lbl_001FCBBC
-lbl_001FCBBC:
-    # 0x1FCBBC
-    .4byte 0x00000000
-    .4byte 0x070B0909
-    .4byte 0x00000000
-.global lbl_001FCBC8
-lbl_001FCBC8:
-    # 0x1FCBC8
-    .4byte 0x0BFE0EFC
-    .4byte 0x15FC04FC
-    .4byte 0x0BFE18FC
-    .4byte 0xFF000000
-.global lbl_001FCBD8
-lbl_001FCBD8:
-    # 0x1FCBD8
-    .4byte 0x02FC14FC
-    .4byte 0x13FC04FC
-    .4byte 0xFF000000
-.global lbl_001FCBE4
-lbl_001FCBE4:
-    # 0x1FCBE4
-    .4byte 0x11FC00FC
-    .4byte 0x01FC01FC
-    .4byte 0x08FC1308
-    .4byte 0x09FC14FC
-    .4byte 0x0CFC0FFC
-    .4byte 0xFF000000
-.global lbl_001FCBFC
-lbl_001FCBFC:
-    # 0x1FCBFC
-    .4byte 0x12FC0CFC
-    .4byte 0x00FC0BFE
-    .4byte 0x0B0811FC
-    .4byte 0x00FC01FC
-    .4byte 0x01FC08FC
-    .4byte 0x1308FF00
-.global lbl_001FCC14
-lbl_001FCC14:
-    # 0x1FCC14
-    .4byte 0x15FC00FC
-    .4byte 0x0DFC08FC
-    .4byte 0x0BFE0BFE
-    .4byte 0x000804FC
-    .4byte 0x12FC12FC
-    .4byte 0x04FC0DFC
-    .4byte 0x02FC04FC
-    .4byte 0xFF000000
-.global lbl_001FCC34
-lbl_001FCC34:
-    # 0x1FCC34
-    .4byte 0x12FC13FC
-    .4byte 0x11FC00FC
-    .4byte 0x16FC01FC
-    .4byte 0x04FC11FC
-    .4byte 0x11FC1808
-    .4byte 0x05FC0BFE
-    .4byte 0x00FC15FC
-    .4byte 0x0EFC11FC
-    .4byte 0xFF000000
-.global lbl_001FCC58
-lbl_001FCC58:
-    # 0x1FCC58
-    .4byte 0x02FC07FC
-    .4byte 0x0EFC02FC
-    .4byte 0x0EFC0BFE
-    .4byte 0x00FC13FC
-    .4byte 0x040801FC
-    .4byte 0x0EFC17FC
-    .4byte 0xFF000000
-.global lbl_001FCC74
-lbl_001FCC74:
-    # 0x1FCC74
-    .4byte 0x11FC04FC
-    .4byte 0x15FC0EFC
-    .4byte 0x0BFE14FC
-    .4byte 0x13FC08FC
-    .4byte 0x0EFC0D08
-    .4byte 0x11FC00FC
-    .4byte 0x01FC01FC
-    .4byte 0x08FC13FC
-    .4byte 0xFF000000
-.global lbl_001FCC98
-lbl_001FCC98:
-    # 0x1FCC98
-    .4byte 0x02FC14FC
-    .4byte 0x13FC04FC
-    .4byte 0x0BFE18FC
-    .4byte 0xFF000000
-.global lbl_001FCCA8
-lbl_001FCCA8:
-    # 0x1FCCA8
-    .4byte 0x11FC00FC
-    .4byte 0x01FC01FC
-    .4byte 0x08FC1308
-    .4byte 0x02FC08FC
-    .4byte 0x11FC02FC
-    .4byte 0x0BFE04FC
-    .4byte 0xFF000000
-.global lbl_001FCCC4
-lbl_001FCCC4:
-    # 0x1FCCC4
-    .4byte 0x11FC00FC
-    .4byte 0x01FC01FC
-    .4byte 0x08FC1308
-    .4byte 0x00FC11FC
-    .4byte 0x02FC07FC
-    .4byte 0xFF000000
-.global lbl_001FCCDC
-lbl_001FCCDC:
-    # 0x1FCCDC
-    .4byte lbl_001FCC74
-    .4byte lbl_001FCC98
-    .4byte lbl_001FCCA8
-    .4byte lbl_001FCCC4
-    .4byte lbl_001FCC14
-    .4byte lbl_001FCC34
-    .4byte lbl_001FCC58
-    .4byte lbl_001FCC58
-    .4byte lbl_001FCBC8
-    .4byte lbl_001FCBD8
-    .4byte lbl_001FCBE4
-    .4byte lbl_001FCBFC
-.global lbl_001FCD0C
-lbl_001FCD0C:
-    # 0x1FCD0C
-    .4byte 0x11070D0B
-    .4byte 0x0F110D0D
-    .4byte 0x07050B0C
-.global lbl_001FCD18
-lbl_001FCD18:
-    # 0x1FCD18
-    .4byte 0x02FC07FC
-    .4byte 0x00FC11FC
-    .4byte 0x0CFCFF00
-.global lbl_001FCD24
-lbl_001FCD24:
-    # 0x1FCD24
-    .4byte 0x16FC08FC
-    .4byte 0x13FC02FC
-    .4byte 0x07FCFF00
-.global lbl_001FCD30
-lbl_001FCD30:
-    # 0x1FCD30
-    .4byte 0x01FC00FC
-    .4byte 0x130805FC
-    .4byte 0x0BFE18FC
-    .4byte 0xFF000000
-.global lbl_001FCD40
-lbl_001FCD40:
-    # 0x1FCD40
-    .4byte 0x12FC04FC
-    .4byte 0x17FC1808
-    .4byte 0x01FC00FC
-    .4byte 0x13FCFF00
-.global lbl_001FCD50
-lbl_001FCD50:
-    # 0x1FCD50
-    .4byte 0x09FC04FC
-    .4byte 0x16FC04FC
-    .4byte 0x0B0801FC
-    .4byte 0x0EFC17FC
-    .4byte 0xFF000000
-.global lbl_001FCD64
-lbl_001FCD64:
-    # 0x1FCD64
-    .4byte 0x12FC04FC
-    .4byte 0x17FC1808
-    .4byte 0x04FC18FC
-    .4byte 0x04FCFF00
-.global lbl_001FCD74
-lbl_001FCD74:
-    # 0x1FCD74
-    .4byte 0x0CFC00FC
-    .4byte 0x0AFC0408
-    .4byte 0x14FC0FFC
-    .4byte 0xFF000000
-.global lbl_001FCD84
-lbl_001FCD84:
-    # 0x1FCD84
-    .4byte 0x01FC04FC
-    .4byte 0x00FC14FC
-    .4byte 0x13FC1808
-    .4byte 0x0CFC00FC
-    .4byte 0x11FC0AFC
-    .4byte 0xFF000000
-.global lbl_001FCD9C
-lbl_001FCD9C:
-    # 0x1FCD9C
-    .4byte 0x0CFC18FC
-    .4byte 0x12FC13FC
-    .4byte 0x04FC11FC
-    .4byte 0x08FC0EFC
-    .4byte 0x14FC1208
-    .4byte 0x02FC07FC
-    .4byte 0x00FC11FC
-    .4byte 0x0CFCFF00
-.global lbl_001FCDBC
-lbl_001FCDBC:
-    # 0x1FCDBC
-    .4byte 0x12FC04FC
-    .4byte 0x17FC1808
-    .4byte 0x02FC07FC
-    .4byte 0x00FC11FC
-    .4byte 0x0CFCFF00
-.global lbl_001FCDD0
-lbl_001FCDD0:
-    # 0x1FCDD0
-    .4byte 0x12FC04FC
-    .4byte 0x17FC1808
-    .4byte 0x12FC07FC
-    .4byte 0x0EFC13FC
-    .4byte 0xFF000000
-.global lbl_001FCDE4
-lbl_001FCDE4:
-    # 0x1FCDE4
-    .4byte lbl_001FCD84
-    .4byte lbl_001FCD9C
-    .4byte lbl_001FCDBC
-    .4byte lbl_001FCDD0
-    .4byte lbl_001FCD50
-    .4byte lbl_001FCD64
-    .4byte lbl_001FCD74
-    .4byte lbl_001FCD74
-    .4byte lbl_001FCD18
-    .4byte lbl_001FCD24
-    .4byte lbl_001FCD30
-    .4byte lbl_001FCD40
-.global lbl_001FCE14
-lbl_001FCE14:
-    # 0x1FCE14
-    .4byte 0x0B100A09
-    .4byte 0x09080707
-    .4byte 0x06060708
-.global lbl_001FCE20
-lbl_001FCE20:
-    # 0x1FCE20
-    .4byte 0x03FC00FC
-    .4byte 0x11FC0AFC
-    .4byte 0x0DFC04FC
-    .4byte 0x12FC12FC
-    .4byte 0xFF000000
-.global lbl_001FCE34
-lbl_001FCE34:
-    # 0x1FCE34
-    .4byte 0x04FC15FC
-    .4byte 0x08FC0B08
-    .4byte 0x12FC13FC
-    .4byte 0x00FC11FC
-    .4byte 0xFF000000
-.global lbl_001FCE48
-lbl_001FCE48:
-    # 0x1FCE48
-    .4byte 0x03FC00FC
-    .4byte 0x11FC0A08
-    .4byte 0x0DFC08FC
-    .4byte 0x06FC07FC
-    .4byte 0x13FCFF00
-.global lbl_001FCE5C
-lbl_001FCE5C:
-    # 0x1FCE5C
-    .4byte 0x03FC00FC
-    .4byte 0x11FC0A08
-    .4byte 0x02FC07FC
-    .4byte 0x00FC0EFC
-    .4byte 0x12FCFF00
-.global lbl_001FCE70
-lbl_001FCE70:
-    # 0x1FCE70
-    .4byte 0x03FC00FC
-    .4byte 0x11FC0A08
-    .4byte 0x02FC0EFC
-    .4byte 0x0DFC13FC
-    .4byte 0x08FC0DFC
-    .4byte 0x04FC0DFC
-    .4byte 0x13FCFF00
-.global lbl_001FCE8C
-lbl_001FCE8C:
-    # 0x1FCE8C
-    .4byte 0x01FC11FC
-    .4byte 0x04FC00FC
-    .4byte 0x0A0800FC
-    .4byte 0x16FC00FC
-    .4byte 0x18FCFF00
-.global lbl_001FCEA0
-lbl_001FCEA0:
-    # 0x1FCEA0
-    .4byte 0x01FC0BFE
-    .4byte 0x00FC02FC
-    .4byte 0x0A0800FC
-    .4byte 0x11FC13FC
-    .4byte 0xFF000000
-.global lbl_001FCEB4
-lbl_001FCEB4:
-    # 0x1FCEB4
-    .4byte 0x04FC15FC
-    .4byte 0x08FC0B08
-    .4byte 0x01FC14FC
-    .4byte 0x11FC12FC
-    .4byte 0x13FCFF00
-.global lbl_001FCEC8
-lbl_001FCEC8:
-    # 0x1FCEC8
-    .4byte 0x03FC00FC
-    .4byte 0x11FC0A08
-    .4byte 0x08FC0CFC
-    .4byte 0x0FFC00FC
-    .4byte 0x02FC13FC
-    .4byte 0xFF000000
-.global lbl_001FCEE0
-lbl_001FCEE0:
-    # 0x1FCEE0
-    .4byte 0x03FC00FC
-    .4byte 0x11FC0A08
-    .4byte 0x13FC18FC
-    .4byte 0x0FFC07FC
-    .4byte 0x0EFC0EFC
-    .4byte 0x0DFCFF00
-.global lbl_001FCEF8
-lbl_001FCEF8:
-    # 0x1FCEF8
-    .4byte 0x03FC00FC
-    .4byte 0x11FC0A08
-    .4byte 0x07FC14FC
-    .4byte 0x11FC11FC
-    .4byte 0x08FC02FC
-    .4byte 0x00FC0DFC
-    .4byte 0x04FCFF00
-.global lbl_001FCF14
-lbl_001FCF14:
-    # 0x1FCF14
-    .4byte lbl_001FCEB4
-    .4byte lbl_001FCEC8
-    .4byte lbl_001FCEE0
-    .4byte lbl_001FCEF8
-    .4byte lbl_001FCE70
-    .4byte lbl_001FCE8C
-    .4byte lbl_001FCEA0
-    .4byte lbl_001FCEA0
-    .4byte lbl_001FCE20
-    .4byte lbl_001FCE34
-    .4byte lbl_001FCE48
-    .4byte lbl_001FCE5C
-.global lbl_001FCF44
-lbl_001FCF44:
-    # 0x1FCF44
-    .4byte 0x0A0B0C0E
-    .4byte 0x0E0A0909
-    .4byte 0x09090A0A
-.global lbl_001FCF50
-lbl_001FCF50:
-    # 0x1FCF50
-    .4byte 0x06FC0EFC
-    .4byte 0x0BFE03FC
-    .4byte 0x04FC0D08
-    .4byte 0x13FC16FC
-    .4byte 0x08FC12FC
-    .4byte 0x13FC04FC
-    .4byte 0x11FCFF00
-.global lbl_001FCF6C
-lbl_001FCF6C:
-    # 0x1FCF6C
-    .4byte 0x06FC0EFC
-    .4byte 0x0BFE03FC
-    .4byte 0x04FC0D08
-    .4byte 0x12FC0AFC
-    .4byte 0x18FCFF00
-.global lbl_001FCF80
-lbl_001FCF80:
-    # 0x1FCF80
-    .4byte 0x06FC0EFC
-    .4byte 0x0BFE03FC
-    .4byte 0x04FC0D08
-    .4byte 0x0CFC0EFC
-    .4byte 0x14FC12FC
-    .4byte 0x04FCFF00
-.global lbl_001FCF98
-lbl_001FCF98:
-    # 0x1FCF98
-    .4byte 0x06FC0EFC
-    .4byte 0x0BFE03FC
-    .4byte 0x04FC0D08
-    .4byte 0x12FC02FC
-    .4byte 0x0EFC11FC
-    .4byte 0x0FFC08FC
-    .4byte 0x0EFC0DFC
-    .4byte 0xFF000000
-.global lbl_001FCFB8
-lbl_001FCFB8:
-    # 0x1FCFB8
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte lbl_001FCF50
-    .4byte lbl_001FCF6C
-    .4byte lbl_001FCF80
-    .4byte lbl_001FCF98
-.global lbl_001FCFE8
-lbl_001FCFE8:
-    # 0x1FCFE8
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x0E0A0C0F
-.global lbl_001FCFF4
-lbl_001FCFF4:
-    # 0x1FCFF4
-    .4byte 0x0CFC08FC
-    .4byte 0x12FC02FC
-    .4byte 0x07FC08FC
-    .4byte 0x04FC05FC
-    .4byte 0xFF000000
-.global lbl_001FD008
-lbl_001FD008:
-    # 0x1FD008
-    .4byte 0x05FC00FC
-    .4byte 0x0DFC02FC
-    .4byte 0x18FCFF00
-.global lbl_001FD014
-lbl_001FD014:
-    # 0x1FD014
-    .4byte 0x03FC08FC
-    .4byte 0x0CFC04FC
-    .4byte 0x0DFC12FC
-    .4byte 0x08FC0EFC
-    .4byte 0x0DFCFF00
-.global lbl_001FD028
-lbl_001FD028:
-    # 0x1FD028
-    .4byte 0x15FC08FC
-    .4byte 0x12FC08FC
-    .4byte 0x13FC0EFC
-    .4byte 0x11FCFF00
-.global lbl_001FD038
-lbl_001FD038:
-    # 0x1FD038
-    .4byte 0x01FC11FC
-    .4byte 0x00FC15FC
-    .4byte 0x04FC11FC
-    .4byte 0x18FCFF00
-.global lbl_001FD048
-lbl_001FD048:
-    # 0x1FD048
-    .4byte 0x06FC11FC
-    .4byte 0x0EFC16FC
-    .4byte 0xFF000000
-.global lbl_001FD054
-lbl_001FD054:
-    # 0x1FD054
-    .4byte 0x05FC00FC
-    .4byte 0x0DFC13FC
-    .4byte 0x00FC12FC
-    .4byte 0x13FC08FC
-    .4byte 0x020812FC
-    .4byte 0x13FC0EFC
-    .4byte 0x11FC18FC
-    .4byte 0xFF000000
-.global lbl_001FD074
-lbl_001FD074:
-    # 0x1FD074
-    .4byte 0x0BFE08FC
-    .4byte 0x01FC04FC
-    .4byte 0x11FC13FC
-    .4byte 0x180801FC
-    .4byte 0x04FC0BFE
-    .4byte 0x0BFEFF00
-.global lbl_001FD08C
-lbl_001FD08C:
-    # 0x1FD08C
-    .4byte 0x05FC11FC
-    .4byte 0x04FC0408
-    .4byte 0x07FC00FC
-    .4byte 0x0DFC03FC
-    .4byte 0xFF000000
-.global lbl_001FD0A0
-lbl_001FD0A0:
-    # 0x1FD0A0
-    .4byte 0x12FC04FC
-    .4byte 0x130805FC
-    .4byte 0x11FC04FC
-    .4byte 0x04FCFF00
-.global lbl_001FD0B0
-lbl_001FD0B0:
-    # 0x1FD0B0
-    .4byte 0x06FC04FC
-    .4byte 0x130805FC
-    .4byte 0x11FC04FC
-    .4byte 0x04FCFF00
-.global lbl_001FD0C0
-lbl_001FD0C0:
-    # 0x1FD0C0
-    .4byte lbl_001FD074
-    .4byte lbl_001FD08C
-    .4byte lbl_001FD0A0
-    .4byte lbl_001FD0B0
-    .4byte lbl_001FD038
-    .4byte lbl_001FD048
-    .4byte lbl_001FD054
-    .4byte lbl_001FD054
-    .4byte lbl_001FCFF4
-    .4byte lbl_001FD008
-    .4byte lbl_001FD014
-    .4byte lbl_001FD028
-.global lbl_001FD0F0
-lbl_001FD0F0:
-    # 0x1FD0F0
-    .4byte 0x0C090808
-    .4byte 0x08050F0F
-    .4byte 0x09060A08
-.global lbl_001FD0FC
-lbl_001FD0FC:
-    # 0x1FD0FC
-    .4byte 0x02FC00FC
-    .4byte 0x11FC04FC
-    .4byte 0x05FC11FC
-    .4byte 0x04FC04FC
-    .4byte 0xFF000000
-.global lbl_001FD110
-lbl_001FD110:
-    # 0x1FD110
-    .4byte 0x16FC08FC
-    .4byte 0x0BFE03FC
-    .4byte 0xFF000000
-.global lbl_001FD11C
-lbl_001FD11C:
-    # 0x1FD11C
-    .4byte 0x0DFC00FC
-    .4byte 0x13FC14FC
-    .4byte 0x11FC04FC
-    .4byte 0xFF000000
-.global lbl_001FD12C
-lbl_001FD12C:
-    # 0x1FD12C
-    .4byte 0x05FC0EFC
-    .4byte 0x11FC04FC
-    .4byte 0x12FC13FC
-    .4byte 0xFF000000
-.global lbl_001FD13C
-lbl_001FD13C:
-    # 0x1FD13C
-    .4byte 0x0CFC0EFC
-    .4byte 0x0DFC0AFC
-    .4byte 0x04FC18FC
-    .4byte 0xFF000000
-.global lbl_001FD14C
-lbl_001FD14C:
-    # 0x1FD14C
-    .4byte 0x09FC14FC
-    .4byte 0x0DFC06FC
-    .4byte 0x0BFE04FC
-    .4byte 0xFF000000
-.global lbl_001FD15C
-lbl_001FD15C:
-    # 0x1FD15C
-    .4byte 0x0CFC0EFC
-    .4byte 0x0DFC0AFC
-    .4byte 0x04FC1808
-    .4byte 0x01FC00FC
-    .4byte 0x11FC12FC
-    .4byte 0xFF000000
-.global lbl_001FD174
-lbl_001FD174:
-    # 0x1FD174
-    .4byte 0x02FC0BFE
-    .4byte 0x04FC15FC
-    .4byte 0x04FC11FC
-    .4byte 0xFF000000
-.global lbl_001FD184
-lbl_001FD184:
-    # 0x1FD184
-    .4byte 0x04FC0DFC
-    .4byte 0x04FC11FC
-    .4byte 0x06FC18FC
-    .4byte 0xFF000000
-.global lbl_001FD194
-lbl_001FD194:
-    # 0x1FD194
-    .4byte 0x0CFC0EFC
-    .4byte 0x0DFC0AFC
-    .4byte 0x04FC1808
-    .4byte 0x04FC00FC
-    .4byte 0x11FCFF00
-.global lbl_001FD1A8
-lbl_001FD1A8:
-    # 0x1FD1A8
-    .4byte 0x0CFC0EFC
-    .4byte 0x0DFC0AFC
-    .4byte 0x04FC1808
-    .4byte 0x04FC18FC
-    .4byte 0x04FCFF00
-.global lbl_001FD1BC
-lbl_001FD1BC:
-    # 0x1FD1BC
-    .4byte lbl_001FD174
-    .4byte lbl_001FD184
-    .4byte lbl_001FD194
-    .4byte lbl_001FD1A8
-    .4byte lbl_001FD13C
-    .4byte lbl_001FD14C
-    .4byte lbl_001FD15C
-    .4byte lbl_001FD15C
-    .4byte lbl_001FD0FC
-    .4byte lbl_001FD110
-    .4byte lbl_001FD11C
-    .4byte lbl_001FD12C
-.global lbl_001FD1EC
-lbl_001FD1EC:
-    # 0x1FD1EC
-    .4byte 0x07070A0A
-    .4byte 0x07070B0B
-    .4byte 0x09050707
-.global lbl_001FD1F8
-lbl_001FD1F8:
-    # 0x1FD1F8
-    .4byte 0x06FC00FC
-    .4byte 0x0BFE00FC
-    .4byte 0x17FC18FC
-    .4byte 0xFF000000
-.global lbl_001FD208
-lbl_001FD208:
-    # 0x1FD208
-    .4byte 0x12FC0FFC
-    .4byte 0x00FC02FC
-    .4byte 0x040800FC
-    .4byte 0x06FC04FC
-    .4byte 0xFF000000
-.global lbl_001FD21C
-lbl_001FD21C:
-    # 0x1FD21C
-    .4byte 0x19FC04FC
-    .4byte 0x11FC0E08
-    .4byte 0x06FC11FC
-    .4byte 0x00FC15FC
-    .4byte 0x08FC13FC
-    .4byte 0x18FCFF00
-.global lbl_001FD234
-lbl_001FD234:
-    # 0x1FD234
-    .4byte 0x00FC0BFE
-    .4byte 0x08FC04FC
-    .4byte 0x0DFCFF00
-.global lbl_001FD240
-lbl_001FD240:
-    # 0x1FD240
-    .4byte 0x12FC0FFC
-    .4byte 0x00FC02FC
-    .4byte 0x040812FC
-    .4byte 0x07FC08FC
-    .4byte 0x0FFCFF00
-.global lbl_001FD254
-lbl_001FD254:
-    # 0x1FD254
-    .4byte 0x12FC0FFC
-    .4byte 0x00FC02FC
-    .4byte 0x040813FC
-    .4byte 0x08FC0CFC
-    .4byte 0x04FCFF00
-.global lbl_001FD268
-lbl_001FD268:
-    # 0x1FD268
-    .4byte 0x12FC0FFC
-    .4byte 0x00FC02FC
-    .4byte 0x040816FC
-    .4byte 0x00FC0BFE
-    .4byte 0x0AFCFF00
-.global lbl_001FD27C
-lbl_001FD27C:
-    # 0x1FD27C
-    .4byte 0x12FC0FFC
-    .4byte 0x00FC02FC
-    .4byte 0x040805FC
-    .4byte 0x0BFE08FC
-    .4byte 0x06FC07FC
-    .4byte 0x13FCFF00
-.global lbl_001FD294
-lbl_001FD294:
-    # 0x1FD294
-    .4byte lbl_001FD240
-    .4byte lbl_001FD254
-    .4byte lbl_001FD268
-    .4byte lbl_001FD27C
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte lbl_001FD1F8
-    .4byte lbl_001FD208
-    .4byte lbl_001FD21C
-    .4byte lbl_001FD234
-.global lbl_001FD2C4
-lbl_001FD2C4:
-    # 0x1FD2C4
-    .4byte 0x0A0A0A0C
-    .4byte 0x00000000
-    .4byte 0x07090C06
-.global lbl_001FD2D0
-lbl_001FD2D0:
-    # 0x1FD2D0
-    .4byte 0x01FC11FC
-    .4byte 0x04FC00FC
-    .4byte 0x0A080CFC
-    .4byte 0x00FC02FC
-    .4byte 0x07FC08FC
-    .4byte 0x0DFC04FC
-    .4byte 0xFF000000
-.global lbl_001FD2EC
-lbl_001FD2EC:
-    # 0x1FD2EC
-    .4byte 0x0DFC0EFC
-    .4byte 0x08FC12FC
-    .4byte 0x04FCFF00
-.global lbl_001FD2F8
-lbl_001FD2F8:
-    # 0x1FD2F8
-    .4byte 0x12FC02FC
-    .4byte 0x11FC00FC
-    .4byte 0x0FFCFF00
-.global lbl_001FD304
-lbl_001FD304:
-    # 0x1FD304
-    .4byte 0x02FC11FC
-    .4byte 0x00FC12FC
-    .4byte 0x07FCFF00
-.global lbl_001FD310
-lbl_001FD310:
-    # 0x1FD310
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte lbl_001FD2D0
-    .4byte lbl_001FD2EC
-    .4byte lbl_001FD2F8
-    .4byte lbl_001FD304
-.global lbl_001FD340
-lbl_001FD340:
-    # 0x1FD340
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x0D060606
-.global lbl_001FD34C
-lbl_001FD34C:
-    # 0x1FD34C
-    .4byte 0x0CFC04FC
-    .4byte 0x02FC07FC
-    .4byte 0x00FC0DFC
-    .4byte 0x08FC02FC
-    .4byte 0x00FC0BFE
-    .4byte 0xFF000000
-.global lbl_001FD364
-lbl_001FD364:
-    # 0x1FD364
-    .4byte 0x04FC0BFE
-    .4byte 0x04FC02FC
-    .4byte 0x13FC11FC
-    .4byte 0x0EFC0DFC
-    .4byte 0x08FC02FC
-    .4byte 0xFF000000
-.global lbl_001FD37C
-lbl_001FD37C:
-    # 0x1FD37C
-    .4byte 0x00FC13FC
-    .4byte 0x0EFC0CFC
-    .4byte 0x08FC02FC
-    .4byte 0xFF000000
-.global lbl_001FD38C
-lbl_001FD38C:
-    # 0x1FD38C
-    .4byte 0x04FC0BFE
-    .4byte 0x04FC0CFC
-    .4byte 0x04FC0DFC
-    .4byte 0x13FC00FC
-    .4byte 0x11FC18FC
-    .4byte 0xFF000000
-.global lbl_001FD3A4
-lbl_001FD3A4:
-    # 0x1FD3A4
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte lbl_001FD34C
-    .4byte lbl_001FD364
-    .4byte lbl_001FD37C
-    .4byte lbl_001FD38C
-.global lbl_001FD3D4
-lbl_001FD3D4:
-    # 0x1FD3D4
-    .4byte 0x00000000
-    .4byte 0x00000000
-    .4byte 0x0B0B070B
-.global lbl_001FD3E0
-lbl_001FD3E0:
+.global trickText_stringptrs
+trickText_stringptrs:
     # 0x1FD3E0
     # pointers to arrays of pointers to trick text strings, in character order
-    .4byte lbl_001FC434
-    .4byte lbl_001FC578
-    .4byte lbl_001FC6C8
-    .4byte lbl_001FC7E0
-    .4byte lbl_001FC8D4
-    .4byte lbl_001FC9E4
-    .4byte lbl_001FCB14
-    .4byte lbl_001FCB8C
-    .4byte lbl_001FCCDC
-    .4byte lbl_001FCDE4
-    .4byte lbl_001FCF14
-    .4byte lbl_001FCFB8
-    .4byte lbl_001FD0C0
-    .4byte lbl_001FD1BC
-    .4byte lbl_001FD294
-    .4byte lbl_001FD310
-    .4byte lbl_001FD3A4
+    .4byte sonic_stringptrs			// Sonic
+    .4byte tails_stringptrs			// Tails
+    .4byte knuckles_stringptrs		// Knuckles
+    .4byte amy_stringptrs			// Amy
+    .4byte jet_stringptrs			// Jet
+    .4byte storm_stringptrs			// Storm
+    .4byte wave_stringptrs			// Wave
+    .4byte eggman_stringptrs		// Eggman
+    .4byte cream_stringptrs			// Cream
+    .4byte rouge_stringptrs			// Rouge
+    .4byte shadow_stringptrs		// Shadow
+    .4byte supersonic_stringptrs	// Super Sonic
+    .4byte nights_stringptrs		// Nights
+    .4byte aiai_stringptrs			// Aiai
+    .4byte ulala_stringptrs			// Ulala
+    .4byte e10g_stringptrs			// E10G
+    .4byte e10r_stringptrs			// E10R
     # ------
-    # new characters, will default to sonic for now
-    .4byte silver_stringptrs
-    .4byte metalsonic_stringptrs
-    .4byte emerl_stringptrs
-    .4byte blaze_stringptrs
-    .4byte chaos_stringptrs
-    .4byte tikal_stringptrs
-    .4byte lbl_001FC434
-.global lbl_001FD424
-lbl_001FD424:
+    .4byte silver_stringptrs		// Silver
+    .4byte metalsonic_stringptrs	// Metal Sonic
+    .4byte emerl_stringptrs			// Emerl
+    .4byte blaze_stringptrs			// Blaze
+    .4byte chaos_stringptrs			// Chaos
+    .4byte tikal_stringptrs			// Tikal
+.global trickText_lengths
+trickText_lengths:
     # 0x1FD424
     # pointers to arrays of pointers to trick text string lengths, in character order, in string order
-    .4byte lbl_001FC464
-    .4byte lbl_001FC5A8
-    .4byte lbl_001FC6F8
-    .4byte lbl_001FC810
-    .4byte lbl_001FC904
-    .4byte lbl_001FCA14
-    .4byte lbl_001FCB44
-    .4byte lbl_001FCBBC
-    .4byte lbl_001FCD0C
-    .4byte lbl_001FCE14
-    .4byte lbl_001FCF44
-    .4byte lbl_001FCFE8
-    .4byte lbl_001FD0F0
-    .4byte lbl_001FD1EC
-    .4byte lbl_001FD2C4
-    .4byte lbl_001FD340
-    .4byte lbl_001FD3D4
+    .4byte sonic_lengths			// Sonic
+    .4byte tails_lengths			// Tails
+    .4byte knuckles_lengths			// Knuckles
+    .4byte amy_lengths				// Amy
+    .4byte jet_lengths				// Jet
+    .4byte storm_lengths			// Storm
+    .4byte wave_lengths				// Wave
+    .4byte eggman_lengths			// Eggman
+    .4byte cream_lengths			// Cream
+    .4byte rouge_lengths			// Rouge
+    .4byte shadow_lengths			// Shadow
+    .4byte supersonic_lengths		// Super Sonic
+    .4byte nights_lengths			// Nights
+    .4byte aiai_lengths				// Aiai
+    .4byte ulala_lengths			// Ulala
+    .4byte e10g_lengths				// E10G
+    .4byte e10r_lengths				// E10R
     # ------
-    # new characters, will default to sonic for now
-    .4byte silver_lengths
-    .4byte metalsonic_lengths
-    .4byte emerl_lengths
-    .4byte blaze_lengths
-    .4byte chaos_lengths
-    .4byte tikal_lengths
-    .4byte lbl_001FC464
+    .4byte silver_lengths			// Silver
+    .4byte metalsonic_lengths		// Metal Sonic
+    .4byte emerl_lengths			// Emerl
+    .4byte blaze_lengths			// Blaze
+    .4byte chaos_lengths			// Chaos
+    .4byte tikal_lengths			// Tikal
 .global lbl_001FD468
 lbl_001FD468:
     # 0x1FD468
@@ -44674,3 +43164,8 @@ lbl_001FF2A8:
     .4byte 0x3DCCCCCD
     .4byte 0x3DCCCCCD
     .4byte 0x003F0000
+
+.global CharacterMotionFrames
+CharacterMotionFrames:
+    .single 0
+    .single 0

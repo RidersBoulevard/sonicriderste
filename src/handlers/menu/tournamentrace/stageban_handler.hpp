@@ -5,25 +5,25 @@
 #include "riders/stage.hpp"
 
 struct BannedStages {
-	bool heroesStage : 1;
-	bool babylonStage : 1;
-	u8 heroesStage_playerIndex : 1; // index of the player that banned the heroes stage (0 or 1)
-	u8 babylonStage_playerIndex : 1;// index of the player that banned the babylon stage (0 or 1)
+	bool heroesStage : 1{};
+	bool babylonStage : 1{};
+	u8 heroesStage_playerIndex : 1{}; // index of the player that banned the heroes stage (0 or 1)
+	u8 babylonStage_playerIndex : 1{};// index of the player that banned the babylon stage (0 or 1)
 	u8 : 4;
 };
 
 struct BSS_StageBan {
-	u8 tournamentRace;// this is 1 if it's tournament race gamemode
-	u8 currentRound;// starts off with 1 for round 1, so it's easier
-	u8 roundState;  // depicts the state the round is in
-	std::array<u8, 2> player_banCount;
-	std::array<u8, 2> player_port; // saves the controller port of player 1 and 2 here
-	u8 player1Score : 4;
-	u8 player2Score : 4;
-	u32 playerControl;                       // which player can currently control menus
-	std::array<BannedStages, TotalHeroStageCount> bannedStages;// array for each Heroes stage
-    bool isTestLap;
-    bool hasTestLapOccurred;
+	u8 tournamentRace{};// this is 1 if it's tournament race gamemode
+	u8 currentRound{};// starts off with 1 for round 1, so it's easier
+	u8 roundState{};  // depicts the state the round is in
+	std::array<u8, 2> player_banCount{};
+	std::array<u8, 2> player_port{}; // saves the controller port of player 1 and 2 here
+	u8 player1Score : 4{};
+	u8 player2Score : 4{};
+	u32 playerControl{};                       // which player can currently control menus
+	std::array<BannedStages, TotalHeroStageCount> bannedStages{};// array for each Heroes stage
+    bool isTestLap{};
+    bool hasTestLapOccurred{};
 };
 
 struct NeutralStages {

@@ -1,12 +1,14 @@
-#include "riders/player.hpp"
 #include "specialflagtweaks.hpp"
-#include "riders/stage.hpp"
 #include <mechanics/archetype/afterburner.hpp>
-#include "mechanics/magneticimpulse.hpp"
-#include "gears/gambler.hpp"
-#include "gears/supertails.hpp"
-#include "gears/supermetal.hpp"
+#include "riders/player.hpp"
+#include "riders/stage.hpp"
+
+// #include "SetPlayerState.hpp"
 #include "gears/faster.hpp"
+#include "gears/gambler.hpp"
+#include "gears/supermetal.hpp"
+#include "gears/supertails.hpp"
+#include "mechanics/magneticimpulse.hpp"
 #include "tweaks/player/archetype/boostarchetypejcbc.hpp"
 
 std::array<SpecialFlagInfo, MaxPlayerCount> PlayerSpecialFlagInfo;
@@ -448,6 +450,14 @@ cmplwi r0, 0
 li r3, 0 // return value in case not attackable
 bne lbl_000985C8 // return if in super form
 	 */
+
+    // Fix to sand ruins/red canyon QTE killing people
+    if ((CurrentStage == SandRuins && (player->currPathFindingPoint >= 46 && player->currPathFindingPoint <= 48))
+        || (CurrentStage == RedCanyon && player->state == PlayerState::QTE)) {
+        player->canBeAttacked = false;
+        return;
+    }
+
     if (player->state == PlayerState::AttackingPlayer) {
         player->canBeAttacked = false;
         return;
@@ -479,7 +489,12 @@ bne lbl_000985C8 // return if in super form
 ASMUsed bool Player_CanAttack(Player *player) {
 	// Passes in the player who is attacking (r26)
 	// Prevent players with this flag from attacking anyone
-	if (DebugMenu_CheckOption(DebugMenuOptions::DisableAttacks) || player->specialFlags.hasAny(SpecialFlags::disableAttacks) || player->state == PlayerState::AttackedByPlayer) {
+    // player->state == PlayerState::QTE
+	if (DebugMenu_CheckOption(DebugMenuOptions::DisableAttacks)
+	    || player->specialFlags.hasAny(SpecialFlags::disableAttacks)
+	    || player->state == PlayerState::AttackedByPlayer
+	    || (CurrentStage == SandRuins && (player->currPathFindingPoint >= 46 && player->currPathFindingPoint <= 48)) // The tiny area near the QTE, near the gate
+	    || (CurrentStage == RedCanyon && player->state == PlayerState::QTE)) {
 		return false;
 	}
 	return true;

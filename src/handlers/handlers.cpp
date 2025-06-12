@@ -118,5 +118,6 @@ ASMUsed void PlayerHandler(Player &player) {
 	Player_BerserkerSpeedCheck(&player);
 	Player_SuperMetalIII(player);
 	Player_Darkness(player);
+    Player_cancelAttackHack(player);
 	// Player_HandleSpeedShoes(player); // tap to speed shoe
 }

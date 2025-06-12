@@ -1,4 +1,8 @@
 #include "berserker.hpp"
+
+#include <handlers/player/SetPlayerState.hpp>
+#include <riders/stage.hpp>
+
 #include "lib/stdlib.hpp"
 
 std::array<u8, MaxPlayerCount> Player_BerserkerStatIncreaseMultipliers;
@@ -87,4 +91,18 @@ void Player_BerserkerSpeedCheck(Player *player) {
 			player->specialFlags |= SpecialFlags::berserkerEffect;
 		}
 
+}
+
+// NOTE: MOVE TO ANOTHER FILE LATER
+void Player_cancelAttackHack(Player &player) {
+    if (player.state != PlayerState::AttackingPlayer) return;
+    // if attacking, end the attack by setting the state to cruise to disconnect when in this area near the QTE
+    switch (CurrentStage) {
+        case SandRuins:
+            if (player.currPathFindingPoint >= 46 && player.currPathFindingPoint <= 48) {
+                func_SetPlayerActionType(player, static_cast<u32>(PlayerState::Cruise));
+            }
+        break;
+        default: break;
+    }
 }

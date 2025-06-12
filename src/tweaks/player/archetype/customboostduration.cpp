@@ -4,6 +4,8 @@
 #include "handlers/player/specialflagtweaks.hpp"
 #include "gears/faster.hpp"
 #include "tweaks/player/archetype/boostarchetypejcbc.hpp"
+#include "gears/blastGaugeGears.hpp"
+#include "gears/supertails.hpp"
 
 constexpr m2darray<u8, std::to_underlying(CharacterArchetype::Count), 3> Archetype_BoostDuration = {{
 		{0x14, 0x14, 0x14},// all rounder
@@ -40,6 +42,7 @@ ASMUsed u32 CustomBoostDuration(Player *player, u32 currentBoostDuration) {
 		// if (exLoads.gearExLoadID == HyperHangOnEXLoad)
 		// {if (hhoInfo->saturnMegadriveStatus != 2) currentBoostDuration /= 2;}
 		const auto &exloadID = player->gearExload().exLoadID;
+	    BlastGaugeInfo &bgInfo = PlayerBlastGaugeInfo[player->index];
 		if(player->character == Character::SuperSonic && player->extremeGear == ExtremeGear::ChaosEmerald
 			&& exloadID != EXLoad::HyperSonic) {
 			currentBoostDuration = 150;
@@ -48,10 +51,14 @@ ASMUsed u32 CustomBoostDuration(Player *player, u32 currentBoostDuration) {
 			currentBoostDuration = 210;
 		} else if(player->isSuperCharacter(Character::Shadow)){
 			currentBoostDuration = 120;
+		    bgInfo.currentGauge = 0; // Reset boost gauge here
 			// if (player->supershadowboostflag) currentBoostDuration = 60;
 		} else if(player->isSuperCharacter(Character::MetalSonic)){
 			currentBoostDuration = 180;
-		}
+		} else if(player->isSuperCharacter(Character::Tails) && player->superFormState >= 1 && player->state == PlayerState::Cruise) {
+	        s32 newGauge = bgInfo.currentGauge - 0x55F0 * static_cast<s32>(1.2); // Super state boost cost
+	        bgInfo.currentGauge = clamp(newGauge);
+	    }
 
 		switch(player->extremeGear) {
 			using namespace ExtremeGear;
@@ -59,6 +66,7 @@ ASMUsed u32 CustomBoostDuration(Player *player, u32 currentBoostDuration) {
 				// KC: Replaced the bool variable with the one in the union used everywhere else. Must've never gotten around to fixing this on my part.
 				if(player->input->toggleFaceButtons.hasAny(Buttons::X) && player->stardustspeederII_1frameboost) {
 					currentBoostDuration = 1;
+				    player->rings -= 25; // Subtract rings here
 				}
 				break;
 			}

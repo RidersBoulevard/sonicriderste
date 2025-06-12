@@ -82,14 +82,15 @@ void Player_SuperTailsTransformation(Player &player){
 			// Cap gauge
 			bgInfo->currentGauge = 200000;
 		}
-		if (player.input->toggleFaceButtons.hasAny(Buttons::B)
-		&& !player.movementFlags.hasAny(MovementFlags::boosting)
-		&& player.unkB90 <= 0 && player.currentAir >= SuperTails_SuperStats.boostCost
-		&& player.unkB08 & 0x2400) {
-			// Take away timer if he boosts
-			s32 newGauge = bgInfo->currentGauge - SuperTails_SuperStats.boostCost * 1.2;
-			bgInfo->currentGauge = clamp(newGauge);
-		}
+	    // See customboostduration
+		// if (player.input->toggleFaceButtons.hasAny(Buttons::B)
+		// && !player.movementFlags.hasAny(MovementFlags::boosting)
+		// && player.unkB90 <= 0 && player.currentAir >= SuperTails_SuperStats.boostCost
+		// && player.unkB08 & 0x2400) {
+		// 	// Take away timer if he boosts
+		// 	s32 newGauge = bgInfo->currentGauge - SuperTails_SuperStats.boostCost * 1.2;
+		// 	bgInfo->currentGauge = clamp(newGauge);
+		// }
 	}
 
 	if (player.superFormState == 0 && player.state == PlayerState::Cruise) {

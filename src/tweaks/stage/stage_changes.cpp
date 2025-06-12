@@ -118,7 +118,7 @@ ASMUsed void func_StageChanges(ObjectNode *currentObject) {
 	const auto &object_id = currentObject->object_id;
 	switch(CurrentStage) {
 		case GreenCave: {
-			if((object_id == 0xF4 || object_id == 0xF5) && object_type == ObjectTypes::WhiteCaveWeb) {
+			if((object_id == 0xF4) && object_type == ObjectTypes::WhiteCaveWeb) {
 				if(currentObject->state != 1) {
 					currentObject->state = 1;
 				}

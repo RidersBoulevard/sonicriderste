@@ -4,6 +4,7 @@
 #include "handlers/player/initgeardata.hpp"
 #include "lib/sound.hpp"
 #include "mechanics/magneticimpulse.hpp"
+#include "compare_many.hpp"
 
 namespace ZIgnore {
 	constexpr s32 AcceleratorRingCost = 12;
@@ -34,6 +35,11 @@ ASMUsed bool Player_ZIgnoreTornado(Player &player) {
 	// f32 maxWeight = 2.05f; // eggman heavy bike
 	f32 weightDiff;
 	f32 airMultiplier;
+
+    // IF IN A QTE, ALWAYS IGNORE TORNADOS. If this does not happen, some QTEs will break if the player encounters a tornado in the middle of one.
+    if(if_any(player.state, std::is_eq, PlayerState::QTE, PlayerState::QTE2)) {
+        return isTornadoIgnored = true;
+    }
 
 	if(!DebugMenu_CheckOption(DebugMenuOptions::TornadoIgnore)) {
 		return isTornadoIgnored;

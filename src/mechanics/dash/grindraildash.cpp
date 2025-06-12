@@ -79,6 +79,7 @@ void Player_GrindRailDashHandler(Player &player) {
 				Player_InitBoostParticles(player);
 				if(player.specialFlags.hasAny(SpecialFlags::ringGear)) {
 					if(player.character == Character::SuperSonic
+					   && player.extremeGear == ExtremeGear::ChaosEmerald
 					   && currentGauge > 0
 					   && player.gearExload().exLoadID != EXLoad::HyperSonic
 					   ){
@@ -99,6 +100,7 @@ void Player_GrindRailDashHandler(Player &player) {
 					player.speed += pSpeed(2);
 					f32 newMI;
 					if(player.character == Character::SuperSonic
+					   && player.extremeGear == ExtremeGear::ChaosEmerald
 					   && currentGauge > 0
 					   && player.gearExload().exLoadID != EXLoad::HyperSonic
 					   ){

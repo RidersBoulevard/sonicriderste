@@ -39,7 +39,8 @@ void Player_SSIIRingBoost(Player &player) {
 	   ) {
 		//if (player.rings < 25) { return; } // Redundant check, above if already checks ring count
 
-		player.rings -= 25;
+	    // See customboostduration
+		// player.rings -= 25;
 		player.gearStats[player.level].boostCost = 0;
 		player.gearStats[player.level].boostSpeed = pSpeed(310);
 		if(player.characterArchetype == CharacterArchetype::Boost) { player.gearStats[player.level].boostSpeed = pSpeed(310) + BoostArchetypeBoostSpeeds[player.level]; }

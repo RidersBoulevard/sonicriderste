@@ -302,6 +302,7 @@ ASMUsed f32 Player_MISpeedAirGain(Player &player, f32 airGain){
 		if (player.specialFlags.hasAny(SpecialFlags::ringGear)) {
 			auto &[currentGauge] = PlayerBlastGaugeInfo[player.index];
 			if (player.character == Character::SuperSonic
+			    && player.extremeGear == ExtremeGear::ChaosEmerald
 				&& currentGauge > 0
 				&& player.gearExload().exLoadID != EXLoad::HyperSonic
 				) {
@@ -354,6 +355,7 @@ ASMUsed f32 Player_MIFlyAirGain(Player &player, f32 airGain){
 		// This first if-statement is for ring gears
 		if (player.specialFlags.hasAny(SpecialFlags::ringGear)) {
 			if (player.character == Character::SuperSonic
+			    && player.extremeGear == ExtremeGear::ChaosEmerald
 				&& bgInfo->currentGauge > 0
 				&& player.gearExload().exLoadID != EXLoad::HyperSonic
 				) {
@@ -396,6 +398,7 @@ ASMUsed f32 Player_MIFlyAirGain(Player &player, f32 airGain){
 	if (player.flyHoopDash == 1) {
 		if (player.specialFlags.hasAny(SpecialFlags::ringGear)) {
 			if (player.character == Character::SuperSonic
+			    && player.extremeGear == ExtremeGear::ChaosEmerald
 				&& bgInfo->currentGauge > 0
 				&& player.gearExload().exLoadID != EXLoad::HyperSonic
 				) {

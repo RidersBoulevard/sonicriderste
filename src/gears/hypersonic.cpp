@@ -275,7 +275,7 @@ void Player_SuperShadow(Player &player) {
 	s32 jumpChargeBonus = (player.input->holdFaceButtons.hasAny(Buttons::A) && player.jumpCharge > 0) ? 277.77 : 0;
 	if(player.state == PlayerState::Cruise && !player.movementFlags.hasAny(MovementFlags::boosting))
 	{
-		bgInfo.currentGauge += (555.5 + driftMeterBonus + jumpChargeBonus);
+		bgInfo.currentGauge += (static_cast<s32>(555.5) + driftMeterBonus + jumpChargeBonus);
 	}
 
 	// meter cap
@@ -303,14 +303,15 @@ void Player_SuperShadow(Player &player) {
 
 
 	// Boost removes all meter
-	if(player.input->toggleFaceButtons.hasAny(Buttons::B, Buttons::X)
-		&& !player.movementFlags.hasAny(MovementFlags::boosting) && player.state == PlayerState::Cruise
-		&& player.currentAir >= player.gearStats[player.level].boostCost
-		&& player.unkB90 <= 0
-		&& player.unkB08 & 0x2400)
-	{
-		bgInfo.currentGauge = 0;
-	}
+    // See customboostduration
+	// if(player.input->toggleFaceButtons.hasAny(Buttons::B, Buttons::X)
+	// 	&& !player.movementFlags.hasAny(MovementFlags::boosting) && player.state == PlayerState::Cruise
+	// 	&& player.currentAir >= player.gearStats[player.level].boostCost
+	// 	&& player.unkB90 <= 0
+	// 	&& player.unkB08 & 0x2400)
+	// {
+	// 	bgInfo.currentGauge = 0;
+	// }
 
 	//
 

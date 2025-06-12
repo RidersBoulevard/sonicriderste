@@ -413,6 +413,7 @@ ASMUsed void CustomFlyHoopSpeeds(Player &player, ObjectNode &object, const f32 c
 		f32 newMI;
 		const auto &[currentGauge] = PlayerBlastGaugeInfo[player.index];
 		if(player.character == Character::SuperSonic
+		    && player.extremeGear == ExtremeGear::ChaosEmerald
 			&& currentGauge > 0
 			&& player.gearExload().exLoadID != EXLoad::HyperSonic
 			)
